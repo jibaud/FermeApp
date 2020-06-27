@@ -1,61 +1,64 @@
 <?php
-
+ 
 session_start();
 include 'includes/database.php';
-
-if (isset($_POST["submit"])){
-  
-  $pseudo = htmlspecialchars($_POST['pseudo']);
-  $email = htmlspecialchars($_POST['email']);
-  $password = sha1($_POST['password']);
-  $password_confirm = sha1($_POST['password_confirm']);
-  date_default_timezone_set('Europe/Paris');
-  $date = date('d/m/Y à H:i:s');
-
-  if((!empty($pseudo)) && (!empty($email)) && (!empty($password))) {
-    if (strlen($pseudo) <= 16) {
-      if (filter_var($email, FILTER_VALIDATE_ELMAIL)) {
-        if ($password == $password_confirm) {
-
-          $databade = getPDO();
-          $rowEmail = 
-
-        } else {
-          $errorMessage = "Les mots de passe ne correspondent pas...";
-        }
-      } else {
-        $errorMessage = "Votre email n'est pas valide";
-      }
-    } else {
-      $errorMessage = "Le pseudo est trop long...";
-    }
-  } else {
-    $errorMessage = "Veuillez remplir tout les champs...";
-  }
+ 
+if (isset($_SESSION['userEmail'])) {
+    header('Location:index.php');
 }
+ 
+if (isset($_POST['submit'])){
+   
+    $pseudo = htmlspecialchars($_POST['pseudo']);
+    $email = htmlspecialchars($_POST['email']);
+    if (!empty($_POST['password'])){
+      $password = sha1($_POST['password']);
+    }
+    if (!empty($_POST['password_confirm'])){
+      $password_confirm = sha1($_POST['password']);
+    }
+    date_default_timezone_set('Europe/Paris');
+    $date = date('d/m/Y à H:i:s');
+ 
+    if ((!empty($pseudo)) && (!empty($email)) && (!empty($password_confirm)) && (!empty($password))) {
+        if (strlen($pseudo) <= 16) {
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                if ($password == $password_confirm) {
+ 
+                    $database = getPDO();
+                    $rowEmail = countDatabaseValue($database, 'user_email', $email);
+                    if ($rowEmail == 0) {
+                      $insertMember = $database->prepare("INSERT INTO users(user_pseudo, user_email, user_password, isadmin, registerdate) VALUES(?, ?, ?, ?, ?)");
+                      $insertMember->execute([
+                          $pseudo,
+                          $email,
+                          $password,
+                          0,
+                          $date
+                      ]);
+                      $successMessage = "Votre compte à bien été créé !";
+                      header('refresh:3;url=login.php');
+                    } else {
+                        $errorMessage = 'Cette email est déjà utilisée..';
+                    }
+                } else {
+                    $errorMessage = 'Les mots de passes ne correspondent pas...';
+                }
+            } else {
+                $errorMessage = "Votre email n'est pas valide...";
+            }
+        } else {
+            $errorMessage = 'Le pseudo est trop long...';
+        }
+    } else {
+        $errorMessage = 'Veuillez remplir tous les champs...';
+    }
+}
+
+$pageTitle = 'Register';
+include 'header.php';
+ 
 ?>
-
-<!DOCTYPE html>
-<html lang="fr">
-
-<head>
-
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="">
-  <meta name="author" content="">
-
-  <title>SB Admin 2 - Register</title>
-
-  <!-- Custom fonts for this template-->
-  <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-  <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
-
-  <!-- Custom styles for this template-->
-  <link href="css/sb-admin-2.min.css" rel="stylesheet">
-
-</head>
 
 <body class="bg-gradient-primary">
 
@@ -84,14 +87,14 @@ if (isset($_POST["submit"])){
               <form class="user" method="post" action="">
                 <div class="form-group row">
                   <div class="col-sm-6 mb-3 mb-sm-0">
-                    <input type="text" class="form-control form-control-user" id="exampleFirstName" name="pseudo" placeholder="First Name">
+                    <input type="text" class="form-control form-control-user" id="exampleFirstName" name="pseudo" placeholder="First Name" <?php if (isset($pseudo)) { ?>value="<?= $pseudo ?>" <?php } ?>>
                   </div>
                   <div class="col-sm-6">
                     <input type="text" class="form-control form-control-user" id="exampleLastName" placeholder="Last Name">
                   </div>
                 </div>
                 <div class="form-group">
-                  <input type="email" class="form-control form-control-user" id="exampleInputEmail" name="email" placeholder="Email Address">
+                  <input type="email" class="form-control form-control-user" id="exampleInputEmail" name="email" placeholder="Email Address" <?php if (isset($email)) { ?>value="<?= $email ?>" <?php } ?>>
                 </div>
                 <div class="form-group row">
                   <div class="col-sm-6 mb-3 mb-sm-0">
@@ -102,23 +105,13 @@ if (isset($_POST["submit"])){
                   </div>
                 </div>
                 <input type="submit" name="submit" value="Register Account" class="btn btn-primary btn-user btn-block">
-                <!--<a href="login.html" class="btn btn-primary btn-user btn-block">
-                  Register Account
-                </a>-->
-                <hr>
-                <a href="index.html" class="btn btn-google btn-user btn-block">
-                  <i class="fab fa-google fa-fw"></i> Register with Google
-                </a>
-                <a href="index.html" class="btn btn-facebook btn-user btn-block">
-                  <i class="fab fa-facebook-f fa-fw"></i> Register with Facebook
-                </a>
               </form>
               <hr>
               <div class="text-center">
-                <a class="small" href="forgot-password.html">Forgot Password?</a>
+                <a class="small" href="forgot-password.php">Forgot Password?</a>
               </div>
               <div class="text-center">
-                <a class="small" href="login.html">Already have an account? Login!</a>
+                <a class="small" href="login.php">Already have an account? Login!</a>
               </div>
             </div>
           </div>
