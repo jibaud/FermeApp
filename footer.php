@@ -5,7 +5,7 @@
 <footer class="sticky-footer bg-white">
         <div class="container my-auto">
           <div class="copyright text-center my-auto">
-            <span>Copyright &copy; Your Website 2020</span>
+            <span>Copyright &copy; Jean-Baptiste BAUD 2020</span>
           </div>
         </div>
       </footer>
@@ -51,12 +51,19 @@
   <!-- Custom scripts for all pages-->
   <script src="js/sb-admin-2.min.js"></script>
 
-  <!-- Page level plugins -->
   <script src="vendor/chart.js/Chart.min.js"></script>
 
-  <!-- Page level custom scripts -->
   <script src="js/demo/chart-area-demo.js"></script>
   <script src="js/demo/chart-pie-demo.js"></script>
+
+  <script src="vendor/datatables/jquery.dataTables.min.js"></script>
+  <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+  <script src="vendor/datatables/fixedHeader.bootstrap4.min.js"></script>
+
+  <script src="vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+  <script src="vendor/bootstrap-datepicker/js/bootstrap-datepicker.fr.min.js"></script>
+  <script src="js/bootstrap-datepicker/bootstrap-datepicker.js"></script>
+  <script src="js/scripts.js"></script>
 
 </body>
 

@@ -1,3 +1,9 @@
+<!-- Content Wrapper -->
+<div id="content-wrapper" class="d-flex flex-column">
+
+<!-- Main Content -->
+<div id="content">
+    
 <!-- Topbar -->
 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
@@ -38,6 +44,63 @@
           </div>
         </div>
       </form>
+    </div>
+  </li>
+
+  <?php
+
+// On récupère tout le contenu de la table jeux_video
+$owner_id = $_SESSION['userID'];
+$database = getPDO();
+$reponseCowPregnant = $database->prepare("SELECT * FROM cows WHERE owner_id = ? AND ispregnant = 1");
+$reponseCowPregnant->execute([$owner_id]);
+$pregnantNumber = $reponseCowPregnant->rowCount();
+
+?>
+
+  <!-- Nav Item - Pregnancy -->
+  <li class="nav-item dropdown no-arrow mx-1">
+    <a class="nav-link dropdown-toggle" href="#" id="pregnancyAlert" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <i class="fad fa-cow"></i>
+      <!-- Counter - Pregnancy -->
+      <span class="badge badge-danger badge-counter">3+</span>
+    </a>
+    <!-- Dropdown - Pregnancy -->
+    <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">
+      <h6 class="dropdown-header">
+        <?= $pregnantNumber.' '?> Grossesses en cours
+      </h6>
+<?php
+while ($donnees = $reponseCowPregnant->fetch())
+{
+  $pregnantdays = daysSince($donnees['pregnant_since']);
+  $pregnantpercent = ($pregnantdays / 280 * 100);
+  if ($pregnantdays > 240) {
+    $color = "bg-danger";
+  } else {
+    $color = "bg-success";
+  }
+
+?>
+      <a class="dropdown-item d-flex align-items-center" href="#">
+        <div class="mr-3">
+          <div class="icon-circle bg-primary">
+            <i class="fad fa-cow text-white"></i>
+          </div>
+        </div>
+        <div class="w-100">
+          <div class="text-gray-900"><?= $donnees['id'].' - '.$donnees['name'];?></div>
+          <div class="progress">
+            <div class="progress-bar <?= $color ?>" role="progressbar" style="width:<?= $pregnantpercent ?>%;" aria-valuenow="<?= $pregnantpercent ?>" aria-valuemin="0" aria-valuemax="100"><?= $pregnantdays.'/280' ?></div>
+          </div>
+        </div>
+      </a>
+<?php
+}
+$reponseCowPregnant->closeCursor();
+?>
+      
+      <a class="dropdown-item text-center small text-gray-500" href="cows-manager.php?filter=">Show All Alerts</a>
     </div>
   </li>
 
@@ -156,11 +219,11 @@
     </a>
     <!-- Dropdown - User Information -->
     <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-      <a class="dropdown-item" href="#">
+      <a class="dropdown-item" href="profile.php">
         <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-        Profile
+        Profil
       </a>
-      <a class="dropdown-item" href="#">
+      <a class="dropdown-item" href="settings.php">
         <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
         Settings
       </a>
@@ -171,7 +234,7 @@
       <div class="dropdown-divider"></div>
       <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
         <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-        Logout
+        Se déconnecter
       </a>
     </div>
   </li>

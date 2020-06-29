@@ -26,7 +26,7 @@ if (isset($_POST['submit'])){
                 if ($password == $password_confirm) {
  
                     $database = getPDO();
-                    $rowEmail = countDatabaseValue($database, 'user_email', $email);
+                    $rowEmail = countDatabaseValue($database, 'users', 'user_email', $email);
                     if ($rowEmail == 0) {
                       $insertMember = $database->prepare("INSERT INTO users(user_pseudo, user_email, user_password, isadmin, registerdate) VALUES(?, ?, ?, ?, ?)");
                       $insertMember->execute([
@@ -55,7 +55,7 @@ if (isset($_POST['submit'])){
     }
 }
 
-$pageTitle = 'Register';
+$pageTitle = 'Inscription';
 include 'header.php';
  
 ?>
@@ -95,6 +95,7 @@ include 'header.php';
                 </div>
                 <div class="form-group">
                   <input type="email" class="form-control form-control-user" id="exampleInputEmail" name="email" placeholder="Email Address" <?php if (isset($email)) { ?>value="<?= $email ?>" <?php } ?>>
+                  <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
                 </div>
                 <div class="form-group row">
                   <div class="col-sm-6 mb-3 mb-sm-0">

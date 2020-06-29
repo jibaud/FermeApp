@@ -5,7 +5,7 @@
      */
     function getPDO() {
         try {
-            $pdo = new PDO('mysql:dbname=clients;host=localhost', 'root', 'root');
+            $pdo = new PDO('mysql:dbname=fermeapp;host=localhost', 'root', 'root');
             $pdo->exec("SET CHARACTER SET utf8");
             return $pdo;
         } catch (PDOException $e) {
@@ -13,8 +13,8 @@
         }
     }
 
-    function countDatabaseValue($connexionBDD, $key, $value) {
-        $request = "SELECT * FROM users WHERE $key = ?";
+    function countDatabaseValue($connexionBDD, $tableName, $key, $value) {
+        $request = "SELECT * FROM $tableName WHERE $key = ?";
         $rowCount = $connexionBDD->prepare($request);
         $rowCount->execute(array($value));
         return $rowCount->rowCount();

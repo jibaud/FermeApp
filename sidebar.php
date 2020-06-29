@@ -4,9 +4,9 @@
 <!-- Sidebar - Brand -->
 <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.php">
   <div class="sidebar-brand-icon rotate-n-15">
-    <i class="fas fa-laugh-wink"></i>
+    <i class="fas fa-tractor"></i>
   </div>
-  <div class="sidebar-brand-text mx-3">SB Admin <sup>3</sup></div>
+  <div class="sidebar-brand-text mx-3">FermeApp <sup>0.1</sup></div>
 </a>
 
 <!-- Divider -->
@@ -83,6 +83,7 @@
       <h6 class="collapse-header">Other Pages:</h6>
       <a class="collapse-item" href="404.php">404 Page</a>
       <a class="collapse-item" href="blank.php">Blank Page</a>
+      <a class="collapse-item" href="cows-manager.php">Gérer mes vaches</a>
     </div>
   </div>
 </li>
@@ -99,6 +100,13 @@
   <a class="nav-link" href="tables.php">
     <i class="fas fa-fw fa-table"></i>
     <span>Tables</span></a>
+</li>
+
+<!-- Nav Item - Cow Manager -->
+<li class="nav-item">
+  <a class="nav-link" href="cows-manager.php">
+    <i class="fad fa-cow"></i>
+    <span>Mon Étable</span></a>
 </li>
 
 <!-- Divider -->
