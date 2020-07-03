@@ -49,10 +49,10 @@
 
   <?php
 
-// On récupère tout le contenu de la table jeux_video
+// On récupère tout le contenu de la table cows
 $owner_id = $_SESSION['userID'];
 $database = getPDO();
-$reponseCowPregnant = $database->prepare("SELECT * FROM cows WHERE owner_id = ? AND ispregnant = 1");
+$reponseCowPregnant = $database->prepare("SELECT * FROM cows WHERE owner_id = ? AND isarchived = 0 AND ispregnant = 1 ORDER BY `cows`.`pregnant_since` DESC");
 $reponseCowPregnant->execute([$owner_id]);
 $pregnantNumber = $reponseCowPregnant->rowCount();
 
@@ -63,7 +63,7 @@ $pregnantNumber = $reponseCowPregnant->rowCount();
     <a class="nav-link dropdown-toggle" href="#" id="pregnancyAlert" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       <i class="fad fa-cow"></i>
       <!-- Counter - Pregnancy -->
-      <span class="badge badge-danger badge-counter">3+</span>
+      <span class="badge badge-danger badge-counter"><?= $pregnantNumber.' '?></span>
     </a>
     <!-- Dropdown - Pregnancy -->
     <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">
@@ -75,7 +75,9 @@ while ($donnees = $reponseCowPregnant->fetch())
 {
   $pregnantdays = daysSince($donnees['pregnant_since']);
   $pregnantpercent = ($pregnantdays / 280 * 100);
-  if ($pregnantdays > 240) {
+  if ($pregnantdays >= 240) {
+    $color = "bg-warning";
+  } else if ($pregnantdays >= 280) {
     $color = "bg-danger";
   } else {
     $color = "bg-success";
@@ -89,7 +91,7 @@ while ($donnees = $reponseCowPregnant->fetch())
           </div>
         </div>
         <div class="w-100">
-          <div class="text-gray-900"><?= $donnees['id'].' - '.$donnees['name'];?></div>
+          <div class="text-gray-900 uppercase"><?= $donnees['name'].' - '.$donnees['id'];?></div>
           <div class="progress">
             <div class="progress-bar <?= $color ?>" role="progressbar" style="width:<?= $pregnantpercent ?>%;" aria-valuenow="<?= $pregnantpercent ?>" aria-valuemin="0" aria-valuemax="100"><?= $pregnantdays.'/280' ?></div>
           </div>

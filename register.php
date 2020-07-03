@@ -9,28 +9,31 @@ if (isset($_SESSION['userEmail'])) {
  
 if (isset($_POST['submit'])){
    
-    $pseudo = htmlspecialchars($_POST['pseudo']);
+    $firstname = htmlspecialchars($_POST['firstname']);
+    $lastname = htmlspecialchars($_POST['lastname']);
     $email = htmlspecialchars($_POST['email']);
+    $email_confirm = htmlspecialchars($_POST['email_confirm']);
     if (!empty($_POST['password'])){
       $password = sha1($_POST['password']);
     }
     if (!empty($_POST['password_confirm'])){
-      $password_confirm = sha1($_POST['password']);
+      $password_confirm = sha1($_POST['password_confirm']);
     }
     date_default_timezone_set('Europe/Paris');
     $date = date('d/m/Y à H:i:s');
  
-    if ((!empty($pseudo)) && (!empty($email)) && (!empty($password_confirm)) && (!empty($password))) {
-        if (strlen($pseudo) <= 16) {
-            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    if ((!empty($firstname)) && (!empty($lastname)) && (!empty($email)) && (!empty($email_confirm)) && (!empty($password)) && (!empty($password_confirm))) {
+        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            if ($email == $email_confirm) {
                 if ($password == $password_confirm) {
  
                     $database = getPDO();
-                    $rowEmail = countDatabaseValue($database, 'users', 'user_email', $email);
+                    $rowEmail = countDatabaseValue($database, 'users', 'user_email', 'user_email', $email, $email_confirm);
                     if ($rowEmail == 0) {
-                      $insertMember = $database->prepare("INSERT INTO users(user_pseudo, user_email, user_password, isadmin, registerdate) VALUES(?, ?, ?, ?, ?)");
+                      $insertMember = $database->prepare("INSERT INTO users(user_firstname, user_lastname, user_email, user_password, isadmin, registerdate) VALUES(?, ?, ?, ?, ?, ?)");
                       $insertMember->execute([
-                          $pseudo,
+                          $firstname,
+                          $lastname,
                           $email,
                           $password,
                           0,
@@ -39,19 +42,19 @@ if (isset($_POST['submit'])){
                       $successMessage = "Votre compte à bien été créé !";
                       header('refresh:3;url=login.php');
                     } else {
-                        $errorMessage = 'Cette email est déjà utilisée..';
+                        $errorMessage = 'Cette adresse email est déjà utilisée.';
                     }
                 } else {
-                    $errorMessage = 'Les mots de passes ne correspondent pas...';
+                    $errorMessage = 'Les mots de passes ne correspondent pas.';
                 }
             } else {
-                $errorMessage = "Votre email n'est pas valide...";
+                $errorMessage = "Les adresses email ne correspondent pas.";
             }
         } else {
-            $errorMessage = 'Le pseudo est trop long...';
+            $errorMessage = "L'adresse email n'est pas valide.";
         }
     } else {
-        $errorMessage = 'Veuillez remplir tous les champs...';
+        $errorMessage = 'Veuillez remplir tous les champs.';
     }
 }
 
@@ -72,7 +75,7 @@ include 'header.php';
           <div class="col-lg-7">
             <div class="p-5">
               <div class="text-center">
-                <h1 class="h4 text-gray-900 mb-4">Create an Account!</h1>
+                <h1 class="h4 text-gray-900 mb-4"><?= $pageTitle ?></h1>
               </div>
 <?php if (isset($errorMessage)) {?>
               <div class="alert alert-danger" role="alert">
@@ -87,32 +90,34 @@ include 'header.php';
               <form class="user" method="post" action="">
                 <div class="form-group row">
                   <div class="col-sm-6 mb-3 mb-sm-0">
-                    <input type="text" class="form-control form-control-user" id="exampleFirstName" name="pseudo" placeholder="First Name" <?php if (isset($pseudo)) { ?>value="<?= $pseudo ?>" <?php } ?>>
+                    <input type="text" class="form-control form-control-user" id="firstname" name="firstname" placeholder="Prénom" <?php if (isset($firstname)) { ?>value="<?= $firstname ?>" <?php } ?>>
                   </div>
                   <div class="col-sm-6">
-                    <input type="text" class="form-control form-control-user" id="exampleLastName" placeholder="Last Name">
+                    <input type="text" class="form-control form-control-user" id="lastname" name="lastname" placeholder="Nom" <?php if (isset($lastname)) { ?>value="<?= $lastname ?>" <?php } ?>>
                   </div>
                 </div>
                 <div class="form-group">
-                  <input type="email" class="form-control form-control-user" id="exampleInputEmail" name="email" placeholder="Email Address" <?php if (isset($email)) { ?>value="<?= $email ?>" <?php } ?>>
-                  <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                  <input type="email" class="form-control form-control-user" id="email" name="email" placeholder="Adresse email" <?php if (isset($email)) { ?>value="<?= $email ?>" <?php } ?>>
+                </div>
+                <div class="form-group">
+                  <input type="email" class="form-control form-control-user" id="email_confirm" name="email_confirm" placeholder="Confirmez l'adresse email">
                 </div>
                 <div class="form-group row">
                   <div class="col-sm-6 mb-3 mb-sm-0">
-                    <input type="password" class="form-control form-control-user" id="exampleInputPassword" name="password" placeholder="Password">
+                    <input type="password" class="form-control form-control-user" id="password" name="password" placeholder="Mot de passe">
                   </div>
                   <div class="col-sm-6">
-                    <input type="password" class="form-control form-control-user" id="exampleRepeatPassword" name="password_confirm" placeholder="Repeat Password">
+                    <input type="password" class="form-control form-control-user" id="password_confirm" name="password_confirm" placeholder="Confirmez le mot de passe">
                   </div>
                 </div>
-                <input type="submit" name="submit" value="Register Account" class="btn btn-primary btn-user btn-block">
+                <input type="submit" name="submit" value="Inscription" class="btn btn-primary btn-user btn-block">
               </form>
               <hr>
               <div class="text-center">
-                <a class="small" href="forgot-password.php">Forgot Password?</a>
+                <a class="small" href="forgot-password.php">Mot de passe oublié ?</a>
               </div>
               <div class="text-center">
-                <a class="small" href="login.php">Already have an account? Login!</a>
+                <a class="small" href="login.php">Vous avez déjà un compte ? Connectez vous.</a>
               </div>
             </div>
           </div>
@@ -122,16 +127,5 @@ include 'header.php';
 
   </div>
 
-  <!-- Bootstrap core JavaScript-->
-  <script src="vendor/jquery/jquery.min.js"></script>
-  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <?php include 'footer.php'; ?>
 
-  <!-- Core plugin JavaScript-->
-  <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
-  <!-- Custom scripts for all pages-->
-  <script src="js/sb-admin-2.min.js"></script>
-
-</body>
-
-</html>

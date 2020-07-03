@@ -32,16 +32,24 @@ function calculeAge($date, $option) {
   $diff = $dateTime1->diff($dateTime2);
   
   if ($option == 'full') {
-    return $diff->y.' Années, '.$diff->m.' Mois, '.$diff->d.' Jours';
+    return $diff->y.' an(s), '.$diff->m.' mois, '.$diff->d.' jour(s)';
   } else if ($option == 'short') {
     if ($diff->y < 1) {
       if ($diff->m < 1) {
-        return $diff->d.' Jours';
+        if ($diff->d > 1) {
+          return $diff->d.' jours';
+        } else {
+          return $diff->d.' jour';
+        }
       } else {
-      return $diff->m.' Mois';
+      return $diff->m.' mois';
       }
     } else {
-      return $diff->y.' Ans';
+      if ($diff->y > 1) {
+        return $diff->y.' ans';
+      } else {
+        return $diff->y.' an';
+      }
     }
   } else {
       return 'Option \"full\" ou \"short\" manquante.';

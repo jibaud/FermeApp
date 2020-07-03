@@ -40,7 +40,7 @@
      }
  }
 
-$pageTitle = 'Login';
+$pageTitle = 'Connexion';
 include 'header.php';
 
 ?>
@@ -62,7 +62,7 @@ include 'header.php';
               <div class="col-lg-6">
                 <div class="p-5">
                   <div class="text-center">
-                    <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
+                    <h1 class="h4 text-gray-900 mb-4"><?= $pageTitle ?></h1>
                   </div>
 <?php if (isset($errorMessage)) {?>
               <div class="alert alert-danger" role="alert">
@@ -76,25 +76,25 @@ include 'header.php';
 <?php } ?>
                   <form class="user" method="post" action="">
                     <div class="form-group">
-                      <input type="email" class="form-control form-control-user" id="exampleInputEmail" name="email" aria-describedby="emailHelp" placeholder="Enter Email Address..." <?php if (isset($email)) { ?>value="<?= $email ?>" <?php } ?>>
+                      <input type="email" class="form-control form-control-user" id="email" name="email" aria-describedby="emailHelp" placeholder="Adresse email" <?php if (isset($email)) { ?>value="<?= $email ?>" <?php } ?>>
                     </div>
                     <div class="form-group">
-                      <input type="password" class="form-control form-control-user" id="exampleInputPassword" name="password" placeholder="Password">
+                      <input type="password" class="form-control form-control-user" id="password" name="password" placeholder="Mot de passe">
                     </div>
                     <div class="form-group">
                       <div class="custom-control custom-checkbox small">
                         <input type="checkbox" class="custom-control-input" id="customCheck">
-                        <label class="custom-control-label" for="customCheck">Remember Me</label>
+                        <label class="custom-control-label" for="customCheck">Rester connecté sur cet ordinateur</label>
                       </div>
                     </div>
                     <input type="submit" name="submit" value="Login" class="btn btn-primary btn-user btn-block">
                   </form>
                   <hr>
                   <div class="text-center">
-                    <a class="small" href="forgot-password.php">Forgot Password?</a>
+                    <a class="small" href="forgot-password.php">Mot de passe oublié ?</a>
                   </div>
                   <div class="text-center">
-                    <a class="small" href="register.php">Create an Account!</a>
+                    <a class="small" href="register.php">Pas encore de compte ? Inscrivez-vous.</a>
                   </div>
                 </div>
               </div>
@@ -108,16 +108,5 @@ include 'header.php';
 
   </div>
 
-  <!-- Bootstrap core JavaScript-->
-  <script src="vendor/jquery/jquery.min.js"></script>
-  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-  <!-- Core plugin JavaScript-->
-  <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
-  <!-- Custom scripts for all pages-->
-  <script src="js/sb-admin-2.min.js"></script>
-
-</body>
-
-</html>
+  <?php include 'footer.php'; ?>
+  

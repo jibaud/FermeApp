@@ -4,21 +4,18 @@ session_start();
 include 'includes/database.php';
 include 'includes/forbidden.php';
 
-include 'includes/add-cow-engine.php';
+$pageTitle = 'Étable';
+include 'header.php';
 
 if (isset($_POST['delete'])){
   $deleteidnumber = htmlspecialchars($_POST['selectedId']);
-
+  $owner_id = $_SESSION['userID'];
   $database = getPDO();
-  $deleteCow = $database->prepare("UPDATE cows SET isarchived = 1 WHERE id = ?");
-  $deleteCow->execute([$deleteidnumber]);
+  $deleteCow = $database->prepare("UPDATE cows SET isarchived = 1 WHERE id = $deleteidnumber AND owner_id = $owner_id");
+  $deleteCow->execute();
   
-  $successMessage = "Elément supprimé.";
   header();
 }
-
-$pageTitle = 'Mon Étable';
-include 'header.php';
 
 ?>
 
@@ -33,6 +30,7 @@ include 'header.php';
 
         <!-- Begin Page Content -->
         <div class="container-fluid">
+        
 
           <!-- Page Heading -->
           <div class="d-sm-flex align-items-center justify-content-between mb-4">
@@ -54,7 +52,7 @@ include 'header.php';
                       <th>Nom</th>
                       <th>Genre</th>
                       <th>Type</th>
-                      <th>DDN</th>
+                      <th>Né(e) le</th>
                       <th>Age</th>
                       <th>Enceinte</th>
                       <th>Actions</th>
@@ -66,7 +64,7 @@ include 'header.php';
                       <th>Nom</th>
                       <th>Genre</th>
                       <th>Type</th>
-                      <th>DDN</th>
+                      <th>Né(e) le</th>
                       <th>Age</th>
                       <th>Enceinte</th>
                       <th>Actions</th>
@@ -76,11 +74,10 @@ include 'header.php';
 
 <?php
 
-// On récupère tout le contenu de la table jeux_video
 $owner_id = $_SESSION['userID'];
 $database = getPDO();
-$reponseCowList = $database->prepare("SELECT * FROM cows WHERE owner_id = ? AND isarchived = 0");
-$reponseCowList->execute([$owner_id]);
+$reponseCowList = $database->prepare("SELECT * FROM cows WHERE owner_id = $owner_id AND isarchived = 0");
+$reponseCowList->execute();
 
 // On affiche chaque entrée une à une
 while ($donnees = $reponseCowList->fetch())
@@ -88,33 +85,39 @@ while ($donnees = $reponseCowList->fetch())
 ?>
                     <tr>
                       <td><?= $donnees['id'];?></td>
-                      <td><?= $donnees['name'];?></td>
-                      <td><?= $donnees['gender'];?></td>
-                      <td><?= $donnees['type'];?></td>
+                      <td style="text-transform:capitalize;"><?= $donnees['name'];?></td>
+                      <td style="text-transform:capitalize;"><?= $donnees['gender'];?></td>
+                      <td style="text-transform:capitalize;"><?= $donnees['type'];?></td>
                       <td><?= $donnees['birth_date'];?></td>
                       <td><?= calculeAge($donnees['birth_date'], 'short')?></td>
                       
                       <?php 
                       if($donnees['ispregnant']){
                           $pregnantdays = daysSince($donnees['pregnant_since']);
-                          echo '<td class="text-success">Oui ('.$pregnantdays.'/280j)</td>';
+                          if ($pregnantdays >= 240) {
+                            echo '<td class="text-warning">Oui ('.$pregnantdays.'/280j)</td>';
+                          } else if ($pregnantdays >= 280) {
+                            echo '<td class="text-danger">Oui ('.$pregnantdays.'/280j)</td>';
+                          } else {
+                            echo '<td class="text-success">Oui ('.$pregnantdays.'/280j)</td>';
+                          }
                       } else {
-                        if($donnees['type'] != 'vache') {
+                        if($donnees['type'] != 'vache' & $donnees['genre'] != 'femelle') {
                           echo '<td></td>';
                         } else {
-                          echo '<td class="text-warning">Non</td>';
+                          echo '<td>Non</td>';
                         }
                       }
                       ?>
 
                       <td>
-                        <button type="button" class="btn btn-primary">
+                        <button type="button" class="btn btn-primary btn-sm" id="<?= $donnees['id'];?>" data-toggle="modal" data-target="#viewCowModal">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button type="button" class="btn btn-success">
+                        <button type="button" class="btn btn-success btn-sm">
                             <i class="fas fa-pencil-alt"></i>
                         </button>
-                        <button type="button" class="btn btn-danger" id="<?= $donnees['id'];?>" data-toggle="modal" data-target="#deleteCowModal">
+                        <button type="button" class="btn btn-danger btn-sm" id="<?= $donnees['id'];?>" data-toggle="modal" data-target="#deleteCowModal">
                             <i class="fas fa-trash"></i>
                         </button>
                       </td>
@@ -132,7 +135,21 @@ $reponseCowList->closeCursor(); // Termine le traitement de la requête
               </div>
             </div>
           </div>
+<?php 
+// Stocker résultats dans un array
+$reponseCowSingle = $database->prepare("SELECT * FROM cows WHERE id = 1");
+$reponseCowSingle->execute();
+$result = $reponseCowSingle->fetch();
 
+$_1 = new Cow();
+$_1->setId($result['id']);
+$_1->setName($result['name']);
+$_1->setOwner($result['owner_id']);
+$_1->setGender($result['gender']);
+$_1->setType($result['type']);
+$_1->setRace($result['race']);
+
+?>
         </div>
         <!-- /.container-fluid -->
 
@@ -155,21 +172,47 @@ $reponseCowList->closeCursor(); // Termine le traitement de la requête
             </div>
         </div>
 
-        <div class="modal fade" id="deleteCowModal" tabindex="-1" role="dialog" aria-labelledby="DeleteCow" aria-hidden="true" data-keyboard="false">
-            <div class="modal-dialog" role="document">
+         <!-- View Cow Modal -->
+         <div class="modal fade" id="viewCowModal" tabindex="-1" role="dialog" aria-labelledby="ViewCow" aria-hidden="true" data-keyboard="false">
+            <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                <h5 class="modal-title text-gray-800" id="">Supprimer un élément</h5>
+                <h5 class="modal-title text-gray-800" id="">Harmonie</h5>
                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
                 </div>
                 <div class="modal-body">
-                  <p>Etes vous certain de vouloir supprimer cet élément ?</p>
+
+<?= $_1->getId(); ?>
+<?= $_1->getName(); ?>
+<?= $_1->getOwner(); ?>
+<?= $_1->getGender(); ?>
+<?= $_1->getType(); ?>
+<?= $_1->getRace(); ?>
+
+                </div>
+            </div>
+            </div>
+        </div>
+
+
+        <!-- Delete Modal-->
+        <div class="modal fade" id="deleteCowModal" tabindex="-1" role="dialog" aria-labelledby="DeleteCow" aria-hidden="true" data-keyboard="false">
+            <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title text-gray-800" id="">Supprimer une bête</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                </div>
+                <div class="modal-body">
+                  <p>Etes vous certain de vouloir supprimer cette bête ?</p>
                   <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
                     <form action="" method="post">
-                      <input type="text" id="selectedId" name="selectedId" value="">
+                      <input type="text" id="selectedId" name="selectedId" value="" style="display:none;">
                       <input type="submit" name="delete" id="delete" value="Supprimer" class="btn btn-danger">
                     </form>
                   </div>

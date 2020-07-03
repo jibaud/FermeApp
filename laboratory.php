@@ -4,7 +4,7 @@ session_start();
 include 'includes/database.php';
 include 'includes/forbidden.php';
 
-$pageTitle = 'Ajouter une nouvelle bête';
+$pageTitle = 'A simple page';
 include 'header.php';
 
 ?>
@@ -21,12 +21,11 @@ include 'header.php';
         <div class="container-fluid">
 
           <!-- Page Heading -->
-          <h1 class="h3 mb-4 text-gray-800"><?= $pageTitle ?></h1>
-          <hr>
+          <iframe src="http://infolabo.fr/" width="100%" height="1000px" style="border: none;"></iframe>
 
-<?php include 'add-cow-form.php'; ?>
 
+            
+            
         </div>
         <!-- /.container-fluid -->
-
 <?php include 'footer.php'; ?>

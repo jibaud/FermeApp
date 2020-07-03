@@ -13,10 +13,11 @@
         }
     }
 
-    function countDatabaseValue($connexionBDD, $tableName, $key, $value) {
-        $request = "SELECT * FROM $tableName WHERE $key = ?";
+    // Fonction qui empeche les doublons (2 vaches ayant le meme ID)
+    function countDatabaseValue($connexionBDD, $tableName, $key1, $key2, $value1, $value2) {
+        $request = "SELECT * FROM $tableName WHERE $key1 = ? AND $key2 = ?";
         $rowCount = $connexionBDD->prepare($request);
-        $rowCount->execute(array($value));
+        $rowCount->execute(array($value1, $value2));
         return $rowCount->rowCount();
     }
 

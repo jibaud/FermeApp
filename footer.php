@@ -1,6 +1,7 @@
 </div>
 <!-- End of Main Content -->
 
+<?php if (!stripos($_SERVER['REQUEST_URI'], 'login.php') & !stripos($_SERVER['REQUEST_URI'], 'register.php') & !stripos($_SERVER['REQUEST_URI'], 'forgot-password.php')) { ?>
 <!-- Footer -->
 <footer class="sticky-footer bg-white">
         <div class="container my-auto">
@@ -16,6 +17,7 @@
 
   </div>
   <!-- End of Page Wrapper -->
+
 
   <!-- Scroll to Top Button-->
   <a class="scroll-to-top rounded" href="#page-top">
@@ -40,6 +42,7 @@
       </div>
     </div>
   </div>
+<?php } // END IF PAGE ?> 
 
   <!-- Bootstrap core JavaScript-->
   <script src="vendor/jquery/jquery.min.js"></script>
@@ -63,6 +66,10 @@
   <script src="vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
   <script src="vendor/bootstrap-datepicker/js/bootstrap-datepicker.fr.min.js"></script>
   <script src="js/bootstrap-datepicker/bootstrap-datepicker.js"></script>
+
+  <script src="vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
+  <script src="vendor/bootstrap-select/js/defaults-fr_FR.min.js"></script>
+
   <script src="js/scripts.js"></script>
 
 </body>

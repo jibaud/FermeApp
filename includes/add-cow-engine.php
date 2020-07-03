@@ -1,24 +1,19 @@
 <?php
 
 if (isset($_POST['add'])){
-    $idnumber = htmlspecialchars($_POST['idnumber']);
-    $name = htmlspecialchars($_POST['name']);
+    $cow_id = htmlspecialchars($_POST['cow_id']);
+    $name = ucfirst(htmlspecialchars($_POST['name']));
     $owner_id = $_SESSION['userID'];
     $gender = htmlspecialchars($_POST['gender']);
     $type = htmlspecialchars($_POST['type']);
+    $race = htmlspecialchars($_POST['race']);
     $birthdate = htmlspecialchars($_POST['birthdate']);
     $ispregnant = htmlspecialchars($_POST['ispregnant']);
 
-    if (empty($_POST['motherid'])){
-        $motherid = "";
+    if (empty($_POST['mother_id'])){
+        $mother_id = "";
     } else {
-        $motherid = htmlspecialchars($_POST['motherid']);
-    }
-
-    if (empty($_POST['childrennumber'])){
-        $childrennumber = 0;
-    } else {
-        $childrennumber = htmlspecialchars($_POST['childrennumber']);
+        $mother_id = htmlspecialchars($_POST['mother_id']);
     }
 
     if (empty($_POST['ispregnant'])){
@@ -48,53 +43,57 @@ if (isset($_POST['add'])){
     $date = date('d/m/Y à H:i:s');
 
   
-    if ((!empty($idnumber)) && (!empty($name)) && (!empty($gender)) && (!empty($type)) && (!empty($birthdate)) ) {
+    if ((!empty($cow_id)) && (!empty($name)) && (!empty($gender)) && (!empty($type)) && (!empty($race)) && (!empty($birthdate)) ) {
         if (strlen($name) <= 32) {
             if (is_numeric($pregnancynumber) && ($pregnancynumber >= 0)) {
-                if (is_numeric($idnumber)) {
-                    $database = getPDO();
-                    $rowId = countDatabaseValue($database, 'cows', 'id', $idnumber);
-                    if ($rowId == 0) {
-                        $insertCow = $database->prepare("INSERT INTO cows(
-                            id,
-                            name,
-                            owner_id,
-                            gender,
-                            type,
-                            birth_date,
-                            mother_id,
-                            children_number,
-                            ispregnant,
-                            pregnancy_number,
-                            pregnant_since,
-                            death_date,
-                            sale_date,
-                            sale_price,
-                            isarchived,
-                            create_date
-                            ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                        $insertCow->execute([
-                            $idnumber,
-                            $name,
-                            $owner_id,
-                            $gender,
-                            $type,
-                            $birthdate,
-                            $motherid,
-                            $childrennumber,
-                            $ispregnant,
-                            $pregnancynumber,
-                            $pregnantsince,
-                            $deathDate,
-                            $saleDate,
-                            $salePrice,
-                            $isArchived,
-                            $date
-                        ]);
-                        $successMessage = "Opération réussie.";
-                        header('refresh:1;url=../cows-manager.php');
+                if (is_numeric($cow_id)) {
+                    if (true){
+                        $database = getPDO();
+                        $rowId = countDatabaseValue($database, 'cows', 'id', 'owner_id', $cow_id, $owner_id);
+                        if ($rowId == 0) {
+                            $insertCow = $database->prepare("INSERT INTO cows(
+                                id,
+                                name,
+                                owner_id,
+                                gender,
+                                type,
+                                race,
+                                birth_date,
+                                mother_id,
+                                ispregnant,
+                                pregnancy_number,
+                                pregnant_since,
+                                death_date,
+                                sale_date,
+                                sale_price,
+                                isarchived,
+                                create_date
+                                ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                            $insertCow->execute([
+                                $cow_id,
+                                $name,
+                                $owner_id,
+                                $gender,
+                                $type,
+                                $race,
+                                $birthdate,
+                                $mother_id,
+                                $ispregnant,
+                                $pregnancynumber,
+                                $pregnantsince,
+                                $deathDate,
+                                $saleDate,
+                                $salePrice,
+                                $isArchived,
+                                $date
+                            ]);
+                            $successMessage = "Opération réussie.";
+                            header('refresh:1;url=../cows-manager.php');
+                        } else {
+                            $errorMessage = 'Une vache existe déjà avec ce numéro.';
+                        }
                     } else {
-                        $errorMessage = 'Une vache existe déjà avec ce numéro.';
+                        $errorMessage = 'Les dates doivent être au format jj/mm/aaaa. Exemple, le 2 décembre 1991 doit être écrit 02/12/1991.';
                     }
                 } else {
                     $errorMessage = 'Le numéro d\'identification n\'est pas valide.';
@@ -108,6 +107,6 @@ if (isset($_POST['add'])){
     } else {
         $errorMessage = 'Veuillez remplir tous les champs obligatoires.';
     }
-  }
+}
 
-  ?>
+?>

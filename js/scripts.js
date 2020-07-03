@@ -1,13 +1,19 @@
 $(document).ready(function() {
+  // Pour griser les champs de formulaire
   noPregnant();
 
+  // Options du tableau
   $('#cowListTable').DataTable( {
     "language": {
         "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json"
     },
+    "columnDefs": [
+      { "orderable": false, "targets": 7 }
+    ],
     fixedHeader: true
   } );
 
+  // Pour éditer la ligne cliquée dans le tableau
   $("td button").click(function(e) 
    { 
     document.getElementById("selectedId").value = this.id;
@@ -35,7 +41,7 @@ function noPregnant() {
   var hidden = document.querySelectorAll('.hiddenifmale');
 
 
-  if ((gender.options[gender.selectedIndex].value == "male") | (type.options[type.selectedIndex].value != "vache")) {
+  if ((gender.options[gender.selectedIndex].value != "femelle") | (type.options[type.selectedIndex].value != "vache")) {
     hidden.forEach(element => {
       element.disabled = true;
     });

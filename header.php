@@ -21,12 +21,14 @@
   <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
   <link href="vendor/datatables/fixedHeader.bootstrap4.min.css" rel="stylesheet">
   <link href="vendor/bootstrap-datepicker/css/bootstrap-datepicker3.min.css" rel="stylesheet">
+  <link href="vendor/bootstrap-select/css/bootstrap-select.min.css" rel="stylesheet">
   <link href="css/styles.css" rel="stylesheet">
 
   
   <?php // INCLUDES
   include 'includes/add-cow-engine.php';
   include 'includes/age.php';
+  include 'class/class_cow.php';
   ?>
 
 </head>

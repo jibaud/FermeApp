@@ -2,3 +2,30 @@
     background-image: url("../img/cow.svg");
     background-position: center center;
 }
+
+.uppercase{
+    text-transform: uppercase;
+}
+
+.capitalize{
+    text-transform: capitalize;
+}
+
+.text-black{
+    color: #000;
+}
+
+.btn-select{
+    background-color: #fff;
+    border: 1px solid #d1d3e2;
+}
+
+.bg-login-image{
+    background-image: url("../img/bg_img/image1.jpg");
+}
+.bg-register-image{
+    background-image: url("../img/bg_img/image2.jpg");
+}
+.bg-password-image{
+    background-image: url("../img/bg_img/image3.jpg");
+}

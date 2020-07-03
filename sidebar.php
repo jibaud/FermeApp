@@ -6,7 +6,7 @@
   <div class="sidebar-brand-icon rotate-n-15">
     <i class="fas fa-tractor"></i>
   </div>
-  <div class="sidebar-brand-text mx-3">FermeApp <sup>0.1</sup></div>
+  <div class="sidebar-brand-text mx-3">Milkow <sup>0.1</sup></div>
 </a>
 
 <!-- Divider -->
@@ -16,7 +16,7 @@
 <li class="nav-item active">
   <a class="nav-link" href="index.php">
     <i class="fas fa-fw fa-tachometer-alt"></i>
-    <span>Dashboard</span></a>
+    <span>Tableau de bord</span></a>
 </li>
 
 <!-- Divider -->
@@ -26,6 +26,34 @@
 <div class="sidebar-heading">
   Interface
 </div>
+
+<!-- Nav Item - Tables -->
+<li class="nav-item">
+  <a class="nav-link" href="laboratory.php">
+  <i class="fas fa-flask"></i>
+    <span>Laboratoire</span></a>
+</li>
+
+<!-- Nav Item - Cow Manager -->
+<li class="nav-item">
+  <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCows" aria-expanded="true" aria-controls="collapsePages">
+    <i class="fad fa-cow"></i>
+    <span>Étable</span>
+  </a>
+  <div id="collapseCows" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+    <div class="bg-white py-2 collapse-inner rounded">
+      <h6 class="collapse-header">Gestion :</h6>
+      <a class="collapse-item" href="cows-manager.php">Géger les bêtes</a>
+      <a class="collapse-item" href="add-cow.php">Ajouter une bête</a>
+      <a class="collapse-item" href="cow-single.php">Single</a>
+      <div class="collapse-divider"></div>
+      <h6 class="collapse-header">Other Pages:</h6>
+      <a class="collapse-item" href="404.php">404 Page</a>
+      <a class="collapse-item" href="blank.php">Blank Page</a>
+      <a class="collapse-item" href="cows-manager.php">Gérer mes vaches</a>
+    </div>
+  </div>
+</li>
 
 <!-- Nav Item - Pages Collapse Menu -->
 <li class="nav-item">
@@ -95,19 +123,7 @@
     <span>Charts</span></a>
 </li>
 
-<!-- Nav Item - Tables -->
-<li class="nav-item">
-  <a class="nav-link" href="tables.php">
-    <i class="fas fa-fw fa-table"></i>
-    <span>Tables</span></a>
-</li>
 
-<!-- Nav Item - Cow Manager -->
-<li class="nav-item">
-  <a class="nav-link" href="cows-manager.php">
-    <i class="fad fa-cow"></i>
-    <span>Mon Étable</span></a>
-</li>
 
 <!-- Divider -->
 <hr class="sidebar-divider d-none d-md-block">
