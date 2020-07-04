@@ -49,13 +49,13 @@ if(isset($_POST['recup_submit'],$_POST['recup_mail'])) {
               $recup_insert->execute(array($recup_mail,$recup_code));
            }
            $header="MIME-Version: 1.0\r\n";
-        $header.='From:"FermeApp"<donotreply@jeanbaptistebaud.fr>'."\n";
+        $header.='From:"Milkow"<donotreply@jeanbaptistebaud.fr>'."\n";
         $header.='Content-Type:text/html; charset="utf-8"'."\n";
         $header.='Content-Transfer-Encoding: 8bit';
         $message = '
         <html>
         <head>
-          <title>Récupération de mot de passe - FermeApp</title>
+          <title>Récupération de mot de passe - Milkow</title>
           <meta charset="utf-8" />
         </head>
         <body background-color="#ededed">
@@ -87,7 +87,7 @@ if(isset($_POST['recup_submit'],$_POST['recup_mail'])) {
         </body>
         </html>
         ';
-        mail($recup_mail, "Récupération de mot de passe - FermeApp", $message, $header);
+        mail($recup_mail, "Récupération de mot de passe - Milkow", $message, $header);
            header("Location:forgot-password.php?section=code");
         } else {
            $errorMessage = "Cette adresse email n'est pas enregistrée.";

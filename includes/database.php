@@ -5,7 +5,7 @@
      */
     function getPDO() {
         try {
-            $pdo = new PDO('mysql:dbname=fermeapp;host=localhost', 'root', 'root');
+            $pdo = new PDO('mysql:dbname=milkow;host=localhost', 'root', 'root');
             $pdo->exec("SET CHARACTER SET utf8");
             return $pdo;
         } catch (PDOException $e) {
