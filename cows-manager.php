@@ -7,6 +7,8 @@ include 'includes/forbidden.php';
 $pageTitle = 'Étable';
 include 'header.php';
 
+
+// Supprimer une bête
 if (isset($_POST['delete'])){
   $deleteidnumber = htmlspecialchars($_POST['selectedId']);
   $owner_id = $_SESSION['userID'];
@@ -38,11 +40,10 @@ if (isset($_POST['delete'])){
             <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm" data-toggle="modal" data-target="#addCowModal" onclick="actualise()"><i class="fas fa-plus-square fa-sm"></i> Nouveau</a>
           </div>
 
+
           <!-- DataTales Example -->
           <div class="card shadow mb-4">
-            <div class="card-header py-3">
-              <h6 class="m-0 font-weight-bold text-primary">Mes vaches</h6>
-            </div>
+
             <div class="card-body">
               <div class="table-responsive">
                 <table class="table table-bordered" id="cowListTable" width="100%" cellspacing="0">
@@ -85,7 +86,7 @@ while ($donnees = $reponseCowList->fetch())
 ?>
                     <tr>
                       <td><?= $donnees['id'];?></td>
-                      <td style="text-transform:capitalize;"><?= $donnees['name'];?></td>
+                      <td style="text-transform:capitalize;" id="namefor<?= $donnees['id'];?>"><?= $donnees['name'];?></td>
                       <td style="text-transform:capitalize;"><?= $donnees['gender'];?></td>
                       <td style="text-transform:capitalize;"><?= $donnees['type'];?></td>
                       <td><?= $donnees['birth_date'];?></td>
@@ -111,15 +112,17 @@ while ($donnees = $reponseCowList->fetch())
                       ?>
 
                       <td>
-                        <button type="button" class="btn btn-primary btn-sm" id="<?= $donnees['id'];?>" data-toggle="modal" data-target="#viewCowModal">
+                          <button type="button" class="btn btn-primary btn-sm" id="<?= $donnees['id'];?>" data-toggle="modal" data-target="#viewCowModal<?= $donnees['id'];?>">
                             <i class="fas fa-eye"></i>
-                        </button>
+                          </button>
+                    
                         <button type="button" class="btn btn-success btn-sm">
                             <i class="fas fa-pencil-alt"></i>
                         </button>
-                        <button type="button" class="btn btn-danger btn-sm" id="<?= $donnees['id'];?>" data-toggle="modal" data-target="#deleteCowModal">
-                            <i class="fas fa-trash"></i>
-                        </button>
+
+                          <button type="button" class="btn btn-danger btn-sm deleteButton" id="<?= $donnees['id'];?>" data-toggle="modal" data-target="#deleteCowModal">
+                              <i class="fas fa-trash"></i>
+                          </button>
                       </td>
                     </tr>
 <?php
@@ -135,23 +138,10 @@ $reponseCowList->closeCursor(); // Termine le traitement de la requête
               </div>
             </div>
           </div>
-<?php 
-// Stocker résultats dans un array
-$reponseCowSingle = $database->prepare("SELECT * FROM cows WHERE id = 1");
-$reponseCowSingle->execute();
-$result = $reponseCowSingle->fetch();
-
-$_1 = new Cow();
-$_1->setId($result['id']);
-$_1->setName($result['name']);
-$_1->setOwner($result['owner_id']);
-$_1->setGender($result['gender']);
-$_1->setType($result['type']);
-$_1->setRace($result['race']);
-
-?>
+          
         </div>
         <!-- /.container-fluid -->
+
 
         <!-- Add Cow Modal-->
         <div class="modal fade" id="addCowModal" tabindex="-1" role="dialog" aria-labelledby="AddCow" aria-hidden="true" data-backdrop="static" data-keyboard="false">
@@ -172,29 +162,7 @@ $_1->setRace($result['race']);
             </div>
         </div>
 
-         <!-- View Cow Modal -->
-         <div class="modal fade" id="viewCowModal" tabindex="-1" role="dialog" aria-labelledby="ViewCow" aria-hidden="true" data-keyboard="false">
-            <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                <h5 class="modal-title text-gray-800" id="">Harmonie</h5>
-                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-                </div>
-                <div class="modal-body">
-
-<?= $_1->getId(); ?>
-<?= $_1->getName(); ?>
-<?= $_1->getOwner(); ?>
-<?= $_1->getGender(); ?>
-<?= $_1->getType(); ?>
-<?= $_1->getRace(); ?>
-
-                </div>
-            </div>
-            </div>
-        </div>
+         
 
 
         <!-- Delete Modal-->
@@ -222,3 +190,74 @@ $_1->setRace($result['race']);
         </div>
 
 <?php include 'footer.php'; ?>
+
+<?php
+$reponseCowList->execute();
+while ($donnees = $reponseCowList->fetch())
+{
+?>
+
+<script>
+  $('#tooltipFor<?= $donnees["id"]?>').tooltip({ 
+  title: 'coucou'
+ })
+</script>
+
+        <!-- View Cow Modal -->
+        <div class="modal fade" id="viewCowModal<?= $donnees['id']?>" tabindex="-1" role="dialog" aria-labelledby="ViewCow" aria-hidden="true" data-keyboard="false">
+            <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title text-gray-800" id=""><?= $donnees['name'];?> - <?= $donnees['id'];?></h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                </div>
+                <div class="modal-body">
+                  <table class="table table-sm">
+                    <tbody>
+                      <tr>
+                        <th scope="row">Nom</th>
+                        <td><?= $donnees['name'];?></td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Numéro d'identification</th>
+                        <td><?= $donnees['id'];?></td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Genre</th>
+                        <td><?= $donnees['gender'];?></td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Type</th>
+                        <td><?= $donnees['type'];?></td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Race</th>
+                        <td><?= $donnees['race'];?></td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Date de naissance</th>
+                        <td><?= $donnees['birth_date'];?></td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Age</th>
+                        <td><?= calculeAge($donnees['birth_date'], 'full') ?></td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Numéro de la mère</th>
+                        <?php if($donnees['mother_id'] == '') { ?>
+                        <td>Inconnu</td>
+                        <?php } else { ?>
+                        <td><a href="#" id="tooltipFor<?= $donnees['id'];?>" data-toggle="modal" data-target="#viewCowModal<?= $donnees['mother_id'];?>" data-dismiss="modal"><?= $donnees['mother_id'];?></a></td>
+                        <?php } ?>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                </div>
+            </div>
+            </div>
+        </div>
+
+<?php } ?>

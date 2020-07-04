@@ -14,12 +14,21 @@ $(document).ready(function() {
   } );
 
   // Pour éditer la ligne cliquée dans le tableau
-  $("td button").click(function(e) 
+  $("button.deleteButton").click(function(e) 
    { 
     document.getElementById("selectedId").value = this.id;
    });
 
+   $(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+  })
+
+  $('#tooltipFor3929').tooltip({ 
+    title: 'coucou'
+   })
+
 });
+
 
 // PREGNANT DISABLER //
 

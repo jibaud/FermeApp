@@ -30,26 +30,25 @@ function calculeAge($date, $option) {
   $dateTime1 = new DateTime($dateTiret);
   $dateTime2 = new DateTime($today);
   $diff = $dateTime1->diff($dateTime2);
+
+  if ($diff->y > 1) {
+    $ys = 's'; // Rajoute un s à "an" si pluriel
+  }
+  if ($diff->d > 1) {
+    $ds = 's'; // Rajoute un s à "jour" si pluriel
+  }
   
   if ($option == 'full') {
-    return $diff->y.' an(s), '.$diff->m.' mois, '.$diff->d.' jour(s)';
+    return $diff->y.' an'.$ys.', '.$diff->m.' mois et '.$diff->d.' jour'.$ds;
   } else if ($option == 'short') {
     if ($diff->y < 1) {
       if ($diff->m < 1) {
-        if ($diff->d > 1) {
-          return $diff->d.' jours';
-        } else {
-          return $diff->d.' jour';
-        }
+        return $diff->d.' jour'.$ds;
       } else {
       return $diff->m.' mois';
       }
     } else {
-      if ($diff->y > 1) {
-        return $diff->y.' ans';
-      } else {
-        return $diff->y.' an';
-      }
+      return $diff->y.' an'.$ys;
     }
   } else {
       return 'Option \"full\" ou \"short\" manquante.';

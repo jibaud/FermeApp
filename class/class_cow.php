@@ -8,6 +8,8 @@ class Cow {
   public $gender;
   public $type;
   public $race;
+  public $birthdate;
+  public $mother_id;
 
   // Methods
   function setId($id) {
@@ -50,6 +52,20 @@ class Cow {
   }
   function getRace() {
     return $this->race;
+  }
+
+  function setBirthdate($birthdate) {
+    $this->birthdate = $birthdate;
+  }
+  function getBirthdate() {
+    return $this->birthdate;
+  }
+
+  function setMotherId($mother_id) {
+    $this->mother_id = $mother_id;
+  }
+  function getMotherId() {
+    return $this->mother_id;
   }
 }
 
