@@ -53,7 +53,7 @@ $(document).ready(function() {
     history.pushState({key: 'milkow'}, '', 'cows-manager');
   })
 
-  // Desactive le touche entrer pr valider le formulaire
+  // Desactive la touche entrer pr valider le formulaire
   $('.noEnterKey').on('keyup keypress', function(e) {
     var keyCode = e.keyCode || e.which;
     if (keyCode === 13) { 

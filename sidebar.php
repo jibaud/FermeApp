@@ -44,25 +44,17 @@
 
 <!-- Nav Item - Tables -->
 <li class="nav-item">
-  <a class="nav-link" href="laboratory">
+  <a class="nav-link" href="/">
   <i class="fas fa-baby-carriage"></i>
     <span>Gestations</span></a>
 </li>
 
 <!-- Nav Item - Tables -->
 <li class="nav-item">
-  <a class="nav-link" href="laboratory">
+  <a class="nav-link" href="/">
   <i class="fas fa-medkit"></i>
     <span>Santé</span></a>
 </li>
-
-<!-- Nav Item - Tables -->
-<li class="nav-item">
-  <a class="nav-link" href="archives">
-  <i class="fas fa-archive"></i>
-    <span>Archives</span></a>
-</li>
-
 
 <!-- Divider -->
 <hr class="sidebar-divider">
@@ -79,10 +71,31 @@
     <span>Laboratoire</span></a>
 </li>
 
-
-
 <!-- Divider -->
 <hr class="sidebar-divider d-none d-md-block">
+
+<!-- Heading -->
+<div class="sidebar-heading">
+  Bureau
+</div>
+
+<!-- Nav Item - Cow Manager -->
+<li class="nav-item">
+  <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseArchives" aria-expanded="true" aria-controls="collapsePages">
+    <i class="fas fa-archive"></i>
+    <span>Archives</span>
+  </a>
+  <div id="collapseArchives" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+    <div class="bg-white py-2 collapse-inner rounded">
+      <a class="collapse-item" href="/">Vaches vendues</a>
+      <a class="collapse-item" href="/">Vaches décédées</a>
+      <a class="collapse-item" href="archives">Corbeille</a>
+    </div>
+  </div>
+</li>
+
+<!-- Divider -->
+<hr class="sidebar-divider">
 
 <!-- Sidebar Toggler (Sidebar) -->
 <div class="text-center d-none d-md-inline">

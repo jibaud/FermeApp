@@ -21,12 +21,6 @@ if (isset($_POST['add'])){
         $ispregnant = 1;
     }
 
-    if (empty($_POST['pregnancynumber'])){
-      $pregnancynumber = 0;
-    } else {
-      $pregnancynumber = htmlspecialchars($_POST['pregnancynumber']);
-    }
-
     if (empty($_POST['pregnantsince'])){
         $pregnantsince = "";
     } else {
@@ -35,7 +29,7 @@ if (isset($_POST['add'])){
 
     $deathDate = "";
     $saleDate = "";
-    $salePrice = 0;
+    $salePrice = null;
     $isArchived = 0;
   
     date_default_timezone_set('Europe/Paris');
@@ -44,7 +38,6 @@ if (isset($_POST['add'])){
   
     if ((!empty($cow_id)) && (!empty($name)) && (!empty($gender)) && (!empty($race)) && (!empty($birthdate)) ) {
         if (strlen($name) <= 32) {
-            if (is_numeric($pregnancynumber) && ($pregnancynumber >= 0)) {
                 if (is_numeric($cow_id)) {
                     if (true){
                         $database = getPDO();
@@ -59,14 +52,13 @@ if (isset($_POST['add'])){
                                 birth_date,
                                 mother_id,
                                 ispregnant,
-                                pregnancy_number,
                                 pregnant_since,
                                 death_date,
                                 sale_date,
                                 sale_price,
                                 isarchived,
                                 create_date
-                                ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                                ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                             $insertCow->execute([
                                 $cow_id,
                                 $name,
@@ -76,7 +68,6 @@ if (isset($_POST['add'])){
                                 $birthdate,
                                 $mother_id,
                                 $ispregnant,
-                                $pregnancynumber,
                                 $pregnantsince,
                                 $deathDate,
                                 $saleDate,
@@ -95,9 +86,7 @@ if (isset($_POST['add'])){
                 } else {
                     $errorMessage = 'Le numéro d\'identification n\'est pas valide.';
                 }
-            } else {
-                $errorMessage = 'Le champs nombre de grossesse n\'est pas valide.';
-            }
+
         } else {
             $errorMessage = 'Le nom est trop long. 32 charactères maximum.';
         }
