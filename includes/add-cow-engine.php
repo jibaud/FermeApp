@@ -5,7 +5,6 @@ if (isset($_POST['add'])){
     $name = ucfirst(htmlspecialchars($_POST['name']));
     $owner_id = $_SESSION['userID'];
     $gender = htmlspecialchars($_POST['gender']);
-    $type = htmlspecialchars($_POST['type']);
     $race = htmlspecialchars($_POST['race']);
     $birthdate = htmlspecialchars($_POST['birthdate']);
     $ispregnant = htmlspecialchars($_POST['ispregnant']);
@@ -43,7 +42,7 @@ if (isset($_POST['add'])){
     $date = date('d/m/Y à H:i:s');
 
   
-    if ((!empty($cow_id)) && (!empty($name)) && (!empty($gender)) && (!empty($type)) && (!empty($race)) && (!empty($birthdate)) ) {
+    if ((!empty($cow_id)) && (!empty($name)) && (!empty($gender)) && (!empty($race)) && (!empty($birthdate)) ) {
         if (strlen($name) <= 32) {
             if (is_numeric($pregnancynumber) && ($pregnancynumber >= 0)) {
                 if (is_numeric($cow_id)) {
@@ -56,7 +55,6 @@ if (isset($_POST['add'])){
                                 name,
                                 owner_id,
                                 gender,
-                                type,
                                 race,
                                 birth_date,
                                 mother_id,
@@ -68,13 +66,12 @@ if (isset($_POST['add'])){
                                 sale_price,
                                 isarchived,
                                 create_date
-                                ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                                ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                             $insertCow->execute([
                                 $cow_id,
                                 $name,
                                 $owner_id,
                                 $gender,
-                                $type,
                                 $race,
                                 $birthdate,
                                 $mother_id,
@@ -88,7 +85,7 @@ if (isset($_POST['add'])){
                                 $date
                             ]);
                             $successMessage = "Opération réussie.";
-                            header('refresh:1;url=../cows-manager.php');
+                            header('refresh:1;url=../cow-single?id='.$cow_id);
                         } else {
                             $errorMessage = 'Une vache existe déjà avec ce numéro.';
                         }

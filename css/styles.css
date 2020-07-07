@@ -29,3 +29,10 @@
 .bg-password-image{
     background-image: url("../img/bg_img/image3.jpg");
 }
+
+.childrenList:after{
+    content: ",";
+}
+.childrenList:last-child:after{
+    content: "";
+}

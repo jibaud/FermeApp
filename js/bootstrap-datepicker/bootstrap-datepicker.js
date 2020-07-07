@@ -5,7 +5,7 @@ $(document).ready(function() {
         endDate: "0d",
         language: "fr",
         orientation: "auto top",
-        autoclose: true,
+        autoclose: false, //To avoid to change URL of the modal
         todayHighlight: true
     });
   });

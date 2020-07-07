@@ -68,17 +68,18 @@ $pregnantNumber = $reponseCowPregnant->rowCount();
     <!-- Dropdown - Pregnancy -->
     <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">
       <h6 class="dropdown-header">
-        <?= $pregnantNumber.' '?> Grossesses en cours
+      <?php if ($pregnantNumber > 1) { $ps = 's'; } ?>
+        <?= $pregnantNumber.' '?> Gestation<?= $ps ?> en cours
       </h6>
 <?php
 while ($donnees = $reponseCowPregnant->fetch())
 {
   $pregnantdays = daysSince($donnees['pregnant_since']);
-  $pregnantpercent = ($pregnantdays / 280 * 100);
-  if ($pregnantdays >= 240) {
-    $color = "bg-warning";
-  } else if ($pregnantdays >= 280) {
+  $pregnantpercent = ($pregnantdays / 283 * 100);
+  if ($pregnantdays >= 283) {
     $color = "bg-danger";
+  } else if ($pregnantdays >= 250 && $pregnantdays < 283) {
+    $color = "bg-warning";
   } else {
     $color = "bg-success";
   }
@@ -93,7 +94,7 @@ while ($donnees = $reponseCowPregnant->fetch())
         <div class="w-100">
           <div class="text-gray-900 uppercase"><?= $donnees['name'].' - '.$donnees['id'];?></div>
           <div class="progress">
-            <div class="progress-bar <?= $color ?>" role="progressbar" style="width:<?= $pregnantpercent ?>%;" aria-valuenow="<?= $pregnantpercent ?>" aria-valuemin="0" aria-valuemax="100"><?= $pregnantdays.'/280' ?></div>
+            <div class="progress-bar <?= $color ?>" role="progressbar" style="width:<?= $pregnantpercent ?>%;" aria-valuenow="<?= $pregnantpercent ?>" aria-valuemin="0" aria-valuemax="100"><?= $pregnantdays.'/283' ?></div>
           </div>
         </div>
       </a>
@@ -102,7 +103,7 @@ while ($donnees = $reponseCowPregnant->fetch())
 $reponseCowPregnant->closeCursor();
 ?>
       
-      <a class="dropdown-item text-center small text-gray-500" href="cows-manager.php?filter=">Show All Alerts</a>
+      <a class="dropdown-item text-center small text-gray-500" href="cows-manager?filter=">Show All Alerts</a>
     </div>
   </li>
 
@@ -216,16 +217,16 @@ $reponseCowPregnant->closeCursor();
   <!-- Nav Item - User Information -->
   <li class="nav-item dropdown no-arrow">
     <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      <span class="mr-2 d-none d-lg-inline text-gray-600 small">Valerie Luna</span>
-      <img class="img-profile rounded-circle" src="https://source.unsplash.com/QAB-WJcbgJk/60x60">
+      <span class="mr-2 d-none d-lg-inline text-gray-600 small"><?= $_SESSION['userFirstname'] ?> <?= $_SESSION['userLastname'] ?></span>
+      <img class="img-profile rounded-circle" src="https://images.unsplash.com/photo-1518526157563-b1ee37a05129?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjI5MzI0fQ&auto=format&fit=crop&w=1500&q=80">
     </a>
     <!-- Dropdown - User Information -->
     <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-      <a class="dropdown-item" href="profile.php">
+      <a class="dropdown-item" href="profile">
         <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
         Profil
       </a>
-      <a class="dropdown-item" href="settings.php">
+      <a class="dropdown-item" href="settings">
         <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
         Settings
       </a>

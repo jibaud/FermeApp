@@ -189,10 +189,10 @@ if(isset($_POST['change_submit'])) {
                   </form>
                   <hr>
                   <div class="text-center">
-                    <a class="small" href="register.php">Pas encore de compte ? Inscrivez-vous.</a>
+                    <a class="small" href="register">Pas encore de compte ? Inscrivez-vous.</a>
                   </div>
                   <div class="text-center">
-                    <a class="small" href="login.php">Vous avez déjà un compte ? Connectez vous.</a>
+                    <a class="small" href="login">Vous avez déjà un compte ? Connectez vous.</a>
                   </div>          
 <?php } elseif($section == "changemdp") { ?>
                   <div class="text-center">
@@ -210,10 +210,10 @@ if(isset($_POST['change_submit'])) {
                   </form>
                   <hr>
                   <div class="text-center">
-                    <a class="small" href="register.php">Pas encore de compte ? Inscrivez-vous.</a>
+                    <a class="small" href="register">Pas encore de compte ? Inscrivez-vous.</a>
                   </div>
                   <div class="text-center">
-                    <a class="small" href="login.php">Vous avez déjà un compte ? Connectez vous.</a>
+                    <a class="small" href="login">Vous avez déjà un compte ? Connectez vous.</a>
                   </div> 
 <?php } else { ?>
                   <div class="text-center">
@@ -228,10 +228,10 @@ if(isset($_POST['change_submit'])) {
                   </form>
                   <hr>
                   <div class="text-center">
-                    <a class="small" href="register.php">Pas encore de compte ? Inscrivez-vous.</a>
+                    <a class="small" href="register">Pas encore de compte ? Inscrivez-vous.</a>
                   </div>
                   <div class="text-center">
-                    <a class="small" href="login.php">Vous avez déjà un compte ? Connectez vous.</a>
+                    <a class="small" href="login">Vous avez déjà un compte ? Connectez vous.</a>
                   </div>
 <?php } ?>
                 </div>

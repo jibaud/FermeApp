@@ -9,7 +9,7 @@
               </div>
 <?php } ?>
 
-<form method="post" action="">
+<form method="post" action="" id="addCowForm" class="noEnterKey">
 <p>
     <h5>Informations générales</h5>
 </p>
@@ -27,7 +27,7 @@
         <div class="form-group col-md-6">
         <label for="birthdate">Date de naissance <span class="text-danger">*</span></label>
         <div class="input-group date" data-provide="datepicker">
-            <input type="text" class="form-control" placeholder="jj/mm/aaaa" id="birthdate" name="birthdate" <?php if (isset($birthdate)) { ?>value="<?= $birthdate ?>" <?php } ?>>
+            <input type="text" class="form-control" placeholder="jj/mm/aaaa" id="birthdate" name="birthdate" onchange="noPregnant();" <?php if (isset($birthdate)) { ?>value="<?= $birthdate ?>" <?php } ?>>
             <div class="input-group-addon">
                 <span class="glyphicon glyphicon-th"></span>
             </div>
@@ -43,15 +43,6 @@
         </div>
     </div>
     <div class="form-row">
-    <div class="form-group col-md-6">
-        <label for="type">Type <span class="text-danger">*</span></label>
-        <select class="form-control" id="type" name="type" onchange="noPregnant();">
-            <option></option>
-            <option value="veau" <?php if (isset($type) && $type == "veau") { echo "selected"; } ?>>Veau</option>
-            <option value="génisse" <?php if (isset($type) && $type == "génisse") { echo "selected"; } ?>>Génisse</option>
-            <option value="vache" <?php if (isset($type) && $type == "vache") { echo "selected"; } ?>>Vache</option>
-        </select>
-        </div>
         <div class="form-group col-md-6">
         <label for="type">Race <span class="text-danger">*</span></label>
         <select class="form-control selectpicker" data-live-search="true" data-style="btn-select" id="race" name="race">
@@ -99,7 +90,7 @@
                 <option value="Normande" <?php if (isset($race) && $race == "Normande") { echo "selected"; } ?>>Normande</option>
                 <option value="Salers" <?php if (isset($race) && $race == "Salers") { echo "selected"; } ?>>Salers</option>
                 <option value="Simmental française" <?php if (isset($race) && $race == "Simmental française") { echo "selected"; } ?>>Simmental française</option>
-                <option value="Tarentaise (ou tarine)" <?php if (isset($race) && $race == "Tarentaise (ou tarine)") { echo "selected"; } ?>>Tarentaise (ou tarine)</option>
+                <option value="Tarentaise (ou Tarine)" <?php if (isset($race) && $race == "Tarentaise (ou Tarine)") { echo "selected"; } ?>>Tarentaise (ou Tarine)</option>
                 <option value="Villard-de-lans" <?php if (isset($race) && $race == "Villard-de-lans") { echo "selected"; } ?>>Villard-de-lans</option>
             </optgroup>
             <optgroup label="Autres">
@@ -114,14 +105,14 @@
     </div>
     <hr>
     <p>
-        <h5>Grossesse</h5>
+        <h5>Gestation</h5>
     </p>
     <div class="form-row">
         <div class="form-group col-md-6">
         <div class="form-check">
             <input class="form-check-input hiddenifmale" type="checkbox" id="ispregnant" name="ispregnant" onchange="isPregnantChecked();" <?php if ($ispregnant) {echo "checked";} ?>>
             <label class="form-check-label" for="ispregnant">
-            Enceinte
+            Gestante
             </label>
         </div>
         </div>
@@ -137,7 +128,7 @@
         </div>
         </div>
         <div class="form-group col-md-6">
-        <label for="pregnancynumber">Nombre de grossesses</label>
+        <label for="pregnancynumber">Nombre de gestation(s)</label>
         <input type="text" class="form-control hiddenifmale" id="pregnancynumber" name="pregnancynumber" <?php if (isset($pregnancynumber)) { ?>value="<?= $pregnancynumber ?>" <?php } ?>>
         <small id="" class="form-text text-muted">Laisser vide si inconnu</small>
         </div>
@@ -155,6 +146,6 @@
     </div>
     <div class="modal-footer">
         <button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
-        <input type="submit" name="add" value="Valider" class="btn btn-success" onclick="isPregnantChecked();">
+        <input type="submit" name="add" value="Valider" class="btn btn-primary" onclick="isPregnantChecked();">
     </div>
 </form>

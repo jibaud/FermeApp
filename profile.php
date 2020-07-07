@@ -4,8 +4,92 @@ session_start();
 include 'includes/database.php';
 include 'includes/forbidden.php';
 
-$pageTitle = 'Profile';
+$pageTitle = 'Profil';
 include 'header.php';
+
+
+$currentUserId = $_SESSION['userID'];
+
+$database = getPDO();
+$getUser = $database->prepare("SELECT * FROM users WHERE user_id = $currentUserId");
+$getUser->execute();
+$resultUser = $getUser->fetch();
+
+
+if (isset($_POST['saveProfil'])){
+   
+  $firstname = ucwords(htmlspecialchars($_POST['firstname']));
+  $lastname = ucwords(htmlspecialchars($_POST['lastname']));
+  $email = htmlspecialchars($_POST['email']);
+ 
+  if (!empty($_POST['phone'])){
+    $phone = htmlspecialchars($_POST['phone']);
+  } else {
+    $phone = null;
+  }
+  if (!empty($_POST['address'])){
+    $address = ucfirst(htmlspecialchars($_POST['address']));
+  } else {
+    $address = "";
+  }
+  if (!empty($_POST['city'])){
+    $city = ucfirst(htmlspecialchars($_POST['city']));
+  } else {
+    $city = "";
+  }
+  if (!empty($_POST['zipcode'])){
+    $zipcode = htmlspecialchars($_POST['zipcode']);
+  } else {
+    $zipcode = "";
+  }
+
+  if ( (!empty($firstname)) && (!empty($lastname)) && (!empty($email)) ) {
+      if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+
+            if($email == $resultUser['user_email']) {
+              $rowEmail == 0; // Si l'email appartient à l'utilisateur.
+            } else {
+              $rowEmail = countDatabaseValue($database, 'users', 'user_email', 'user_email', $email, $email);
+              // Sinon on vérifie que personne n'utilise cet email.
+            }
+            if ($rowEmail == 0) {
+              //$updateMember = $database->prepare("UPDATE users SET user_firstname = $firstname, user_lastname = $lastname, user_email = $email, user_phone = $phone, user_address = $address, user_city = $city, user_zipcode = $zipcode WHERE user_id = $currentUserId");    
+              //$updateMember->execute();
+              $database = getPDO();
+              try{
+                $updateMember = $database->prepare("UPDATE users SET user_firstname=?, user_lastname=?, user_email=?, user_phone=?, user_address=?, user_city=?, user_zipcode=? WHERE user_id = $currentUserId");    
+                $updateMember->execute([
+                    $firstname,
+                    $lastname,
+                    $email,
+                    $phone,
+                    $address,
+                    $city,
+                    $zipcode
+                ]);
+                $_SESSION['userFirstname'] = $firstname;
+                $_SESSION['userLastname'] = $lastname;
+                $_SESSION['userEmail'] = $email;
+                $_SESSION['userPhone'] = $Phone;
+                $_SESSION['userAddress'] = $address;
+                $_SESSION['userCity'] = $city;
+                $_SESSION['userZipcode'] = $zipcode;
+              }catch(Exception $e){
+                 echo " Error ! ".$e->getMessage();
+              }
+
+              $successMessage = "Changements sauvegardés.";
+              header('refresh:1');
+            } else {
+                $errorMessage = 'Cette adresse email est déjà utilisée.';
+            }
+      } else {
+          $errorMessage = "L'adresse email n'est pas valide.";
+      }
+  } else {
+      $errorMessage = 'Veuillez remplir tous les champs.';
+  }
+}
 
 ?>
 
@@ -23,8 +107,18 @@ include 'header.php';
           <!-- Page Heading -->
           <h1 class="h3 mb-4 text-gray-800"><?= $pageTitle ?></h1>
 
-          <!-- Content Row -->
+          <?php if (isset($errorMessage)) {?>
+              <div class="alert alert-danger" role="alert">
+                <?= $errorMessage // <?= shortcode for <?php echo ?>
+              </div>
+<?php } ?>
+<?php if (isset($successMessage)) {?>
+              <div class="alert alert-success" role="alert">
+                <?= $successMessage ?>
+              </div>
+<?php } ?>
 
+          <!-- Content Row -->
           <div class="row">
 
             <!-- Area Chart -->
@@ -36,44 +130,44 @@ include 'header.php';
                 </div>
                 <!-- Card Body -->
                 <div class="card-body">
-                     <form>
+                     <form action="" method="post" id="profilInfos">
                         <div class="form-row">
                             <div class="col-md-6 mb-3">
-                            <label for="validationDefault01">First name</label>
-                            <input type="text" class="form-control" id="validationDefault01" value="Mark" required>
+                            <label for="firstname">Prénom <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control capitalize" id="firstname" name="firstname" value="<?php if (isset($firstname)) { echo $firstname; } else { echo $resultUser['user_firstname']; } ?>" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                            <label for="validationDefault02">Last name</label>
-                            <input type="text" class="form-control" id="validationDefault02" value="Otto" required>
+                            <label for="lastname">Nom <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control capitalize" id="lastname" name="lastname" value="<?php if (isset($lastname)) { echo $lastname; } else { echo $resultUser['user_lastname']; } ?>" required>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="col-md-6 mb-3">
-                            <label for="validationDefault01">Adresse email</label>
-                            <input type="text" class="form-control" id="validationDefault01" value="<?= $_SESSION['userEmail'] ?>" required>
+                            <label for="email">Adresse email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="email" name="email" value="<?php if (isset($email)) { echo $email; } else { echo $resultUser['user_email']; } ?>" required>
                             <small id="emailHelp" class="form-text text-muted">Votre identifiant de connexion</small>
                             </div>
                             <div class="col-md-6 mb-3">
-                            <label for="validationDefault02">Téléphone</label>
-                            <input type="text" class="form-control" id="validationDefault02" value="">
+                            <label for="phone">Téléphone</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" value="<?php if (isset($phone)) { echo $phone; } else { echo $resultUser['user_phone']; } ?>">
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="col-md-6 mb-3">
-                            <label for="validationDefault03">Adresse</label>
-                            <input type="text" class="form-control" id="validationDefault03" required>
+                            <label for="address">Adresse</label>
+                            <input type="text" class="form-control capitalize" id="address" name="address" value="<?php if (isset($address)) { echo $address; } else { echo $resultUser['user_address']; } ?>">
                             </div>
                             <div class="col-md-3 mb-3">
-                            <label for="validationDefault05">Ville</label>
-                            <input type="text" class="form-control" id="validationDefault05" required>
+                            <label for="city">Ville</label>
+                            <input type="text" class="form-control capitalize" id="city" name="city" value="<?php if (isset($city)) { echo $city; } else { echo $resultUser['user_city']; } ?>">
                             </div>
                             <div class="col-md-3 mb-3">
-                            <label for="validationDefault05">Code Postal</label>
-                            <input type="text" class="form-control" id="validationDefault05" required>
+                            <label for="zipcode">Code Postal</label>
+                            <input type="text" class="form-control" id="zipcode" name="zipcode" value="<?php if (isset($zipcode)) { echo $zipcode; } else { echo $resultUser['user_zipcode']; } ?>">
                             </div>
                         </div>
                         <hr>
-                        <button class="btn btn-primary" type="submit">Sauvegarder les changements</button>
+                        <input type="submit" name="saveProfil" id="saveProfil" value="Sauvegarder les changements" class="btn btn-primary">
                         </form>
                 </div>
               </div>
@@ -97,7 +191,7 @@ include 'header.php';
                 </div>
                 <!-- Card Body -->
                 <div class="card-body">
-                    <img class="img-profile rounded img-fluid mx-auto d-block" src="https://source.unsplash.com/QAB-WJcbgJk/200x200">
+                    <img class="img-profile rounded img-fluid mx-auto d-block" src="https://images.unsplash.com/photo-1518526157563-b1ee37a05129?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjI5MzI0fQ&auto=format&fit=crop&w=1500&q=80">
                 </div>
               </div>
             </div>

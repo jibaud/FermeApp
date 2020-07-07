@@ -4,7 +4,7 @@
  include 'includes/database.php';
   
  if (isset($_SESSION['userEmail'])) {
-     header('Location:index.php');
+     header('Location:index');
  }
   
  if (isset($_POST['submit'])) {
@@ -24,13 +24,17 @@
             
              $userInfo = $requestUser->fetch();
              $_SESSION['userID'] = $userInfo['user_id'];
-             $_SESSION['userPseudo'] = $userInfo['user_pseudo'];
+             $_SESSION['userFirstname'] = $userInfo['user_firstname'];
+             $_SESSION['userLastname'] = $userInfo['user_lastname'];
              $_SESSION['userEmail'] = $userInfo['user_email'];
              $_SESSION['userPassword'] = $userInfo['user_password'];
-             $_SESSION['userAdmin'] = $userInfo['isadmin'];
+             $_SESSION['userPhone'] = $userInfo['user_phone'];
+             $_SESSION['userAddress'] = $userInfo['user_address'];
+             $_SESSION['userCity'] = $userInfo['user_city'];
+             $_SESSION['userZipcode'] = $userInfo['user_zipcode'];
              $_SESSION['userRegisterDate'] = $userInfo['registerdate'];
              $successMessage = "Connexion réussie";
-             header('refresh:2;url=index.php');
+             header('refresh:1;url=index');
   
          } else {
              $errorMessage = 'Email ou mot de passe incorrect!';
@@ -91,10 +95,10 @@ include 'header.php';
                   </form>
                   <hr>
                   <div class="text-center">
-                    <a class="small" href="forgot-password.php">Mot de passe oublié ?</a>
+                    <a class="small" href="forgot-password">Mot de passe oublié ?</a>
                   </div>
                   <div class="text-center">
-                    <a class="small" href="register.php">Pas encore de compte ? Inscrivez-vous.</a>
+                    <a class="small" href="register">Pas encore de compte ? Inscrivez-vous.</a>
                   </div>
                 </div>
               </div>

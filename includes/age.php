@@ -56,4 +56,21 @@ function calculeAge($date, $option) {
 
 }
 
+function calculeType($date) {
+  date_default_timezone_set('Europe/Paris');
+
+  $today = date('d-m-Y');
+  $dateTiret = str_replace('/', '-', $date);
+  $dateTime1 = new DateTime($dateTiret);
+  $dateTime2 = new DateTime($today);
+  $diff = $dateTime1->diff($dateTime2);
+
+  if ($diff->m < 12 && $diff->y < 1) {
+    return 'veau';
+  } else {
+    return 'génisse';
+  }
+
+}
+
 ?>

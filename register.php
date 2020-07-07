@@ -4,13 +4,13 @@ session_start();
 include 'includes/database.php';
  
 if (isset($_SESSION['userEmail'])) {
-    header('Location:index.php');
+    header('Location:index');
 }
  
 if (isset($_POST['submit'])){
    
-    $firstname = htmlspecialchars($_POST['firstname']);
-    $lastname = htmlspecialchars($_POST['lastname']);
+    $firstname = ucwords(htmlspecialchars($_POST['firstname']));
+    $lastname = ucwords(htmlspecialchars($_POST['lastname']));
     $email = htmlspecialchars($_POST['email']);
     $email_confirm = htmlspecialchars($_POST['email_confirm']);
     if (!empty($_POST['password'])){
@@ -30,13 +30,12 @@ if (isset($_POST['submit'])){
                     $database = getPDO();
                     $rowEmail = countDatabaseValue($database, 'users', 'user_email', 'user_email', $email, $email_confirm);
                     if ($rowEmail == 0) {
-                      $insertMember = $database->prepare("INSERT INTO users(user_firstname, user_lastname, user_email, user_password, isadmin, registerdate) VALUES(?, ?, ?, ?, ?, ?)");
+                      $insertMember = $database->prepare("INSERT INTO users(user_firstname, user_lastname, user_email, user_password, registerdate) VALUES(?, ?, ?, ?, ?, ?)");
                       $insertMember->execute([
                           $firstname,
                           $lastname,
                           $email,
                           $password,
-                          0,
                           $date
                       ]);
                       $successMessage = "Votre compte à bien été créé !";
@@ -114,10 +113,10 @@ include 'header.php';
               </form>
               <hr>
               <div class="text-center">
-                <a class="small" href="forgot-password.php">Mot de passe oublié ?</a>
+                <a class="small" href="forgot-password">Mot de passe oublié ?</a>
               </div>
               <div class="text-center">
-                <a class="small" href="login.php">Vous avez déjà un compte ? Connectez vous.</a>
+                <a class="small" href="login">Vous avez déjà un compte ? Connectez vous.</a>
               </div>
             </div>
           </div>
