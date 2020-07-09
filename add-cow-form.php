@@ -1,3 +1,8 @@
+<script language="javascript">
+    // Pour griser les champs de formulaire en fonction de la possibilité d'être enceinte
+    noPregnant();
+</script>
+
 <?php if (isset($errorMessage)) { ?>
     <div class="alert alert-danger" role="alert">
         <?= $errorMessage // <?= shortcode for <?php echo 
@@ -208,38 +213,8 @@
             <small id="" class="form-text text-muted">Laisser vide si inconnu</small>
         </div>
     </div>
-    
-    <hr>
-    <p>
-        <h5>Gestation</h5>
-    </p>
-    <div class="form-row">
-        <div class="form-group col-md-6">
-            <div class="form-check">
-                <input class="form-check-input hiddenifmale" type="checkbox" id="ispregnant" name="ispregnant" onchange="isPregnantChecked();" <?php if ($ispregnant) {
-                                                                                                                                                    echo "checked";
-                                                                                                                                                } ?>>
-                <label class="form-check-label" for="ispregnant">
-                    Gestante
-                </label>
-            </div>
-        </div>
-    </div>
-    <div class="form-row">
-        <div class="form-group col-md-6">
-            <label for="pregnantsince">Depuis le</label>
-            <div class="input-group date" data-provide="datepicker">
-                <input type="text" class="form-control hiddenifmale" placeholder="jj/mm/aaaa" id="pregnantsince" name="pregnantsince" <?php if (isset($pregnantsince)) { ?>value="<?= $pregnantsince ?>" <?php } ?>>
-                <div class="input-group-addon">
-                    <span class="glyphicon glyphicon-th"></span>
-                </div>
-            </div>
-        </div>
 
-    </div>
-<?php
-?>
-
+   
     <div class="modal-footer">
         <button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
         <input type="submit" name="add" value="Valider" class="btn btn-primary" onclick="isPregnantChecked();">

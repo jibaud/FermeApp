@@ -1,5 +1,5 @@
 <?php
- 
+
 session_start();
 include 'includes/database.php';
 include 'includes/forbidden.php';
@@ -14,7 +14,7 @@ include 'header.php';
   <!-- Page Wrapper -->
   <div id="wrapper">
 
-<?php include 'sidebar.php'; ?>
+    <?php include 'sidebar.php'; ?>
 
     <!-- Content Wrapper -->
     <div id="content-wrapper" class="d-flex flex-column">
@@ -22,7 +22,7 @@ include 'header.php';
       <!-- Main Content -->
       <div id="content">
 
-<?php include 'topbar.php'; ?>
+        <?php include 'topbar.php'; ?>
 
         <!-- Begin Page Content -->
         <div class="container-fluid">
@@ -69,7 +69,7 @@ include 'header.php';
                 </div>
               </div>
             </div>
-            
+
             <!-- Earnings (Monthly) Card Example -->
             <div class="col-xl-3 col-md-6 mb-4">
               <div class="card border-left-primary shadow h-100 py-2">
@@ -80,7 +80,7 @@ include 'header.php';
                       <div class="h4 mb-0 font-weight-bold text-gray-800">3</div>
                     </div>
                     <div class="col-auto">
-                    <i class="fad fa-calf text-gray-300"></i>
+                      <i class="icon-calf fa-3x text-gray-300"></i>
                     </div>
                   </div>
                 </div>
@@ -119,11 +119,11 @@ include 'header.php';
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pending Requests</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                      <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Gestations en cours</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">2</div>
                     </div>
                     <div class="col-auto">
-                      <i class="fas fa-comments fa-2x text-gray-300"></i>
+                      <i class="fas fa-baby-carriage fa-2x text-gray-300"></i>
                     </div>
                   </div>
                 </div>
@@ -295,16 +295,16 @@ include 'header.php';
                       <div class="text-black-50 small">#f8f9fc</div>
                     </div>
                   </div>
-              </div>
-              <div class="col-lg-6 mb-4">
-                <div class="card bg-dark text-white shadow">
-                  <div class="card-body">
+                </div>
+                <div class="col-lg-6 mb-4">
+                  <div class="card bg-dark text-white shadow">
+                    <div class="card-body">
                       Dark
                       <div class="text-white-50 small">#5a5c69</div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
             </div>
 
@@ -343,5 +343,5 @@ include 'header.php';
 
       </div>
       <!-- End of Main Content -->
-      
-<?php include 'footer.php'; ?>
+
+      <?php include 'footer.php'; ?>

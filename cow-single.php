@@ -18,9 +18,17 @@ $currentCowId = $_GET['id'];
 
 
 // Appel les données de la vache actuelle
-$reponseCow = $database->prepare("SELECT * FROM cows WHERE owner_id = ? AND id = ?");
+$reponseCow = $database->prepare("SELECT * FROM cows WHERE owner_id = ? AND id = ? LIMIT 1"); // LIMIT 1 car il ne doit y avoir qu'un seul résultat de toute façon
 $reponseCow->execute([$owner_id, $currentCowId]);
 $result = $reponseCow->fetch();
+
+$currentCowIndex = $result['cow_index'];
+
+if ($result['pregnant_number'] > 0) {
+	$type = 'vache';
+} else {
+	$type = calculeType($result['birth_date']);
+}
 
 // Update cow
 if (isset($_POST['updateCow'])) {
@@ -49,28 +57,38 @@ if (isset($_POST['updateCow'])) {
 			if (is_numeric($cow_id)) {
 				if ($rowId == 0) {
 					if ($cow_id != $currentCowId) {
+
+						// Update des enfants de la cow actuelle pour changer l'ID de leur mère
+						// seulement si on à changé l'id
+						if ($currentCowId != $cow_id) {
+							$database = getPDO();
+							try {
+								$updateCow = $database->prepare("UPDATE cows SET id=?, name=?, birth_date=?, gender=?, race=?, mother_id=? WHERE id = $currentCowId AND owner_id = $owner_id");
+								$updateCow->execute([
+									$cow_id,
+									$name,
+									$birthdate,
+									$gender,
+									$race,
+									$mother_id
+								]);
+							} catch (Exception $e) {
+								echo " Error ! " . $e->getMessage();
+							}
+						}
+
+						// Update cow actuelle avec nouvelles infos
 						try {
 							$database = getPDO();
-							$updateChildren = $database->prepare("UPDATE cows SET mother_id=? WHERE mother_id = $currentCowId");
+							$updateChildren = $database->prepare("UPDATE cows SET mother_id=? WHERE mother_id = $currentCowId AND owner_id = $owner_id");
 							$updateChildren->execute([$cow_id]);
 						} catch (Exception $e) {
 							echo " Error ! " . $e->getMessage();
 						}
 					}
-					$database = getPDO();
-					try {
-						$updateCow = $database->prepare("UPDATE cows SET id=?, name=?, birth_date=?, gender=?, race=?, mother_id=? WHERE id = $currentCowId");
-						$updateCow->execute([
-							$cow_id,
-							$name,
-							$birthdate,
-							$gender,
-							$race,
-							$mother_id
-						]);
-					} catch (Exception $e) {
-						echo " Error ! " . $e->getMessage();
-					}
+
+
+
 
 					$successMessage = "Changements sauvegardés.";
 					header('refresh:1;url=/cow-single?id=' . $cow_id);
@@ -100,6 +118,207 @@ $result = $reponseCow->fetch();
 if (!isset($result['id'])) {
 	header('Location:cows-manager');
 }
+
+// Update un GestRow
+if (isset($_POST['updateGestRowSubmit'])) {
+	$updateNumber = htmlspecialchars($_POST['inputGestId']);
+	$updateStart = htmlspecialchars($_POST['inputGestStart']);
+	$updateState = htmlspecialchars($_POST['inputGestState']);
+
+	$updateState = (int) $updateState;
+
+	if (empty($_POST['inputGestEnd'])) {
+		$updateEnd = "";
+	} else {
+		$updateEnd = htmlspecialchars($_POST['inputGestEnd']);
+	}
+
+	if (empty($_POST['inputGestNote'])) {
+		$updateNote = "";
+	} else {
+		$updateNote = htmlspecialchars($_POST['inputGestNote']);
+	}
+
+	if ($updateState != 0) {
+
+		$pregnantState = 0;
+
+		if ($updateEnd != '') {
+			$valideEmptyEnd = true;
+		} else {
+			$valideEmptyEnd = false;
+		}
+	} else {
+		$pregnantState = 1;
+		$valideEmptyEnd = true;
+	}
+
+	if ($result['ispregnant'] == 1) {
+		if ($updateState == 0) {
+			$valide2 = false;
+		} else {
+			$valide2 = true;
+		}
+	} else {
+		$valide2 = true;
+	}
+
+	if ($valide2) {
+		if ((!empty($updateStart))) {
+			if ($valideEmptyEnd) {
+				if (strlen($updateNote) <= 50) {
+					if ($updateState == 0 || $updateState == 1 || $updateState == 2) {
+						$database = getPDO();
+						try {
+							$updateGest = $database->prepare("UPDATE gestations SET g_start = ?, g_state = ?, g_end = ?, g_note = ? WHERE g_id = $updateNumber AND g_owner_id = $owner_id");
+							$updateGest->execute([
+								$updateStart,
+								$updateState,
+								$updateEnd,
+								$updateNote
+							]);
+						} catch (Exception $e) {
+							echo " Error ! " . $e->getMessage();
+						}
+
+						try {
+							$changePregnantState = $database->prepare("UPDATE cows SET ispregnant = ?, pregnant_since = ? WHERE id = $currentCowId AND owner_id = $owner_id");
+							$changePregnantState->execute([
+								$pregnantState,
+								$updateStart
+							]);
+						} catch (Exception $e) {
+							echo " Error ! " . $e->getMessage();
+						}
+
+
+						$successMessage = "Opération réussie.";
+						header('Location: ' . $_SERVER['REQUEST_URI']);
+					} else {
+						$errorMessage = 'Champs état non valide';
+					}
+				} else {
+					$errorMessage = 'Le champs note est trop long. 50 charactères maximum.';
+				}
+			} else {
+				$errorMessage = 'Une date de fin de gestation est nécéssaire.';
+			}
+		} else {
+			$errorMessage = 'Une date de début de gestation est nécéssaire.';
+		}
+	} else {
+		$errorMessage = 'Cet vache à déjà une gestation en cours.';
+	}
+}
+
+
+// Add new gestation
+if (isset($_POST['addGestSubmit'])) {
+	$gStart = htmlspecialchars($_POST['g_start']);
+	$gState = htmlspecialchars($_POST['g_state']); // 0 En cours, 1 terminé, 2 avorté
+
+	$gState = (int) $gState;
+
+	if (empty($_POST['g_end'])) {
+		$gEnd = "";
+		$pregnantState = 1;
+	} else {
+		$gEnd = htmlspecialchars($_POST['g_end']);
+		$pregnantState = 0;
+	}
+
+	if (empty($_POST['g_note'])) {
+		$gNote = "";
+	} else {
+		$gNote = htmlspecialchars($_POST['g_note']);
+	}
+
+	if ($gState != 0) {
+		if (!empty($gEnd)) {
+			$valide = true;
+		} else {
+			$valide = false;
+		}
+	} else {
+		$valide = true;
+	}
+
+	date_default_timezone_set('Europe/Paris');
+
+	if ($result['ispregnant'] == 0) {
+		if ((!empty($gStart))) {
+			if ($valide) {
+				if (strlen($gNote) <= 50) {
+					if ($gState == 0 || $gState == 1 || $gState == 2) {
+						try {
+							$insertGest = $database->prepare("INSERT INTO gestations(
+								g_cow_index,
+								g_start,
+								g_end,
+								g_state,
+								g_note,
+								g_owner_id
+								) VALUES(?, ?, ?, ?, ?, ?)");
+							$insertGest->execute([
+								$currentCowIndex,
+								$gStart,
+								$gEnd,
+								$gState,
+								$gNote,
+								$owner_id
+							]);
+						} catch (Exception $e) {
+							echo " Error ! " . $e->getMessage();
+						}
+
+						try {
+							$changePregnantState = $database->prepare("UPDATE cows SET ispregnant='$pregnantState', pregnant_since='$gStart', pregnant_number=pregnant_number+1 WHERE id=$currentCowId AND owner_id=$owner_id");
+							$changePregnantState->execute();
+						} catch (Exception $e) {
+							echo " Error ! " . $e->getMessage();
+						}
+
+						$successMessage = "Opération réussie.";
+						header('Location: ' . $_SERVER['REQUEST_URI']);
+					} else {
+						$errorMessage = 'Champs select non valide';
+					}
+				} else {
+					$errorMessage = 'Le champs note est trop long. 50 charactères maximum.';
+				}
+			} else {
+				$errorMessage = 'Une date de fin de gestation est nécéssaire.';
+			}
+		} else {
+			$errorMessage = 'Une date de début de gestation est nécéssaire.';
+		}
+	} else {
+		$errorMessage = 'Cet vache à déjà une gestation en cours.';
+	}
+}
+
+
+
+// Supprimer un GestRow
+if (isset($_POST['deleteGest'])) {
+	$deletedNumber = htmlspecialchars($_POST['deletedNumber']);
+	$deletedRowState = htmlspecialchars($_POST['deletedRowState']);
+	$owner_id = $_SESSION['userID'];
+
+	if ($deletedRowState == 0) {
+		$deleteIsPregnant = $database->prepare("UPDATE cows SET ispregnant='0', pregnant_since='', pregnant_number=pregnant_number-1 WHERE id=$currentCowId AND owner_id=$owner_id");
+		$deleteIsPregnant->execute();
+	} else {
+		$deleteIsPregnant = $database->prepare("UPDATE cows SET pregnant_number=pregnant_number-1 WHERE id=$currentCowId AND owner_id=$owner_id");
+		$deleteIsPregnant->execute();
+	}
+
+	$deleteGestRow = $database->prepare("DELETE FROM gestations WHERE g_id = $deletedNumber AND g_owner_id = $owner_id");
+	$deleteGestRow->execute();
+	$successMessage = "Opération réussie.";
+	header('Location: ' . $_SERVER['REQUEST_URI']);
+}
+
 
 $pageTitle = $result['name'];
 
@@ -142,7 +361,7 @@ $pageTitle = $result['name'];
 			<div class="row mb-4">
 				<div class="col-12">
 					<p class="h5 text-gray-800"><?= $result['birth_date']; ?><span class="mb-0 text-gray-700 h6"> (<?= calculeAge($result['birth_date'], 'full') ?>)</span></p>
-					<p class="h5 text-gray-800"><span class="capitalize"><?= $type = calculeType($result['birth_date']); ?></span> <?= $result['gender']; ?> de race <?= $result['race']; ?></p>
+					<p class="h5 text-gray-800"><span class="capitalize"><?= $type; ?></span> <?= $result['gender']; ?> de race <?= $result['race']; ?></p>
 				</div>
 			</div> <!-- /.row -->
 
@@ -177,7 +396,20 @@ $pageTitle = $result['name'];
 													<div class="progress-bar bg-<?= $color ?>" role="progressbar" style="width:<?= $pregnantpercent ?>%" aria-valuenow="<?= $pregnantpercent ?>" aria-valuemin="0" aria-valuemax="100"></div>
 												</div>
 											</div>
-											<p class="mt-3">Velâge prévu dans environ <?= 283 - $pregnantdays ?> jours.</p>
+											<?php
+											$daysToEndOfPregnant = (283 - $pregnantdays);
+											if ($daysToEndOfPregnant >= 0) {
+											?>
+												<p class="mt-3 pr-1">Vêlge prévu dans environ <?= $daysToEndOfPregnant ?> jours </p>
+											<?php } else { ?>
+												<p class="mt-3 pr-1">Vêlage prévu depuis environ <?= abs($daysToEndOfPregnant) ?> jours </p>
+											<?php
+											}
+											if (abs($daysToEndOfPregnant) >= 31) {
+												$monthToEndOfPregnant = round(abs($daysToEndOfPregnant) / 30.5, 1);
+											?>
+												<span class="font-weight-lighter"><em> (~<?= $monthToEndOfPregnant ?> mois)</em></span>
+											<?php } ?>
 										</div>
 
 									</div>
@@ -192,8 +424,6 @@ $pageTitle = $result['name'];
 			<?php } ?>
 
 
-
-
 			<!-- INFORMATIONS GENERALES -->
 			<div class="row">
 				<!-- Area Chart -->
@@ -205,7 +435,7 @@ $pageTitle = $result['name'];
 						</div>
 						<!-- Card Body -->
 						<div class="card-body">
-							<form method="post" action="" id="cowInfos">
+							<form method="post" action="" id="cowInfos" class="enableSubmitOnChange">
 								<p class="mb-4 h5">Description</p>
 								<div class="form-row">
 									<div class="form-group col-md-6">
@@ -406,6 +636,7 @@ $pageTitle = $result['name'];
 								<div class="form-row">
 									<div class="form-group col-md-12">
 										<table class="table table-sm">
+
 											<tbody>
 
 												<?php
@@ -446,77 +677,246 @@ $pageTitle = $result['name'];
 			</div> <!-- /.row -->
 
 
+
+			<?php
+
+			$reponseGestationList = $database->prepare("SELECT * FROM gestations WHERE g_owner_id = $owner_id AND g_cow_index = $currentCowIndex ORDER BY g_id ASC");
+			$reponseGestationList->execute();
+
+			?>
+
 			<!-- GESTATION -->
 			<div class="row">
 				<!-- Area Chart -->
 				<div class="col-12">
-					<div class="card shadow mb-4">
+					<div class="card shadow mb-4" id="gestations">
 						<!-- Card Header - Dropdown -->
 						<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-							<h6 class="m-0 font-weight-bold text-primary">Gestation</h6>
+							<h6 class="m-0 font-weight-bold text-primary">Gestations</h6>
 							<div class="dropdown no-arrow">
-								<a class="" href="#" role="button" id="dropdownMenuLink">
-									<i class="fas fa-pencil-alt fa-fw text-primary"></i>
-								</a>
+
 							</div>
 						</div>
 						<!-- Card Body -->
 						<div class="card-body">
-							<form method="post" action="">
-								<div class="form-row">
+							<div class="table-responsive">
+								<table class="table table-bordered" id="gestTable" width="100%" cellspacing="0">
 
-									<table class="table table-bordered" id="" width="100%" cellspacing="0">
-										<thead>
-											<tr>
-												<th>Début</th>
-												<th>Fin</th>
-												<th>Statut</th>
-												<th>Note</th>
+									<thead>
+										<tr>
+											<th>Début</th>
+											<th>État</th>
+											<th>Fin</th>
+											<th>Note</th>
+											<th>Actions</th>
+										</tr>
+									</thead>
+									<tbody>
+
+										<?php
+
+
+										while ($gestData = $reponseGestationList->fetch()) {
+										?>
+											<tr class="rowGestList">
+												<td>
+													<div class="displayRead">
+														<?= $gestData['g_start']; ?>
+													</div>
+													<div class="displayEdit date" data-provide="datepicker">
+														<input type="text" class="form-control g_start_edit col-12" value="" placeholder="Début" required>
+														<div class="input-group-addon">
+															<span class="glyphicon glyphicon-th"></span>
+														</div>
+													</div>
+													<div style="display:none;">
+														<input type="text" class="col-12 g_start_origin" value="<?= $gestData['g_start']; ?>">
+													</div>
+												</td>
+												<td>
+													<div class="displayRead">
+														<?php
+
+														switch ($gestData['g_state']) {
+															case 0:
+																echo "En cours";
+																$select0 = 'selected';
+																break;
+															case 1:
+																echo "Terminé";
+																$select1 = 'selected';
+																break;
+															case 2:
+																echo "Avorté";
+																$select2 = 'selected';
+																break;
+														}
+														?>
+													</div>
+													<div class="displayEdit">
+														<select class="form-control g_state_edit" required>
+															<option value="0" <?= $select0 ?>>En cours</option>
+															<option value="1" <?= $select1 ?>>Vêlage</option>
+															<option value="2" <?= $select2 ?>>Avortement</option>
+														</select>
+													</div>
+													<div style="display:none;">
+														<input type="text" class="col-12 g_state_origin" value="<?= $gestData['g_state']; ?>">
+													</div>
+
+												</td>
+												<td>
+													<div class="displayRead">
+														<?= $gestData['g_end']; ?>
+													</div>
+													<div class="displayEdit date" data-provide="datepicker">
+														<input type="text" class="form-control g_end_edit" value="">
+														<div class="input-group-addon">
+															<span class="glyphicon glyphicon-th"></span>
+														</div>
+													</div>
+													<div style="display:none;">
+														<input type="text" class="col-12 g_end_origin" value="<?= $gestData['g_end']; ?>">
+													</div>
+												</td>
+												<td>
+													<div class="displayRead">
+														<?= $gestData['g_note']; ?>
+													</div>
+													<div class="displayEdit">
+														<input type="text" class="form-control g_note_edit" value="">
+													</div>
+													<div style="display:none;">
+														<input type="text" class="col-12 g_note_origin" value="<?= $gestData['g_note']; ?>">
+													</div>
+												</td>
+												<td>
+
+													<span data-toggle="tooltip" data-placement="top" title="Modifier" class="displayRead">
+														<button class="btn btn-primary btn-sm editGestRow" id="<?= $gestData['g_id']; ?>">
+															<i class="fas fa-pencil-alt"></i>
+														</button>
+													</span>
+
+													<span data-toggle="tooltip" data-placement="top" title="Sauvegarder" class="displayEdit">
+														<button type="submit" class="btn btn-success btn-sm updateGestFormSubmit">
+															<i class="fas fa-check"></i>
+														</button>
+													</span>
+
+													<span data-toggle="tooltip" data-placement="top" title="Annuler" class="displayEdit">
+														<button type="button" class="btn btn-warning btn-sm cancelGestEdit">
+															<i class="fas fa-times"></i>
+														</button>
+													</span>
+
+													<span data-toggle="tooltip" data-placement="top" title="Supprimer" class="displayEdit">
+														<button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteGestModal">
+															<i class="fas fa-trash"></i>
+														</button>
+													</span>
+
+												</td>
 											</tr>
-										</thead>
-										<tbody>
 
-											<?php
+										<?php
+										}
+										$reponseGestationList->closeCursor();
+										?>
 
-											$owner_id = $_SESSION['userID'];
-											$database = getPDO();
-											$reponseCowList = $database->prepare("SELECT * FROM cows WHERE owner_id = $owner_id AND id = $currentCowId");
-											$reponseCowList->execute();
-
-											// On affiche chaque entrée une à une
-											while ($donnees = $reponseCowList->fetch()) {
-												$type = calculeType($donnees['birth_date']);
-											?>
-												<tr>
-													<td><?= $donnees['pregnant_since']; ?></td>
-													<td></td>
-													<td></td>
-													<td></td>
-												</tr>
-											<?php
-											}
-
-											$reponseCowList->closeCursor(); // Termine le traitement de la requête
-
-											?>
+									</tbody>
+								</table>
+							</div>
 
 
-										</tbody>
-									</table>
+							<?php
+							// BOUTON ADD GEST SI NON PREGNANT
+							if (!$result['ispregnant']) {
+							?>
 
+								<div class="d-flex flex-row align-items-center justify-content-end mt-4 mb-2" id="displayGestForm">
+									<div class="pr-2">Déclarer une gestation</div>
+									<i class="fad fa-plus-circle fa-fw text-success" id="displayGestFormIcon"></i>
+								</div>
+								<form method="post" action="" id="addGest" class="enableSubmitOnChange">
 									<div class="form-row">
-										<div class="form-group col-md-6">
+										<div class="form-group input-group date col-md-3" data-provide="datepicker">
+											<input type="text" class="form-control" id="g_start" name="g_start" value="" placeholder="Début" required>
+											<div class="input-group-addon">
+												<span class="glyphicon glyphicon-th"></span>
+											</div>
+										</div>
 
+										<div class="form-group col-md-3">
+											<select class="form-control" id="g_state" name="g_state" onchange="gestationState();" required>
+												<option value="0" selected>En cours</option>
+												<option value="1">Vêlage</option>
+												<option value="2">Avortement</option>
+											</select>
+										</div>
+
+										<div class="form-group input-group date col-md-3" data-provide="datepicker">
+											<input type="text" class="form-control" id="g_end" name="g_end" value="" placeholder="Fin" disabled>
+											<div class="input-group-addon">
+												<span class="glyphicon glyphicon-th"></span>
+											</div>
+										</div>
+
+										<div class="form-group col-md-3">
+											<textarea class="form-control" name="g_note" id="g_note" cols="30" rows="2" value="" maxlength="50" placeholder="Note"></textarea>
 										</div>
 									</div>
-									<input type="submit" name="saveCowInfo" id="saveCowInfo" value="Sauvegarder les changements" class="btn btn-primary">
-							</form>
+									<div class="modal-footer">
+										<input type="submit" name="addGestSubmit" id="addGestSubmit" value="Ajouter" class="btn btn-success">
+									</div>
+								</form>
+
+							<?php } //End if pregnant 
+							?>
+
 						</div>
 					</div>
 				</div>
 			</div> <!-- /.row -->
 
+			<form action="" method="POST" id="updateGestRow" name="updateGestRow">
+				<input type="text" class="form-control" value="" id="inputGestId" name="inputGestId">
+				<input type="text" class="form-control" value="" id="inputGestStart" name="inputGestStart">
+				<input type="text" class="form-control" value="" id="inputGestState" name="inputGestState">
+				<input type="text" class="form-control" value="" id="inputGestEnd" name="inputGestEnd">
+				<input type="text" class="form-control" value="" id="inputGestNote" name="inputGestNote">
+				<input type="submit" id="updateGestRowSubmit" name="updateGestRowSubmit" class="btn btn-success" value="Sauvegarder">
+			</form>
 
 		</div>
 		<!-- /.container-fluid -->
+
+
+		<!-- DeleteGestRow Modal-->
+		<div class="modal fade" id="deleteGestModal" tabindex="-1" role="dialog" aria-labelledby="deleteGest" aria-hidden="true" data-keyboard="false">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title text-gray-800" id="">Supprimer</h5>
+						<button class="close" type="button" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">×</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<p>Voulez-vous vraiment supprimer cette gestation ?</p>
+					</div>
+					<div class="modal-footer">
+						<button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
+						<form action="" method="post">
+							<input type="text" id="deletedNumber" name="deletedNumber" value="">
+							<input type="text" id="deletedRowState" name="deletedRowState" value="">
+							<input type="submit" name="deleteGest" id="deleteGest" value="Supprimer" class="btn btn-danger">
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+
 		<?php include 'footer.php'; ?>

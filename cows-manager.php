@@ -87,23 +87,27 @@ if (isset($_POST['archive'])) {
 
                 // On affiche chaque entrée une à une
                 while ($donnees = $reponseCowList->fetch()) {
-                  $type = calculeType($donnees['birth_date']);
+                  if ($donnees['pregnant_number'] > 0) {
+                    $type = 'vache';
+                  } else {
+                    $type = calculeType($donnees['birth_date']);
+                  }
                 ?>
                   <tr>
-                    <td><?= $donnees['id']; ?></td>
-                    <td style="text-transform:capitalize;" id="namefor<?= $donnees['id']; ?>"><?= $donnees['name']; ?></td>
-                    <td style="text-transform:capitalize;"><?= $donnees['gender']; ?></td>
-                    <td style="text-transform:capitalize;"><?= $type ?></td>
+                    <td class="user-select-all"><?= $donnees['id']; ?></td>
+                    <td class="text-capitalize user-select-all" id="namefor<?= $donnees['id']; ?>"><?= $donnees['name']; ?></td>
+                    <td class="text-capitalize"><?= $donnees['gender']; ?></td>
+                    <td class="text-capitalize"><?= $type ?></td>
                     <td><?= $donnees['birth_date']; ?></td>
                     <td><?= calculeAge($donnees['birth_date'], 'short') ?></td>
 
                     <?php
                     if ($donnees['ispregnant']) {
                       $pregnantdays = daysSince($donnees['pregnant_since']);
-                      if ($pregnantdays >= 240) {
-                        echo '<td class="text-warning">Oui (' . $pregnantdays . '/280j)</td>';
-                      } else if ($pregnantdays >= 280) {
+                      if ($pregnantdays >= 280 ) {
                         echo '<td class="text-danger">Oui (' . $pregnantdays . '/280j)</td>';
+                      } else if ($pregnantdays >= 240) {
+                        echo '<td class="text-warning">Oui (' . $pregnantdays . '/280j)</td>';
                       } else {
                         echo '<td class="text-success">Oui (' . $pregnantdays . '/280j)</td>';
                       }
@@ -215,7 +219,11 @@ if (isset($_POST['archive'])) {
     $reponseCowList->execute();
     while ($donnees = $reponseCowList->fetch()) {
 
-      $type = calculeType($donnees['birth_date']);
+      if ($donnees['pregnant_number'] > 0) {
+        $type = 'vache';
+      } else {
+        $type = calculeType($donnees['birth_date']);
+      }
 
     ?>
       <script language="javascript">
@@ -275,19 +283,19 @@ if (isset($_POST['archive'])) {
                 <tbody>
                   <tr>
                     <th scope="row">Nom</th>
-                    <td><?= $donnees['name']; ?></td>
+                    <td class="user-select-all"><?= $donnees['name']; ?></td>
                   </tr>
                   <tr>
                     <th scope="row">Numéro d'identification</th>
-                    <td><?= $donnees['id']; ?></td>
+                    <td class="user-select-all"><?= $donnees['id']; ?></td>
                   </tr>
                   <tr>
                     <th scope="row">Genre</th>
-                    <td><?= $donnees['gender']; ?></td>
+                    <td class="text-capitalize"><?= $donnees['gender']; ?></td>
                   </tr>
                   <tr>
                     <th scope="row">Type</th>
-                    <td><?= $type; ?></td>
+                    <td class="text-capitalize"><?= $type; ?></td>
                   </tr>
                   <tr>
                     <th scope="row">Race</th>
@@ -310,9 +318,9 @@ if (isset($_POST['archive'])) {
                     <?php } ?>
                   </tr>
                   <tr>
-                    <th scope="row">Géstation</th>
-                    <?php if ($donnees['ispregnant'] == 0 && $donnees['pregnancy_number'] > 0) { ?>
-                      <td><?= $donnees['pregnancy_number']; ?> géstation(s) passée(s). Dernier velâge le [...]</td>
+                    <th scope="row">Gestation</th>
+                    <?php if ($donnees['ispregnant'] == 0 && $donnees['pregnant_number'] > 0) { ?>
+                      <td><?= $donnees['pregnant_number']; ?> géstation(s) passée(s).</td>
                     <?php } else if ($donnees['ispregnant'] == 1) { ?>
                       <td>Depuis le <?= $donnees['pregnant_since']; ?></td>
                     <?php } else { ?>
