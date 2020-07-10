@@ -192,22 +192,23 @@ if (isset($_POST['updateGestRowSubmit'])) {
 						}
 
 
-						$successMessage = "Opération réussie.";
-						header('Location: ' . $_SERVER['REQUEST_URI']);
+						$successMessageGest = "Opération réussie.";
+						header('Location: ' . $_SERVER['REQUEST_URI'] . '#gestations');
 					} else {
-						$errorMessage = 'Champs état non valide';
+						$errorMessageGest = 'Champs état non valide';
 					}
 				} else {
-					$errorMessage = 'Le champs note est trop long. 50 charactères maximum.';
+					$errorMessageGest = 'Le champs note est trop long. 50 charactères maximum.';
 				}
 			} else {
-				$errorMessage = 'Une date de fin de gestation est nécéssaire.';
+				$errorMessageGest = 'Une date de fin de gestation est nécéssaire.';
+				header('Location: /cow-single?id=' . $currentCowId . '&e=1#gestations');
 			}
 		} else {
-			$errorMessage = 'Une date de début de gestation est nécéssaire.';
+			$errorMessageGest = 'Une date de début de gestation est nécéssaire.';
 		}
 	} else {
-		$errorMessage = 'Cet vache à déjà une gestation en cours.';
+		$errorMessageGest = 'Cet vache à déjà une gestation en cours.';
 	}
 }
 
@@ -346,6 +347,7 @@ $pageTitle = $result['name'];
 					<?= $successMessage ?>
 				</div>
 			<?php } ?>
+
 
 			<!-- Page Heading -->
 			<div class="d-sm-flex align-items-center justify-content-between mb-2">
@@ -685,6 +687,18 @@ $pageTitle = $result['name'];
 
 			?>
 
+			<?php if (isset($errorMessageGest)) { ?>
+				<div class="alert alert-danger" role="alert">
+					<?= $errorMessageGest // <?= shortcode for <?php echo 
+					?>
+				</div>
+			<?php } ?>
+			<?php if (isset($successMessageGest)) { ?>
+				<div class="alert alert-success" role="alert">
+					<?= $successMessageGest ?>
+				</div>
+			<?php } ?>
+
 			<!-- GESTATION -->
 			<div class="row">
 				<!-- Area Chart -->
@@ -729,7 +743,7 @@ $pageTitle = $result['name'];
 															<span class="glyphicon glyphicon-th"></span>
 														</div>
 													</div>
-													<div style="display:none;">
+													<div class="d-none">
 														<input type="text" class="col-12 g_start_origin" value="<?= $gestData['g_start']; ?>">
 													</div>
 												</td>
@@ -760,7 +774,7 @@ $pageTitle = $result['name'];
 															<option value="2" <?= $select2 ?>>Avortement</option>
 														</select>
 													</div>
-													<div style="display:none;">
+													<div class="d-none">
 														<input type="text" class="col-12 g_state_origin" value="<?= $gestData['g_state']; ?>">
 													</div>
 
@@ -775,7 +789,7 @@ $pageTitle = $result['name'];
 															<span class="glyphicon glyphicon-th"></span>
 														</div>
 													</div>
-													<div style="display:none;">
+													<div class="d-none">
 														<input type="text" class="col-12 g_end_origin" value="<?= $gestData['g_end']; ?>">
 													</div>
 												</td>
@@ -786,7 +800,7 @@ $pageTitle = $result['name'];
 													<div class="displayEdit">
 														<input type="text" class="form-control g_note_edit" value="">
 													</div>
-													<div style="display:none;">
+													<div class="d-none">
 														<input type="text" class="col-12 g_note_origin" value="<?= $gestData['g_note']; ?>">
 													</div>
 												</td>
@@ -799,9 +813,9 @@ $pageTitle = $result['name'];
 													</span>
 
 													<span data-toggle="tooltip" data-placement="top" title="Sauvegarder" class="displayEdit">
-														<button type="submit" class="btn btn-success btn-sm updateGestFormSubmit">
+														<label for="updateGestRowSubmit" class="btn btn-success btn-sm mb-0 updateGestFormSubmit">
 															<i class="fas fa-check"></i>
-														</button>
+														</label>
 													</span>
 
 													<span data-toggle="tooltip" data-placement="top" title="Annuler" class="displayEdit">
@@ -879,13 +893,13 @@ $pageTitle = $result['name'];
 				</div>
 			</div> <!-- /.row -->
 
-			<form action="" method="POST" id="updateGestRow" name="updateGestRow">
+			<form action="" method="POST" id="updateGestRow" name="updateGestRow" class="d-none">
 				<input type="text" class="form-control" value="" id="inputGestId" name="inputGestId">
 				<input type="text" class="form-control" value="" id="inputGestStart" name="inputGestStart">
 				<input type="text" class="form-control" value="" id="inputGestState" name="inputGestState">
 				<input type="text" class="form-control" value="" id="inputGestEnd" name="inputGestEnd">
 				<input type="text" class="form-control" value="" id="inputGestNote" name="inputGestNote">
-				<input type="submit" id="updateGestRowSubmit" name="updateGestRowSubmit" class="btn btn-success" value="Sauvegarder">
+				<input type="submit" id="updateGestRowSubmit" name="updateGestRowSubmit" value="Sauvegarder">
 			</form>
 
 		</div>
@@ -920,3 +934,16 @@ $pageTitle = $result['name'];
 
 
 		<?php include 'footer.php'; ?>
+
+		<?php
+
+
+		if (!isset($_GET['e']) and $_GET['e'] == '1') {
+			
+				?>
+				<script>
+					alert("Coucou");
+				</script>
+		<?php
+		}
+		?>

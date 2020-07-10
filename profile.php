@@ -138,6 +138,8 @@ if (isset($_POST['change_password'])) {
     <!-- Begin Page Content -->
     <div class="container-fluid">
 
+    <button onclick="showSnackBar('Opération réussie.', 'danger');">Snackbar click</button>
+
       <!-- Page Heading -->
       <h1 class="h3 mb-4 text-gray-800"><?= $pageTitle ?></h1>
 
@@ -156,7 +158,6 @@ if (isset($_POST['change_password'])) {
       <!-- Content Row -->
       <div class="row">
 
-        <!-- Area Chart -->
         <div class="col-xl-8 col-lg-7">
           <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
@@ -169,7 +170,7 @@ if (isset($_POST['change_password'])) {
                 <div class="form-row">
                   <div class="col-md-6 mb-3">
                     <label for="firstname">Prénom <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control capitalize" id="firstname" name="firstname" value="<?php if (isset($firstname)) {
+                    <input type="text" autocomplete="off" class="form-control capitalize" id="firstname" name="firstname" value="<?php if (isset($firstname)) {
                                                                                                                 echo $firstname;
                                                                                                               } else {
                                                                                                                 echo $resultUser['user_firstname'];
@@ -177,7 +178,7 @@ if (isset($_POST['change_password'])) {
                   </div>
                   <div class="col-md-6 mb-3">
                     <label for="lastname">Nom <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control capitalize" id="lastname" name="lastname" value="<?php if (isset($lastname)) {
+                    <input type="text" autocomplete="off" class="form-control capitalize" id="lastname" name="lastname" value="<?php if (isset($lastname)) {
                                                                                                               echo $lastname;
                                                                                                             } else {
                                                                                                               echo $resultUser['user_lastname'];
@@ -187,7 +188,7 @@ if (isset($_POST['change_password'])) {
                 <div class="form-row">
                   <div class="col-md-6 mb-3">
                     <label for="email">Adresse email <span class="text-danger">*</span></label>
-                    <input type="email" class="form-control" id="email" name="email" value="<?php if (isset($email)) {
+                    <input type="email" autocomplete="off" class="form-control" id="email" name="email" value="<?php if (isset($email)) {
                                                                                               echo $email;
                                                                                             } else {
                                                                                               echo $resultUser['user_email'];
@@ -196,7 +197,7 @@ if (isset($_POST['change_password'])) {
                   </div>
                   <div class="col-md-6 mb-3">
                     <label for="phone">Téléphone</label>
-                    <input type="tel" class="form-control" id="phone" name="phone" value="<?php if (isset($phone)) {
+                    <input type="tel" autocomplete="off" class="form-control" id="phone" name="phone" value="<?php if (isset($phone)) {
                                                                                             echo $phone;
                                                                                           } else {
                                                                                             echo $resultUser['user_phone'];
@@ -206,7 +207,7 @@ if (isset($_POST['change_password'])) {
                 <div class="form-row">
                   <div class="col-md-6 mb-3">
                     <label for="address">Adresse</label>
-                    <input type="text" class="form-control capitalize" id="address" name="address" value="<?php if (isset($address)) {
+                    <input type="text" autocomplete="off" class="form-control capitalize" id="address" name="address" value="<?php if (isset($address)) {
                                                                                                             echo $address;
                                                                                                           } else {
                                                                                                             echo $resultUser['user_address'];
@@ -214,7 +215,7 @@ if (isset($_POST['change_password'])) {
                   </div>
                   <div class="col-md-3 mb-3">
                     <label for="city">Ville</label>
-                    <input type="text" class="form-control capitalize" id="city" name="city" value="<?php if (isset($city)) {
+                    <input type="text" autocomplete="off" class="form-control capitalize" id="city" name="city" value="<?php if (isset($city)) {
                                                                                                       echo $city;
                                                                                                     } else {
                                                                                                       echo $resultUser['user_city'];
@@ -222,7 +223,7 @@ if (isset($_POST['change_password'])) {
                   </div>
                   <div class="col-md-3 mb-3">
                     <label for="zipcode">Code Postal</label>
-                    <input type="text" class="form-control" id="zipcode" name="zipcode" value="<?php if (isset($zipcode)) {
+                    <input type="text" autocomplete="off" class="form-control" id="zipcode" name="zipcode" value="<?php if (isset($zipcode)) {
                                                                                                   echo $zipcode;
                                                                                                 } else {
                                                                                                   echo $resultUser['user_zipcode'];
@@ -236,7 +237,6 @@ if (isset($_POST['change_password'])) {
           </div>
         </div>
 
-        <!-- Pie Chart -->
         <div class="col-xl-4 col-lg-5">
           <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
@@ -278,10 +278,10 @@ if (isset($_POST['change_password'])) {
                   <input type="password" class="form-control" name="current_password" placeholder="Mot de passe actuel">
                 </div>
                 <div class="form-group">
-                  <input type="password" class="form-control" name="new_password" placeholder="Nouveau mot de passe">
+                  <input type="password" autocomplete="new-password" class="form-control" name="new_password" placeholder="Nouveau mot de passe">
                 </div>
                 <div class="form-group">
-                  <input type="password" class="form-control" name="new_passwordc" placeholder="Confirmation du mot de passe">
+                  <input type="password" autocomplete="new-password" class="form-control" name="new_passwordc" placeholder="Confirmation du mot de passe">
                 </div>
                 <input type="submit" value="Valider" name="change_password" class="btn btn-primary btn-block">
               </form>

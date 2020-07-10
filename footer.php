@@ -1,6 +1,8 @@
 </div>
 <!-- End of Main Content -->
 
+<snackbar></snackbar>
+
 <?php if (!stripos($_SERVER['REQUEST_URI'], 'login') & !stripos($_SERVER['REQUEST_URI'], 'login.php') & !stripos($_SERVER['REQUEST_URI'], 'register') & !stripos($_SERVER['REQUEST_URI'], 'register.php') & !stripos($_SERVER['REQUEST_URI'], 'forgot-password') & !stripos($_SERVER['REQUEST_URI'], 'forgot-password.php')) { ?>
 <!-- Footer -->
 <footer class="sticky-footer bg-white">
@@ -52,7 +54,7 @@
   <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
 
   <!-- Custom scripts for all pages-->
-  <script src="js/sb-admin-2.min.js"></script>
+  <script src="js/sb-admin-2.js"></script>
 
   <script src="vendor/chart.js/Chart.min.js"></script>
 
@@ -69,6 +71,9 @@
 
   <script src="vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
   <script src="vendor/bootstrap-select/js/defaults-fr_FR.min.js"></script>
+
+  <script src="vendor/snackbar/js/snackbar.js"></script>
+
 
   <script src="js/scripts.js"></script>
 

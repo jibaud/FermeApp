@@ -87,7 +87,7 @@ $(document).ready(function () {
     })
     .find('input:submit, button:submit')
     .prop('disabled', true)
-  ;
+    ;
 
 
   var open = 0
@@ -162,20 +162,18 @@ $(document).ready(function () {
   });
 
   // Change les valeurs des inputs caché quand on modifie un input dans un row
-  $('.g_start_edit').on('change input', function(){
+  $('.g_start_edit').on('change input', function () {
     document.getElementById("inputGestStart").value = $(this).val();
   });
-  $('.g_state_edit').on('change input', function(){
+  $('.g_state_edit').on('change input', function () {
     document.getElementById("inputGestState").value = $(this).val();
   });
-  $('.g_end_edit').on('change input', function(){
+  $('.g_end_edit').on('change input', function () {
     document.getElementById("inputGestEnd").value = $(this).val();
   });
-  $('.g_note_edit').on('change input', function(){
+  $('.g_note_edit').on('change input', function () {
     document.getElementById("inputGestNote").value = $(this).val();
   });
-
-
 
 }); // End of document ready function
 
@@ -220,3 +218,16 @@ function gestationState() {
     gEnd.val('');
   }
 };
+
+
+function showSnackBar($message, $color = "primary"){
+  let snackbar  = new SnackBar;
+    snackbar.make("message",
+  [
+    $message,
+    null,
+    "bottom",
+    "center",
+    $color
+  ], 400000);
+}
