@@ -26,6 +26,9 @@ switch ($_GET['eg']) {
 	case 5:
 		$errorMessageGest = 'Cet vache à déjà une gestation en cours.';
 		break;
+	case 6:
+		$errorMessageGest = 'La date de fin ne peut pas être plus ancienne que celle du début.';
+		break;
 }
 
 switch ($_GET['e']) {
@@ -82,9 +85,9 @@ if (isset($_POST['updateCow'])) {
 		$valideMotherId = true;
 	} else {
 		$mother_id = htmlspecialchars($_POST['mother_id']);
-		if ($mother_id != $cow_id){
+		if ($mother_id != $cow_id) {
 			$valideMotherId = true;
-			if (is_numeric($mother_id)){
+			if (is_numeric($mother_id)) {
 				$valideMotherId = true;
 			} else {
 				$valideMotherId = false;
@@ -108,61 +111,61 @@ if (isset($_POST['updateCow'])) {
 		// Sinon on vérifie que l'id n'est pas déjà utilisé par une autre vache.
 	}
 
-	if(isset($mother_id))
+	if (isset($mother_id))
 
-	if ((!empty($cow_id)) && (!empty($name)) && (!empty($gender)) && (!empty($race)) && (!empty($birthdate))) {
-		if (strlen($name) <= 32) {
-			if (is_numeric($cow_id) && $valideMotherId) {
-				if ($rowId == 0) {
+		if ((!empty($cow_id)) && (!empty($name)) && (!empty($gender)) && (!empty($race)) && (!empty($birthdate))) {
+			if (strlen($name) <= 32) {
+				if (is_numeric($cow_id) && $valideMotherId) {
+					if ($rowId == 0) {
 
-					// Update cow actuelle avec nouvelles infos
-					$database = getPDO();
-					try {
-						$updateCow = $database->prepare("UPDATE cows SET id=?, name=?, birth_date=?, gender=?, race=?, mother_id=?, note=? WHERE id = $currentCowId AND owner_id = $owner_id");
-						$updateCow->execute([
-							$cow_id,
-							$name,
-							$birthdate,
-							$gender,
-							$race,
-							$mother_id,
-							$note
-						]);
-					} catch (Exception $e) {
-						echo " Error ! " . $e->getMessage();
-					}
-
-
-					// Update des enfants de la cow actuelle pour changer l'ID de leur mère
-					// seulement si on à changé l'id
-					if ($currentCowId != $cow_id) {
+						// Update cow actuelle avec nouvelles infos
+						$database = getPDO();
 						try {
-							$database = getPDO();
-							$updateChildren = $database->prepare("UPDATE cows SET mother_id=? WHERE mother_id = $currentCowId AND owner_id = $owner_id");
-							$updateChildren->execute([$cow_id]);
+							$updateCow = $database->prepare("UPDATE cows SET id=?, name=?, birth_date=?, gender=?, race=?, mother_id=?, note=? WHERE id = $currentCowId AND owner_id = $owner_id");
+							$updateCow->execute([
+								$cow_id,
+								$name,
+								$birthdate,
+								$gender,
+								$race,
+								$mother_id,
+								$note
+							]);
 						} catch (Exception $e) {
 							echo " Error ! " . $e->getMessage();
 						}
-					}
 
-					$successMessage = "Changements sauvegardés.";
-					header('Location: /cow-single?id=' . $currentCowId . '&s=1#');
+
+						// Update des enfants de la cow actuelle pour changer l'ID de leur mère
+						// seulement si on à changé l'id
+						if ($currentCowId != $cow_id) {
+							try {
+								$database = getPDO();
+								$updateChildren = $database->prepare("UPDATE cows SET mother_id=? WHERE mother_id = $currentCowId AND owner_id = $owner_id");
+								$updateChildren->execute([$cow_id]);
+							} catch (Exception $e) {
+								echo " Error ! " . $e->getMessage();
+							}
+						}
+
+						$successMessage = "Changements sauvegardés.";
+						header('Location: /cow-single?id=' . $currentCowId . '&s=1#');
+					} else {
+						$errorMessage = 'Une vache existe déjà avec ce numéro.';
+						header('Location: /cow-single?id=' . $currentCowId . '&e=1#');
+					}
 				} else {
-					$errorMessage = 'Une vache existe déjà avec ce numéro.';
-					header('Location: /cow-single?id=' . $currentCowId . '&e=1#');
+					$errorMessage = 'Le numéro d\'identification n\'est pas valide.';
+					header('Location: /cow-single?id=' . $currentCowId . '&e=2#');
 				}
 			} else {
-				$errorMessage = 'Le numéro d\'identification n\'est pas valide.';
-				header('Location: /cow-single?id=' . $currentCowId . '&e=2#');
+				$errorMessage = 'Le nom est trop long. 32 charactères maximum.';
+				header('Location: /cow-single?id=' . $currentCowId . '&e=3#');
 			}
 		} else {
-			$errorMessage = 'Le nom est trop long. 32 charactères maximum.';
-			header('Location: /cow-single?id=' . $currentCowId . '&e=3#');
+			$errorMessage = 'Veuillez remplir tous les champs obligatoires.';
+			header('Location: /cow-single?id=' . $currentCowId . '&e=4#');
 		}
-	} else {
-		$errorMessage = 'Veuillez remplir tous les champs obligatoires.';
-		header('Location: /cow-single?id=' . $currentCowId . '&e=4#');
-	}
 }
 
 
@@ -230,41 +233,46 @@ if (isset($_POST['updateGestRowSubmit'])) {
 	if ($valide) {
 		if ((!empty($updateStart))) {
 			if ($valideEmptyEnd) {
-				if (strlen($updateNote) <= 50) {
-					if ($updateState == 0 || $updateState == 1 || $updateState == 2) {
-						$database = getPDO();
-						try {
-							$updateGest = $database->prepare("UPDATE gestations SET g_start = ?, g_state = ?, g_end = ?, g_note = ? WHERE g_id = $updateNumber AND g_owner_id = $owner_id");
-							$updateGest->execute([
-								$updateStart,
-								$updateState,
-								$updateEnd,
-								$updateNote
-							]);
-						} catch (Exception $e) {
-							echo " Error ! " . $e->getMessage();
+				if (compareDate($updateEnd, $updateStart)) {
+					if (strlen($updateNote) <= 50) {
+						if ($updateState == 0 || $updateState == 1 || $updateState == 2) {
+							$database = getPDO();
+							try {
+								$updateGest = $database->prepare("UPDATE gestations SET g_start = ?, g_state = ?, g_end = ?, g_note = ? WHERE g_id = $updateNumber AND g_owner_id = $owner_id");
+								$updateGest->execute([
+									$updateStart,
+									$updateState,
+									$updateEnd,
+									$updateNote
+								]);
+							} catch (Exception $e) {
+								echo " Error ! " . $e->getMessage();
+							}
+
+							try {
+								$changePregnantState = $database->prepare("UPDATE cows SET ispregnant = ?, pregnant_since = ? WHERE id = $currentCowId AND owner_id = $owner_id");
+								$changePregnantState->execute([
+									$pregnantState,
+									$updateStart
+								]);
+							} catch (Exception $e) {
+								echo " Error ! " . $e->getMessage();
+							}
+
+
+							$successMessageGest = "Opération réussie.";
+							header('Location: /cow-single?id=' . $currentCowId . '&s=1#gestations');
+						} else {
+							$errorMessageGest = 'Champs état non valide';
+							header('Location: /cow-single?id=' . $currentCowId . '&eg=1#gestations');
 						}
-
-						try {
-							$changePregnantState = $database->prepare("UPDATE cows SET ispregnant = ?, pregnant_since = ? WHERE id = $currentCowId AND owner_id = $owner_id");
-							$changePregnantState->execute([
-								$pregnantState,
-								$updateStart
-							]);
-						} catch (Exception $e) {
-							echo " Error ! " . $e->getMessage();
-						}
-
-
-						$successMessageGest = "Opération réussie.";
-						header('Location: /cow-single?id=' . $currentCowId . '&s=1#gestations');
 					} else {
-						$errorMessageGest = 'Champs état non valide';
-						header('Location: /cow-single?id=' . $currentCowId . '&eg=1#gestations');
+						$errorMessageGest = 'Le champs note est trop long. 50 charactères maximum.';
+						header('Location: /cow-single?id=' . $currentCowId . '&eg=2#gestations');
 					}
 				} else {
-					$errorMessageGest = 'Le champs note est trop long. 50 charactères maximum.';
-					header('Location: /cow-single?id=' . $currentCowId . '&eg=2#gestations');
+					$errorMessageGest = 'La date de fin ne peut pas être plus ancienne que celle du début.';
+					header('Location: /cow-single?id=' . $currentCowId . '&eg=6#gestations');
 				}
 			} else {
 				$errorMessageGest = 'Une date de fin de gestation est nécéssaire.';
@@ -317,10 +325,11 @@ if (isset($_POST['addGestSubmit'])) {
 	if ($result['ispregnant'] == 0) {
 		if ((!empty($gStart))) {
 			if ($valide) {
-				if (strlen($gNote) <= 50) {
-					if ($gState == 0 || $gState == 1 || $gState == 2) {
-						try {
-							$insertGest = $database->prepare("INSERT INTO gestations(
+				if (compareDate($updateEnd, $updateStart)) {
+					if (strlen($gNote) <= 50) {
+						if ($gState == 0 || $gState == 1 || $gState == 2) {
+							try {
+								$insertGest = $database->prepare("INSERT INTO gestations(
 								g_cow_index,
 								g_start,
 								g_end,
@@ -328,40 +337,49 @@ if (isset($_POST['addGestSubmit'])) {
 								g_note,
 								g_owner_id
 								) VALUES(?, ?, ?, ?, ?, ?)");
-							$insertGest->execute([
-								$currentCowIndex,
-								$gStart,
-								$gEnd,
-								$gState,
-								$gNote,
-								$owner_id
-							]);
-						} catch (Exception $e) {
-							echo " Error ! " . $e->getMessage();
-						}
+								$insertGest->execute([
+									$currentCowIndex,
+									$gStart,
+									$gEnd,
+									$gState,
+									$gNote,
+									$owner_id
+								]);
+							} catch (Exception $e) {
+								echo " Error ! " . $e->getMessage();
+							}
 
-						try {
-							$changePregnantState = $database->prepare("UPDATE cows SET ispregnant='$pregnantState', pregnant_since='$gStart', pregnant_number=pregnant_number+1 WHERE id=$currentCowId AND owner_id=$owner_id");
-							$changePregnantState->execute();
-						} catch (Exception $e) {
-							echo " Error ! " . $e->getMessage();
-						}
+							try {
+								$changePregnantState = $database->prepare("UPDATE cows SET ispregnant='$pregnantState', pregnant_since='$gStart', pregnant_number=pregnant_number+1 WHERE id=$currentCowId AND owner_id=$owner_id");
+								$changePregnantState->execute();
+							} catch (Exception $e) {
+								echo " Error ! " . $e->getMessage();
+							}
 
-						header('Location: /cow-single?id=' . $currentCowId . '&s=1#gestations');
+							header('Location: /cow-single?id=' . $currentCowId . '&s=1#gestations');
+						} else {
+							$errorMessageGest = 'Champs état non valide';
+							header('Location: /cow-single?id=' . $currentCowId . '&eg=1#gestations');
+						}
 					} else {
-						$errorMessage = 'Champs select non valide';
+						$errorMessageGest = 'Le champs note est trop long. 50 charactères maximum.';
+						header('Location: /cow-single?id=' . $currentCowId . '&eg=2#gestations');
 					}
 				} else {
-					$errorMessage = 'Le champs note est trop long. 50 charactères maximum.';
+					$errorMessageGest = 'La date de fin ne peut pas être plus ancienne que celle du début.';
+					header('Location: /cow-single?id=' . $currentCowId . '&eg=6#gestations');
 				}
 			} else {
-				$errorMessage = 'Une date de fin de gestation est nécéssaire.';
+				$errorMessageGest = 'Une date de fin de gestation est nécéssaire.';
+				header('Location: /cow-single?id=' . $currentCowId . '&eg=3#gestations');
 			}
 		} else {
-			$errorMessage = 'Une date de début de gestation est nécéssaire.';
+			$errorMessageGest = 'Une date de début de gestation est nécéssaire.';
+			header('Location: /cow-single?id=' . $currentCowId . '&eg=4#gestations');
 		}
 	} else {
-		$errorMessage = 'Cet vache à déjà une gestation en cours.';
+		$errorMessageGest = 'Cet vache à déjà une gestation en cours.';
+		header('Location: /cow-single?id=' . $currentCowId . '&eg=5#gestations');
 	}
 }
 
@@ -469,20 +487,20 @@ $pageTitle = $result['name'];
 											<div class="icon-circle bg-primary"><i class="fas fa-tint text-white"></i></div>
 										</div>
 										<div class="col-sm-10 align-middle"><?php
-																date_default_timezone_set('Europe/Paris');
-																$dateToday = date('j/m/Y');
-																$dateEndLact = futureDate($lastGestResult['g_end'], 10);
-																if (compareDate($dateEndLact, $dateToday)) { // Si date 1 > date 2
-																?>
+																			date_default_timezone_set('Europe/Paris');
+																			$dateToday = date('j/m/Y');
+																			$dateEndLact = futureDate($lastGestResult['g_end'], 10);
+																			if (compareDate($dateEndLact, $dateToday)) { // Si date 1 > date 2
+																			?>
 												Lactation prévue pendant les <?= daysSince($dateEndLact) ?> prochains jours, soit jusqu'au <?= $dateEndLact; ?> environ.
 											<?php
-																} else {
+																			} else {
 											?>
-												Vache en tarrissement depuis <?= daysSince($dateEndLact); ?> jours 
+												Vache en tarrissement depuis <?= daysSince($dateEndLact); ?> jours
 												<i class="fad fa-question-circle text-primary" data-toggle="tooltip" data-placement="top" title="Information téhorique car cette vache a vêlé il y a plus de 10 mois"></i>
 												<span class="font-weight-lighter"><em> (~<?= $dateEndLact; ?>)</em></span>
 											<?php
-																}
+																			}
 											?></div>
 									</div>
 									<div class="row gestInfo">
@@ -490,18 +508,18 @@ $pageTitle = $result['name'];
 											<div class="icon-circle bg-primary"></i><i class="icon-sperm text-white"></i></div>
 										</div>
 										<div class="col-sm-10 align-middle"><?php
-																$dateNextInsemin = futureDate($lastGestResult['g_end'], 3);
-																if (compareDate($dateNextInsemin, $dateToday)) {
-																?>
+																			$dateNextInsemin = futureDate($lastGestResult['g_end'], 3);
+																			if (compareDate($dateNextInsemin, $dateToday)) {
+																			?>
 												Prévoir une insémination vers le <?= $dateNextInsemin ?>
 												<i class="fad fa-question-circle text-primary" data-toggle="tooltip" data-placement="top" title="3 mois après le dernier vêlage"></i>
 											<?php
-																} else {
+																			} else {
 											?>
 												La date idéale d'insémination était le <?= $dateNextInsemin ?>.
 												<i class="fad fa-question-circle text-primary" data-toggle="tooltip" data-placement="top" title="3 mois après le dernier vêlage"></i>
 											<?php
-																}
+																			}
 											?></div>
 									</div>
 								</div>
@@ -520,15 +538,15 @@ $pageTitle = $result['name'];
 								<div class="row no-gutters align-items-center">
 									<div class="col mr-5">
 
-									<div class="row mb-1 gestInfo">
-										<div class="col-sm-2 align-middle">
-											<div class="icon-circle bg-<?= $color ?>"><i class="fas fa-baby-carriage text-white"></i></div>
+										<div class="row mb-1 gestInfo">
+											<div class="col-sm-2 align-middle">
+												<div class="icon-circle bg-<?= $color ?>"><i class="fas fa-baby-carriage text-white"></i></div>
+											</div>
+											<div class="col-sm-10 align-middle">
+												<p class="mb-1 text-gray-800 h6">En gestation depuis le <span class="font-weight-bold"><?= $result['pregnant_since']; ?></span></p>
+											</div>
 										</div>
-										<div class="col-sm-10 align-middle">
-										<p class="mb-1 text-gray-800 h6">En gestation depuis le <span class="font-weight-bold"><?= $result['pregnant_since']; ?></span></p>
-										</div>
-									</div>
-										
+
 
 										<div class="row no-gutters align-items-center mt-4">
 											<div class="col-auto">
@@ -834,17 +852,6 @@ $pageTitle = $result['name'];
 
 			?>
 
-			<?php if (isset($errorMessageGest)) { ?>
-				<div class="alert alert-danger" role="alert">
-					<?= $errorMessageGest // <?= shortcode for <?php echo 
-					?>
-				</div>
-			<?php } ?>
-			<?php if (isset($successMessageGest)) { ?>
-				<div class="alert alert-success" role="alert">
-					<?= $successMessageGest ?>
-				</div>
-			<?php } ?>
 
 			<!-- GESTATION -->
 			<div class="row <?php if (calculeType($result['birth_date']) == 'veau') {
@@ -861,6 +868,20 @@ $pageTitle = $result['name'];
 						</div>
 						<!-- Card Body -->
 						<div class="card-body">
+
+							<?php if (isset($errorMessageGest)) { ?>
+								<div class="alert alert-danger" role="alert">
+									<?= $errorMessageGest // <?= shortcode for <?php echo 
+									?>
+								</div>
+							<?php } ?>
+							<?php if (isset($successMessageGest)) { ?>
+								<div class="alert alert-success" role="alert">
+									<?= $successMessageGest ?>
+								</div>
+							<?php } ?>
+
+
 							<p><?= $result['name']; ?> a un total de <?= $GestNumber ?> géstations.</p>
 							<div class="table-responsive">
 								<table class="table table-bordered" id="gestTable" width="100%" cellspacing="0">
@@ -1043,6 +1064,7 @@ $pageTitle = $result['name'];
 
 							<?php } //End if pregnant 
 							?>
+
 
 						</div>
 					</div>
