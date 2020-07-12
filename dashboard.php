@@ -9,14 +9,44 @@ include 'header.php';
 
 ?>
 
+
 <body id="page-top">
-<?php include 'includes/loader.php'; ?>
+  <?php include 'includes/loader.php'; ?>
+
+
 
 
   <!-- Page Wrapper -->
   <div id="wrapper">
 
     <?php include 'sidebar.php'; ?>
+    <?php include 'topbar.php'; ?>
+    
+
+
+<?php
+
+// On récupère tout le contenu de la table cows
+$dashboardCow = $database->prepare("SELECT * FROM cows WHERE owner_id = ? AND isarchived = 0");
+$dashboardCow->execute([$owner_id]);
+$totalCow = 0;
+$totalCalf = 0;
+$totalYoungCow = 0;
+
+while ($data = $dashboardCow->fetch()){
+
+  if (calculeType($data['birth_date']) == 'veau'){
+    $totalCalf++;
+  } else if (calculeType($data['birth_date']) == 'génisse'){
+    if ($data['pregnant_number'] > 0) {
+      $totalCow++;
+    } else {
+      $totalYoungCow++;
+    }
+  }
+}
+
+?>
 
     <!-- Content Wrapper -->
     <div id="content-wrapper" class="d-flex flex-column">
@@ -24,7 +54,7 @@ include 'header.php';
       <!-- Main Content -->
       <div id="content">
 
-        <?php include 'topbar.php'; ?>
+        
 
         <!-- Begin Page Content -->
         <div class="container-fluid">
@@ -45,7 +75,7 @@ include 'header.php';
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                       <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total vaches</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800">15</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $totalCow ?></div>
                     </div>
                     <div class="col-auto">
                       <i class="fas fa-cow fa-3x text-gray-300"></i>
@@ -62,7 +92,7 @@ include 'header.php';
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                       <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total génisses</div>
-                      <div class="h4 mb-0 font-weight-bold text-gray-800">5</div>
+                      <div class="h4 mb-0 font-weight-bold text-gray-800"><?= $totalYoungCow ?></div>
                     </div>
                     <div class="col-auto">
                       <i class="fad fa-cow fa-3x text-gray-300"></i>
@@ -79,7 +109,7 @@ include 'header.php';
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                       <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total veaux</div>
-                      <div class="h4 mb-0 font-weight-bold text-gray-800">3</div>
+                      <div class="h4 mb-0 font-weight-bold text-gray-800"><?= $totalCalf ?></div>
                     </div>
                     <div class="col-auto">
                       <i class="icon-calf fa-3x text-gray-300"></i>
@@ -122,7 +152,8 @@ include 'header.php';
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                       <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Gestation<?= $ps ?> en cours</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $pregnantNumber ?></div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $pregnantNumber //topbar top
+                                                                          ?></div>
                     </div>
                     <div class="col-auto">
                       <i class="fas fa-baby-carriage fa-2x text-gray-300"></i>

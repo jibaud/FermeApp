@@ -22,11 +22,15 @@ if (isset($_POST['restaure'])) {
 
 // Supprimer une bête définitivement
 if (isset($_POST['delete'])) {
-  $deleteidnumber = htmlspecialchars($_POST['selectedIdToDelete']);
+  $deleteindexnumber = htmlspecialchars($_POST['selectedIndexToDelete']);
   $owner_id = $_SESSION['userID'];
   $database = getPDO();
-  $deleteCow = $database->prepare("DELETE FROM cows WHERE id = $deleteidnumber AND owner_id = $owner_id");
+  $deleteCow = $database->prepare("DELETE FROM cows WHERE cow_index = $deleteindexnumber AND owner_id = $owner_id");
   $deleteCow->execute();
+
+  // Supprime aussi les gestations associées à cette vache
+  $deleteCowGest = $database->prepare("DELETE FROM gestations WHERE g_cow_index = $deleteindexnumber AND g_owner_id = $owner_id");
+  $deleteCowGest->execute();
 
   header('Location:archives');
 }
@@ -136,7 +140,7 @@ if (isset($_GET['e'])) {
                       </span>
 
                       <span data-toggle="tooltip" data-placement="top" title="Supprimer">
-                        <button type="button" class="btn btn-danger btn-sm deleteButton selectIdButtonDelete" id="<?= $donnees['id']; ?>" data-toggle="modal" data-target="#deleteCowModal">
+                        <button type="button" class="btn btn-danger btn-sm deleteButton selectIndexButtonDelete" id="<?= $donnees['cow_index']; ?>" data-toggle="modal" data-target="#deleteCowModal">
                           <i class="fas fa-trash"></i>
                         </button>
                       </span>
@@ -220,7 +224,7 @@ if (isset($_GET['e'])) {
           <div class="modal-footer">
               <button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
               <form action="" method="post">
-                <input type="text" id="selectedIdToDelete" name="selectedIdToDelete" value="" style="display:none;">
+                <input type="text" id="selectedIndexToDelete" name="selectedIndexToDelete" value="" style="display:none;">
                 <input type="submit" name="delete" id="delete" value="Confirmer la suppression définitive" class="btn btn-outline-danger">
               </form>
             </div>

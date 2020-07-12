@@ -79,8 +79,19 @@ if (isset($_POST['updateCow'])) {
 
 	if (empty($_POST['mother_id'])) {
 		$mother_id = "";
+		$valideMotherId = true;
 	} else {
 		$mother_id = htmlspecialchars($_POST['mother_id']);
+		if ($mother_id != $cow_id){
+			$valideMotherId = true;
+			if (is_numeric($mother_id)){
+				$valideMotherId = true;
+			} else {
+				$valideMotherId = false;
+			}
+		} else {
+			$valideMotherId = false;
+		}
 	}
 
 	if (empty($_POST['note'])) {
@@ -97,9 +108,11 @@ if (isset($_POST['updateCow'])) {
 		// Sinon on vérifie que l'id n'est pas déjà utilisé par une autre vache.
 	}
 
+	if(isset($mother_id))
+
 	if ((!empty($cow_id)) && (!empty($name)) && (!empty($gender)) && (!empty($race)) && (!empty($birthdate))) {
 		if (strlen($name) <= 32) {
-			if (is_numeric($cow_id) && is_numeric($mother_id)) {
+			if (is_numeric($cow_id) && $valideMotherId) {
 				if ($rowId == 0) {
 
 					// Update cow actuelle avec nouvelles infos

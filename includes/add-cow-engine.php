@@ -8,11 +8,22 @@ if (isset($_POST['add'])){
     $race = htmlspecialchars($_POST['race']);
     $birthdate = htmlspecialchars($_POST['birthdate']);
 
-    if (empty($_POST['mother_id'])){
-        $mother_id = "";
-    } else {
-        $mother_id = htmlspecialchars($_POST['mother_id']);
-    }
+    if (empty($_POST['mother_id'])) {
+		$mother_id = "";
+		$valideMotherId = true;
+	} else {
+		$mother_id = htmlspecialchars($_POST['mother_id']);
+		if ($mother_id != $cow_id){
+			$valideMotherId = true;
+			if (is_numeric($mother_id)){
+				$valideMotherId = true;
+			} else {
+				$valideMotherId = false;
+			}
+		} else {
+			$valideMotherId = false;
+		}
+	}
 
     $note = "";
     $ispregnant = 0;
@@ -29,7 +40,7 @@ if (isset($_POST['add'])){
   
     if ((!empty($cow_id)) && (!empty($name)) && (!empty($gender)) && (!empty($race)) && (!empty($birthdate)) ) {
         if (strlen($name) <= 32) {
-                if (is_numeric($cow_id)) {
+                if (is_numeric($cow_id) && $valideMotherId) {
                     if (true){
                         $database = getPDO();
                         $rowId = countDatabaseValue($database, 'cows', 'id', 'owner_id', $cow_id, $owner_id);
@@ -89,5 +100,3 @@ if (isset($_POST['add'])){
         $errorMessage = 'Veuillez remplir tous les champs obligatoires.';
     }
 }
-
-?>

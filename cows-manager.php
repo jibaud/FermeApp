@@ -49,9 +49,20 @@ if (isset($_POST['archive'])) {
       </div>
 
 
+      <?php
+      if(isset($_GET['filter'])) {
+        $filterValue = $_GET['filter'];
+      } else {
+        $filterValue = '';
+      }
+
+      echo $filterValue;
+      ?>
+
+
+
       <!-- DataTales Example -->
       <div class="card shadow mb-4">
-
         <div class="card-body">
           <div class="table-responsive">
             <table class="table table-bordered" id="cowListTable" width="100%" cellspacing="0">
@@ -379,3 +390,5 @@ if (isset($_POST['archive'])) {
 
       });
     </script>
+
+<script>$(document).ready(function () {$('#cowListTable_filter').child('label').child('input').val("lala");});</script>

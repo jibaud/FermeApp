@@ -41,8 +41,9 @@ $(document).ready(function () {
   $(".selectIdButtonRestaure").click(function (e) {
     document.getElementById("selectedIdToRestaure").value = this.id;
   });
-  $(".selectIdButtonDelete").click(function (e) {
-    document.getElementById("selectedIdToDelete").value = this.id;
+  $(".selectIndexButtonDelete").click(function (e) {
+    console.log('ok');
+    document.getElementById("selectedIndexToDelete").value = this.id;
   });
 
   // Tooltip initializer
