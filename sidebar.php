@@ -67,6 +67,11 @@
 <!-- Nav Item - Tables -->
 <li class="nav-item">
   <a class="nav-link" href="laboratory">
+  <i class="fas fa-cash-register"></i>
+    <span>Ventes</span></a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="laboratory">
   <i class="fas fa-flask"></i>
     <span>Laboratoire</span></a>
 </li>
@@ -87,8 +92,8 @@
   </a>
   <div id="collapseArchives" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
     <div class="bg-white py-2 collapse-inner rounded">
-      <a class="collapse-item" href="/">Vaches vendues</a>
-      <a class="collapse-item" href="/">Vaches décédées</a>
+      <a class="collapse-item" href="/sold">Vaches vendues</a>
+      <a class="collapse-item" href="/dead">Vaches décédées</a>
       <a class="collapse-item" href="archives">Corbeille</a>
     </div>
   </div>

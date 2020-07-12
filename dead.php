@@ -5,39 +5,30 @@ session_start();
 include 'includes/database.php';
 include 'includes/forbidden.php';
 
-$pageTitle = 'Corbeille';
+$pageTitle = 'Cimetière';
 include 'header.php';
 
 
-// Réstaurer une bête archivée
+// Rescusiter une bête morte
 if (isset($_POST['restaure'])) {
   $restaureidnumber = htmlspecialchars($_POST['selectedIdToRestaure']);
   $owner_id = $_SESSION['userID'];
   $database = getPDO();
-  $restaureCow = $database->prepare("UPDATE cows SET isarchived = 0 WHERE id = $restaureidnumber AND owner_id = $owner_id");
+  $restaureCow = $database->prepare("UPDATE cows SET death_date = '' WHERE id = $restaureidnumber AND owner_id = $owner_id");
   $restaureCow->execute();
 
-  header('Location:archives');
+  header('Location:dead');
 }
 
-// Supprimer une bête définitivement
+// Archiver une bête morte
 if (isset($_POST['delete'])) {
   $deleteindexnumber = htmlspecialchars($_POST['selectedIndexToDelete']);
   $owner_id = $_SESSION['userID'];
   $database = getPDO();
-  $deleteCow = $database->prepare("DELETE FROM cows WHERE cow_index = $deleteindexnumber AND owner_id = $owner_id");
+  $deleteCow = $database->prepare("UPDATE cows SET isarchived = 1 WHERE cow_index = $deleteindexnumber AND owner_id = $owner_id");
   $deleteCow->execute();
 
-  // Supprime aussi les gestations associées à cette vache
-  $deleteCowGest = $database->prepare("DELETE FROM gestations WHERE g_cow_index = $deleteindexnumber AND g_owner_id = $owner_id");
-  $deleteCowGest->execute();
-
-  header('Location:archives');
-}
-
-// Message d'erreur redirection from cow-single if archived
-if (isset($_GET['e'])) {
-  $warningMessage = "La vache portant le numéro d'identification " . $_GET['e'] . " se trouve dans la corbeille. Vous pouvez la restaurer si vous le souhaitez.";
+  header('Location:dead');
 }
 
 
@@ -71,6 +62,10 @@ if (isset($_GET['e'])) {
       <!-- Page Heading -->
       <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800"><?= $pageTitle ?></h1>
+        <div class="text-primary">
+            <i class="fad fa-tombstone fa-3x"></i>
+            <i class="fad fa-skull-cow fa-3x"></i>
+        </div>
       </div>
 
 
@@ -86,7 +81,7 @@ if (isset($_GET['e'])) {
                   <th>Nom</th>
                   <th>Genre</th>
                   <th>Naissance</th>
-                  <th>Statut</th>
+                  <th>Mort</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -96,7 +91,7 @@ if (isset($_GET['e'])) {
                   <th>Nom</th>
                   <th>Genre</th>
                   <th>Naissance</th>
-                  <th>Statut</th>
+                  <th>Mort</th>
                   <th>Actions</th>
                 </tr>
               </tfoot>
@@ -106,7 +101,7 @@ if (isset($_GET['e'])) {
 
                 $owner_id = $_SESSION['userID'];
                 $database = getPDO();
-                $reponseCowList = $database->prepare("SELECT * FROM cows WHERE owner_id = $owner_id AND isarchived = 1");
+                $reponseCowList = $database->prepare("SELECT * FROM cows WHERE owner_id = $owner_id AND isarchived = 0 AND death_date != ''");
                 $reponseCowList->execute();
 
                 // On affiche chaque entrée une à une
@@ -118,18 +113,7 @@ if (isset($_GET['e'])) {
                     <td style="text-transform:capitalize;" id="namefor<?= $donnees['id']; ?>"><?= $donnees['name']; ?></td>
                     <td style="text-transform:capitalize;"><?= $donnees['gender']; ?></td>
                     <td><?= $donnees['birth_date']; ?></td>
-
-                    
-                    <?php if ($donnees['death_date'] != '') { ?>
-                      <td class="text-warning">Mort(e)</td>
-                    <?php } else if ($donnees['sale_date']) { ?>
-                      <td class="text-success">Vendu(e)</td>
-                    <?php } else if ($donnees['isarchived']) { ?>
-                      <td class="text-danger">Supprimé</td>
-                    <?php } else { ?>
-                      <td></td>
-                    <?php } ?>
-
+                    <td><?= $donnees['death_date']; ?></td>
 
                     <td>
                       <span data-toggle="tooltip" data-placement="top" id="viewButton<?= $donnees['id']; ?>" title="Coup d'oeil">
@@ -198,19 +182,19 @@ if (isset($_GET['e'])) {
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title text-gray-800" id="">ATTENTION</h5>
+            <h5 class="modal-title text-gray-800" id="">Suppression</h5>
             <button class="close" type="button" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">×</span>
             </button>
           </div>
           <div class="modal-body">
-            <p>Si vous supprimer cette bête vous n'aurez aucun moyen de la retrouver. Etes vous certain de vouloir supprimer cette bête définitivement ?</p>
+            <p>Voulez-vous vraiment supprimer cette vache ?</p>
           </div>
           <div class="modal-footer">
               <button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
               <form action="" method="post">
                 <input type="text" id="selectedIndexToDelete" name="selectedIndexToDelete" value="" style="display:none;">
-                <input type="submit" name="delete" id="delete" value="Confirmer la suppression définitive" class="btn btn-outline-danger">
+                <input type="submit" name="delete" id="delete" value="Supprimer" class="btn btn-danger">
               </form>
             </div>
         </div>
@@ -246,7 +230,7 @@ if (isset($_GET['e'])) {
           $('#viewCowModal<?= $donnees['id'] ?>').on('hide.bs.modal', function(e) {
             history.pushState({
               key: 'milkow'
-            }, '', 'archives');
+            }, '', 'dead');
           })
 
         });
@@ -289,6 +273,14 @@ if (isset($_GET['e'])) {
                     <td><?= $donnees['birth_date']; ?></td>
                   </tr>
                   <tr>
+                    <th scope="row">Date de décès</th>
+                    <td><?= $donnees['death_date']; ?></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Age lors du décès</th>
+                    <td><?= calculeAgeDead($donnees['birth_date'], $donnees['death_date'], 'full'); ?></td>
+                  </tr>
+                  <tr>
                     <th scope="row">Numéro de la mère</th>
                     <?php if ($donnees['mother_id'] == '') { ?>
                       <td>Inconnu</td>
@@ -305,6 +297,10 @@ if (isset($_GET['e'])) {
                     <?php } else { ?>
                       <td>Aucune géstation</td>
                     <?php } ?>
+                  </tr>
+                  <tr>
+                    <th scope="row">Note</th>
+                    <td><?= $donnees['note']; ?></td>
                   </tr>
 
                 </tbody>

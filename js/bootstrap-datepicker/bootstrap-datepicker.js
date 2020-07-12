@@ -4,7 +4,7 @@ $(document).ready(function() {
         format: "dd/mm/yyyy",
         endDate: "0d",
         language: "fr",
-        orientation: "auto top",
+        orientation: "auto",
         autoclose: false, //To avoid to change URL of the modal
         todayHighlight: true
     });

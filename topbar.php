@@ -52,7 +52,7 @@
         // On récupère tout le contenu de la table cows si vache enceinte, non archivée et appartenant a l'utilisateur en cours
         $owner_id = $_SESSION['userID'];
         $database = getPDO();
-        $reponseCowPregnant = $database->prepare("SELECT * FROM cows WHERE owner_id = ? AND isarchived = 0 AND ispregnant = 1 ORDER BY `cows`.`pregnant_since` DESC");
+        $reponseCowPregnant = $database->prepare("SELECT * FROM cows WHERE owner_id = ? AND isarchived = 0 AND ispregnant = 1 AND death_date = '' AND sale_date = '' ORDER BY `cows`.`pregnant_since` DESC");
         $reponseCowPregnant->execute([$owner_id]);
         $pregnantNumber = $reponseCowPregnant->rowCount();
 

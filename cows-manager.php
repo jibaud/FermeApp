@@ -45,19 +45,8 @@ if (isset($_POST['archive'])) {
       <!-- Page Heading -->
       <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800"><?= $pageTitle ?></h1>
-        <a href="#" id="addNewButton" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm" data-toggle="modal" data-target="#addCowModal"><i class="fas fa-plus-square fa-sm text-white-50"></i> Nouveau</a>
+        <a href="#" id="addNewButton" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm" data-toggle="modal" data-target="#addCowModal"><i class="fas fa-plus-circle fa-sm mr-1 text-white-50"></i> Nouveau</a>
       </div>
-
-
-      <?php
-      if(isset($_GET['filter'])) {
-        $filterValue = $_GET['filter'];
-      } else {
-        $filterValue = '';
-      }
-
-      echo $filterValue;
-      ?>
 
 
 
@@ -72,7 +61,7 @@ if (isset($_POST['archive'])) {
                   <th>Nom</th>
                   <th>Genre</th>
                   <th>Type</th>
-                  <th>Né(e) le</th>
+                  <th>Naissance</th>
                   <th>Age</th>
                   <th>Gestante</th>
                   <th>Actions</th>
@@ -84,7 +73,7 @@ if (isset($_POST['archive'])) {
                   <th>Nom</th>
                   <th>Genre</th>
                   <th>Type</th>
-                  <th>Né(e) le</th>
+                  <th>Naissance</th>
                   <th>Age</th>
                   <th>Gestante</th>
                   <th>Actions</th>
@@ -96,7 +85,7 @@ if (isset($_POST['archive'])) {
 
                 $owner_id = $_SESSION['userID'];
                 $database = getPDO();
-                $reponseCowList = $database->prepare("SELECT * FROM cows WHERE owner_id = $owner_id AND isarchived = 0");
+                $reponseCowList = $database->prepare("SELECT * FROM cows WHERE owner_id = $owner_id AND isarchived = 0 AND death_date = '' AND sale_date = ''");
                 $reponseCowList->execute();
 
                 // On affiche chaque entrée une à une
@@ -199,7 +188,7 @@ if (isset($_POST['archive'])) {
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title text-gray-800" id="">Supprimer</h5>
+            <h5 class="modal-title text-gray-800" id="">Suppression</h5>
             <button class="close" type="button" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">×</span>
             </button>
@@ -366,6 +355,10 @@ if (isset($_POST['archive'])) {
                       }
                       ?>
                     </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Note</th>
+                    <td><?= $donnees['note']; ?></td>
                   </tr>
                 </tbody>
               </table>
