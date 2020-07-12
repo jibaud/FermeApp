@@ -87,6 +87,16 @@ if ($result['isarchived'] == 1) {
 	header('Location:archives?e=' . $result['id']);
 }
 
+// Si l'id demandé dans l'URL est dans le cimetière.
+if ($result['death_date']) {
+	header('Location:dead?e=' . $result['id']);
+}
+
+// Si l'id demandé dans l'URL est dans le cimetière.
+if ($result['sale_date']) {
+	header('Location:sold?e=' . $result['id']);
+}
+
 // Si l'id demandé dans l'URL n'existe pas.
 $reponseCow->execute([$owner_id, $currentCowId]);
 $result = $reponseCow->fetch();
@@ -150,7 +160,7 @@ $pageTitle = $result['name'];
 
 		<div class="row mb-4">
 			<div class="col-12">
-				<p class="h5 text-gray-800"><?= $result['birth_date']; ?><span class="mb-0 text-gray-700 h6"> (<?= calculeAge($result['birth_date'], 'full') ?>)</span></p>
+				<p class="h5 text-gray-800">Né<?= $eIfFemal ?> le <?= $result['birth_date']; ?><span class="mb-0 text-gray-700 h6"> (<?= calculeAge($result['birth_date'], 'full') ?>)</span></p>
 				<p class="h5 text-gray-800"><span class="capitalize"><?= $type; ?></span> <?= $result['gender']; ?> de race <?= $result['race']; ?></p>
 			</div>
 		</div> <!-- /.row -->

@@ -32,6 +32,12 @@ if (isset($_POST['delete'])) {
 }
 
 
+// Message d'erreur redirection from cow-single if dead
+if (isset($_GET['e'])) {
+    $warningMessage = "La bête portant le numéro d'identification " . $_GET['e'] . " à été déclarée morte, elle se trouve dans le cimetière.";
+  }
+
+
 ?>
 
 <body id="page-top">

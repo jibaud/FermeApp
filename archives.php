@@ -37,7 +37,7 @@ if (isset($_POST['delete'])) {
 
 // Message d'erreur redirection from cow-single if archived
 if (isset($_GET['e'])) {
-  $warningMessage = "La vache portant le numéro d'identification " . $_GET['e'] . " se trouve dans la corbeille. Vous pouvez la restaurer si vous le souhaitez.";
+  $warningMessage = "La bête portant le numéro d'identification " . $_GET['e'] . " se trouve dans la corbeille. Vous pouvez la restaurer si vous le souhaitez.";
 }
 
 
