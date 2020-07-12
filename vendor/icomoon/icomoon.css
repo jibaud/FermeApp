@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?ip4ey4');
-  src:  url('fonts/icomoon.eot?ip4ey4#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?ip4ey4') format('truetype'),
-    url('fonts/icomoon.woff?ip4ey4') format('woff'),
-    url('fonts/icomoon.svg?ip4ey4#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?j7d1t');
+  src:  url('fonts/icomoon.eot?j7d1t#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?j7d1t') format('truetype'),
+    url('fonts/icomoon.woff?j7d1t') format('woff'),
+    url('fonts/icomoon.svg?j7d1t#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -25,13 +25,22 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-cow .path1:before {
+.icon-sperm:before {
+  content: "\e905";
+}
+.icon-sperm-alt:before {
+  content: "\e906";
+}
+.icon-insemination:before {
   content: "\e900";
+}
+.icon-cow .path1:before {
+  content: "\e901";
   color: rgb(0, 0, 0);
   opacity: 0.4;
 }
 .icon-cow .path2:before {
-  content: "\e901";
+  content: "\e907";
   margin-left: -1.25em;
   color: rgb(0, 0, 0);
 }

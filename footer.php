@@ -31,12 +31,12 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Deconnexion ?</h5>
+          <h5 class="modal-title" id="exampleModalLabel">Deconnexion</h5>
           <button class="close" type="button" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
           </button>
         </div>
-        <div class="modal-body">Cliquez sur "Se déconnecter" ci-dessous pour confirmer.</div>
+        <div class="modal-body">Voulez-vous vraiment vous déconnecter ?</div>
         <div class="modal-footer">
           <button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
           <a class="btn btn-danger" href="logout.php">Se déconnecter</a>
@@ -47,7 +47,7 @@
 <?php } // END IF PAGE ?> 
 
   <!-- Bootstrap core JavaScript-->
-  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.js"></script>
   <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
   <!-- Core plugin JavaScript-->
@@ -74,6 +74,7 @@
 
   <script src="vendor/snackbar/js/snackbar.js"></script>
 
+  
 
   <script src="js/scripts.js"></script>
 

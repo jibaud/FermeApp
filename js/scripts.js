@@ -129,6 +129,7 @@ $(document).ready(function () {
     e.preventDefault();
 
     resetGestRow();
+    $(this).parents('.rowGestList').addClass('activeGest');
 
     // Affiche/Cache edition mode
     $(this).parents('.rowGestList').find('.displayRead').hide();
@@ -147,9 +148,22 @@ $(document).ready(function () {
     document.getElementById("deletedNumber").value = this.id;
     document.getElementById("inputGestStart").value = $(this).parents('.rowGestList').find('.g_start_edit').val();
     document.getElementById("inputGestState").value = $(this).parents('.rowGestList').find('.g_state_edit').val();
+    document.getElementById("inputGestOriginState").value = $(this).parents('.rowGestList').find('.g_state_origin').val();
     document.getElementById("deletedRowState").value = $(this).parents('.rowGestList').find('.g_state_origin').val(); // Pour la suppression
     document.getElementById("inputGestEnd").value = $(this).parents('.rowGestList').find('.g_end_edit').val();
     document.getElementById("inputGestNote").value = $(this).parents('.rowGestList').find('.g_note_edit').val();
+
+
+    // Desactive le champs date de fin si en cours est selectionné
+    gState = $(this).parents('.rowGestList').find('.g_state_edit');
+    gEnd = $(this).parents('.rowGestList').find('.g_end_edit');
+    if (gState.val() != 0) {
+      gEnd.prop('disabled', false);
+    } else {
+      gEnd.prop('disabled', true);
+      gEnd.val('');
+      $('#inputGestEnd').val('');
+    }
 
   });
 
@@ -157,6 +171,7 @@ $(document).ready(function () {
   $('.cancelGestEdit').click(function (e) {
     e.preventDefault();
     $(this).parent().tooltip('hide');
+    $(this).parents('.rowGestList').removeClass('activeGest');
 
     resetGestRow();
   });
@@ -175,11 +190,33 @@ $(document).ready(function () {
     document.getElementById("inputGestNote").value = $(this).val();
   });
 
+  // Desactive le champs date de fin si en cours est selectionné
+  $('.g_state_edit').change(function (e) {
+    e.preventDefault();
+
+    gState = $(this).parents('.rowGestList').find('.g_state_edit');
+    gEnd = $(this).parents('.rowGestList').find('.g_end_edit');
+
+    if (gState.val() != 0) {
+      gEnd.prop('disabled', false);
+    } else {
+      gEnd.prop('disabled', true);
+      gEnd.val('');
+      $('#inputGestEnd').val('');
+    }
+  });
+
 }); // End of document ready function
+
+
+
+
+
 
 function resetGestRow() {
   $('.displayEdit').hide();
   $('.displayRead').show();
+  $('.rowGestList').removeClass('activeGest');
 
   document.getElementById("inputGestId").value = '';
   document.getElementById("deletedNumber").value = '';
@@ -189,22 +226,6 @@ function resetGestRow() {
   document.getElementById("inputGestNote").value = '';
 };
 
-
-// GESTATION EDIT FORM 
-$('.g_state_edit').change(function (e) {
-  e.preventDefault();
-
-  gState = $(this).parents('.rowGestList').find('.g_state_edit');
-  gEnd = $(this).parents('.rowGestList').find('.g_end_edit');
-
-  if (gState.val() != 0) {
-    gEnd.prop('disabled', false);
-  } else {
-    gEnd.prop('disabled', true);
-    gEnd.val('');
-    $('#inputGestEnd').val('');
-  }
-});
 
 
 // GESTATION ADD FORM - Désactive le champs date de fin si gestation toujours en cours
@@ -220,14 +241,14 @@ function gestationState() {
 };
 
 
-function showSnackBar($message, $color = "primary"){
-  let snackbar  = new SnackBar;
-    snackbar.make("message",
-  [
-    $message,
-    null,
-    "bottom",
-    "center",
-    $color
-  ], 400000);
+function showSnackBar($message, $color = "primary") {
+  let snackbar = new SnackBar;
+  snackbar.make("message",
+    [
+      $message,
+      null,
+      "bottom",
+      "center",
+      $color
+    ], 4000);
 }

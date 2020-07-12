@@ -34,7 +34,7 @@
              $_SESSION['userZipcode'] = $userInfo['user_zipcode'];
              $_SESSION['userRegisterDate'] = $userInfo['registerdate'];
              $successMessage = "Connexion réussie";
-             header('refresh:1;url=index');
+             header('refresh:0;url=index');
   
          } else {
              $errorMessage = 'Email ou mot de passe incorrect!';

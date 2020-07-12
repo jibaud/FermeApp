@@ -1,3 +1,24 @@
+.loader {
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    background: rgb(249,249,249);
+    opacity: .4;
+    text-align: center;
+}
+.loader > svg {
+        width: 100px;
+        height: 100px;
+        margin: 20px;
+        display:inline-block;
+        position: absolute; /* postulat de départ */
+        top: 50%; left: 50%; /* à 50%/50% du parent référent */
+        transform: translate(-50%, -50%);
+}
+
 .icon-cow {
     background-image: url("../img/cow.svg");
     background-position: center center;
@@ -65,11 +86,14 @@
     .container-fluid{
         padding-left: 8rem;
     }
-}
-
-@media (max-width: 768px) {
     .topbar{
         padding-left: 8rem;
+    }
+}
+
+@media (max-width: 1050px) {
+    #nprogress .spinner {
+        display: none;
     }
 }
 
@@ -96,10 +120,36 @@
     display: none;
 }
 
+.activeGest{
+    background-color: #f3f5ff;
+}
+
 #displayGestForm{
     cursor: pointer;
 }
 
 .displayEdit{
     display: none;
+}
+
+.progressBarGest{
+    width: 0;
+    height: 3px;
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    margin: 0;
+    padding: 0;
+}
+.positionRelative{
+    position: relative;
+}
+.hideOverflow{
+    overflow: hidden;
+}
+.gestInfo{
+    display: flex;
+}
+.gestInfo > .align-middle{
+    margin: auto;
 }

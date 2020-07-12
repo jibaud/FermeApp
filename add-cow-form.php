@@ -1,7 +1,4 @@
-<script language="javascript">
-    // Pour griser les champs de formulaire en fonction de la possibilité d'être enceinte
-    noPregnant();
-</script>
+
 
 <?php if (isset($errorMessage)) { ?>
     <div class="alert alert-danger" role="alert">
@@ -33,7 +30,7 @@
         <div class="form-group col-md-6">
             <label for="birthdate">Date de naissance <span class="text-danger">*</span></label>
             <div class="input-group date" data-provide="datepicker">
-                <input type="text" class="form-control" placeholder="jj/mm/aaaa" id="birthdate" name="birthdate" onchange="noPregnant();" <?php if (isset($birthdate)) { ?>value="<?= $birthdate ?>" <?php } ?>>
+                <input type="text" class="form-control" placeholder="jj/mm/aaaa" id="birthdate" name="birthdate" <?php if (isset($birthdate)) { ?>value="<?= $birthdate ?>" <?php } ?>>
                 <div class="input-group-addon">
                     <span class="glyphicon glyphicon-th"></span>
                 </div>
@@ -41,7 +38,7 @@
         </div>
         <div class="form-group col-md-6">
             <label for="gender">Genre <span class="text-danger">*</span></label>
-            <select class="form-control" id="gender" name="gender" onchange="noPregnant();">
+            <select class="form-control" id="gender" name="gender">
                 <option></option>
                 <option value="femelle" <?php if (isset($gender) && $gender == "femelle") {
                                             echo "selected";

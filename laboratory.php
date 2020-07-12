@@ -10,6 +10,7 @@ include 'header.php';
 ?>
 
 <body id="page-top">
+<?php include 'includes/loader.php'; ?>
 
   <!-- Page Wrapper -->
   <div id="wrapper">
@@ -21,6 +22,7 @@ include 'header.php';
         <div class="container-fluid">
 
           <!-- Page Heading -->
+          
           <iframe src="http://infolabo.fr/" width="100%" height="1000px" style="border: none;"></iframe>
 
 

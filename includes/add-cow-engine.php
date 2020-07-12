@@ -14,7 +14,7 @@ if (isset($_POST['add'])){
         $mother_id = htmlspecialchars($_POST['mother_id']);
     }
 
-
+    $note = "";
     $ispregnant = 0;
     $pregnantsince= "";
     $pregnantNumber = 0;
@@ -42,6 +42,7 @@ if (isset($_POST['add'])){
                                 race,
                                 birth_date,
                                 mother_id,
+                                note,
                                 ispregnant,
                                 pregnant_since,
                                 pregnant_number,
@@ -50,7 +51,7 @@ if (isset($_POST['add'])){
                                 sale_price,
                                 isarchived,
                                 create_date
-                                ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                                ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                             $insertCow->execute([
                                 $cow_id,
                                 $name,
@@ -59,6 +60,7 @@ if (isset($_POST['add'])){
                                 $race,
                                 $birthdate,
                                 $mother_id,
+                                $note,
                                 $ispregnant,
                                 $pregnantsince,
                                 $pregnantNumber,

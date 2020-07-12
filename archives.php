@@ -40,7 +40,7 @@ if (isset($_GET['e'])) {
 ?>
 
 <body id="page-top">
-
+<?php include 'includes/loader.php'; ?>
   <!-- Page Wrapper -->
   <div id="wrapper">
 

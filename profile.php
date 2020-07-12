@@ -138,8 +138,6 @@ if (isset($_POST['change_password'])) {
     <!-- Begin Page Content -->
     <div class="container-fluid">
 
-    <button onclick="showSnackBar('Opération réussie.', 'danger');">Snackbar click</button>
-
       <!-- Page Heading -->
       <h1 class="h3 mb-4 text-gray-800"><?= $pageTitle ?></h1>
 

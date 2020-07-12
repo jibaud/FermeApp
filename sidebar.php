@@ -51,7 +51,7 @@
 
 <!-- Nav Item - Tables -->
 <li class="nav-item">
-  <a class="nav-link" href="/">
+  <a class="nav-link" href="/health">
   <i class="fas fa-medkit"></i>
     <span>Santé</span></a>
 </li>

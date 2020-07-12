@@ -55,10 +55,10 @@ Snackbar style
 }
 
 .primary > div {
-    background: rgba(78, 115, 223, 0.71);
+    background: rgba(78, 115, 223, 0.85);
 }
 .danger > div {
-    background: rgba(231, 74, 59, 0.74);
+    background: rgba(231, 74, 59, 0.85);
 }
 
 .snackbar button {

@@ -4,7 +4,7 @@ session_start();
 include 'includes/database.php';
 include 'includes/forbidden.php';
 
-$pageTitle = 'Ajouter une nouvelle bête';
+$pageTitle = 'Santé';
 include 'header.php';
 
 ?>
@@ -23,11 +23,9 @@ include 'header.php';
 
           <!-- Page Heading -->
           <h1 class="h3 mb-4 text-gray-800"><?= $pageTitle ?></h1>
-          <hr>
-
-<?php include 'add-cow-form.php'; ?>
-
+          <img src="https://eoimages.gsfc.nasa.gov/images/imagerecords/73000/73751/world.topo.bathy.200407.3x5400x2700.png" alt="">
+            
+            
         </div>
         <!-- /.container-fluid -->
-
 <?php include 'footer.php'; ?>

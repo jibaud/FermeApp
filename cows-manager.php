@@ -23,6 +23,8 @@ if (isset($_POST['archive'])) {
 ?>
 
 <body id="page-top">
+<?php include 'includes/loader.php'; ?>
+
 
   <!-- Page Wrapper -->
   <div id="wrapper">
@@ -34,6 +36,7 @@ if (isset($_POST['archive'])) {
     <!-- Begin Page Content -->
     <div class="container-fluid">
 
+
       <?php if (isset($successMessage)) { ?>
         <div class="alert alert-success" role="alert">
           <?= $successMessage ?>
@@ -42,7 +45,7 @@ if (isset($_POST['archive'])) {
       <!-- Page Heading -->
       <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800"><?= $pageTitle ?></h1>
-        <a href="#" id="addNewButton" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm" data-toggle="modal" data-target="#addCowModal" onclick="actualise()"><i class="fas fa-plus-square fa-sm text-white-50"></i> Nouveau</a>
+        <a href="#" id="addNewButton" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm" data-toggle="modal" data-target="#addCowModal"><i class="fas fa-plus-square fa-sm text-white-50"></i> Nouveau</a>
       </div>
 
 

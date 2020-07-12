@@ -10,6 +10,8 @@ include 'header.php';
 ?>
 
 <body id="page-top">
+<?php include 'includes/loader.php'; ?>
+
 
   <!-- Page Wrapper -->
   <div id="wrapper">
@@ -119,8 +121,8 @@ include 'header.php';
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Gestations en cours</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800">2</div>
+                      <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Gestation<?= $ps ?> en cours</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $pregnantNumber ?></div>
                     </div>
                     <div class="col-auto">
                       <i class="fas fa-baby-carriage fa-2x text-gray-300"></i>

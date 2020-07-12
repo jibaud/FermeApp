@@ -10,6 +10,39 @@ if (!isset($_GET['id'])) {
 	header('Location:cows-manager');
 }
 
+switch ($_GET['eg']) {
+	case 1:
+		$errorMessageGest = 'Champs état non valide.';
+		break;
+	case 2:
+		$errorMessageGest = 'Le champs note est trop long. 50 charactères maximum.';
+		break;
+	case 3:
+		$errorMessageGest = 'Une date de fin de gestation est nécéssaire.';
+		break;
+	case 4:
+		$errorMessageGest = 'Une date de début de gestation est nécéssaire.';
+		break;
+	case 5:
+		$errorMessageGest = 'Cet vache à déjà une gestation en cours.';
+		break;
+}
+
+switch ($_GET['e']) {
+	case 1:
+		$errorMessage = 'Une vache existe déjà avec ce numéro.';
+		break;
+	case 2:
+		$errorMessage = 'Le numéro d\'identification n\'est pas valide.';
+		break;
+	case 3:
+		$errorMessage = 'Le nom est trop long. 32 charactères maximum.';
+		break;
+	case 4:
+		$errorMessage = 'Veuillez remplir tous les champs obligatoires.';
+		break;
+}
+
 
 // Usefull datas
 $database = getPDO();
@@ -30,6 +63,12 @@ if ($result['pregnant_number'] > 0) {
 	$type = calculeType($result['birth_date']);
 }
 
+// Appel la dernière gestation terminée
+$lastGest = $database->prepare("SELECT * FROM gestations WHERE g_state = 1 AND g_owner_id = $owner_id AND g_cow_index = $currentCowIndex ORDER BY g_id DESC LIMIT 1");
+$lastGest->execute();
+$numberLastGest = $lastGest->rowCount();
+$lastGestResult = $lastGest->fetch();
+
 // Update cow
 if (isset($_POST['updateCow'])) {
 	$cow_id = htmlspecialchars($_POST['cow_id']);
@@ -44,6 +83,12 @@ if (isset($_POST['updateCow'])) {
 		$mother_id = htmlspecialchars($_POST['mother_id']);
 	}
 
+	if (empty($_POST['note'])) {
+		$note = "";
+	} else {
+		$note = ucfirst(htmlspecialchars($_POST['note']));
+	}
+
 	if ($cow_id == $result['id']) {
 		$rowId == 0; // Si l'id est l'id actuel
 	} else {
@@ -54,30 +99,30 @@ if (isset($_POST['updateCow'])) {
 
 	if ((!empty($cow_id)) && (!empty($name)) && (!empty($gender)) && (!empty($race)) && (!empty($birthdate))) {
 		if (strlen($name) <= 32) {
-			if (is_numeric($cow_id)) {
+			if (is_numeric($cow_id) && is_numeric($mother_id)) {
 				if ($rowId == 0) {
-					if ($cow_id != $currentCowId) {
 
-						// Update des enfants de la cow actuelle pour changer l'ID de leur mère
-						// seulement si on à changé l'id
-						if ($currentCowId != $cow_id) {
-							$database = getPDO();
-							try {
-								$updateCow = $database->prepare("UPDATE cows SET id=?, name=?, birth_date=?, gender=?, race=?, mother_id=? WHERE id = $currentCowId AND owner_id = $owner_id");
-								$updateCow->execute([
-									$cow_id,
-									$name,
-									$birthdate,
-									$gender,
-									$race,
-									$mother_id
-								]);
-							} catch (Exception $e) {
-								echo " Error ! " . $e->getMessage();
-							}
-						}
+					// Update cow actuelle avec nouvelles infos
+					$database = getPDO();
+					try {
+						$updateCow = $database->prepare("UPDATE cows SET id=?, name=?, birth_date=?, gender=?, race=?, mother_id=?, note=? WHERE id = $currentCowId AND owner_id = $owner_id");
+						$updateCow->execute([
+							$cow_id,
+							$name,
+							$birthdate,
+							$gender,
+							$race,
+							$mother_id,
+							$note
+						]);
+					} catch (Exception $e) {
+						echo " Error ! " . $e->getMessage();
+					}
 
-						// Update cow actuelle avec nouvelles infos
+
+					// Update des enfants de la cow actuelle pour changer l'ID de leur mère
+					// seulement si on à changé l'id
+					if ($currentCowId != $cow_id) {
 						try {
 							$database = getPDO();
 							$updateChildren = $database->prepare("UPDATE cows SET mother_id=? WHERE mother_id = $currentCowId AND owner_id = $owner_id");
@@ -87,22 +132,23 @@ if (isset($_POST['updateCow'])) {
 						}
 					}
 
-
-
-
 					$successMessage = "Changements sauvegardés.";
-					header('refresh:1;url=/cow-single?id=' . $cow_id);
+					header('Location: /cow-single?id=' . $currentCowId . '&s=1#');
 				} else {
 					$errorMessage = 'Une vache existe déjà avec ce numéro.';
+					header('Location: /cow-single?id=' . $currentCowId . '&e=1#');
 				}
 			} else {
 				$errorMessage = 'Le numéro d\'identification n\'est pas valide.';
+				header('Location: /cow-single?id=' . $currentCowId . '&e=2#');
 			}
 		} else {
 			$errorMessage = 'Le nom est trop long. 32 charactères maximum.';
+			header('Location: /cow-single?id=' . $currentCowId . '&e=3#');
 		}
 	} else {
 		$errorMessage = 'Veuillez remplir tous les champs obligatoires.';
+		header('Location: /cow-single?id=' . $currentCowId . '&e=4#');
 	}
 }
 
@@ -124,6 +170,7 @@ if (isset($_POST['updateGestRowSubmit'])) {
 	$updateNumber = htmlspecialchars($_POST['inputGestId']);
 	$updateStart = htmlspecialchars($_POST['inputGestStart']);
 	$updateState = htmlspecialchars($_POST['inputGestState']);
+	$originState = htmlspecialchars($_POST['inputGestOriginState']);
 
 	$updateState = (int) $updateState;
 
@@ -153,17 +200,21 @@ if (isset($_POST['updateGestRowSubmit'])) {
 		$valideEmptyEnd = true;
 	}
 
-	if ($result['ispregnant'] == 1) {
-		if ($updateState == 0) {
-			$valide2 = false;
-		} else {
-			$valide2 = true;
+	if ($result['ispregnant'] == 1) { // Si la vache est enceinte
+		if ($updateState == 0) { // Et qu'on veut sauvegarder en cours
+			if ($originState == 0) { // On vérifie que c'était déjà le row en cours
+				$valide = true; // Dans ce cas OK
+			} else {
+				$valide = false; // Sinon pas OK
+			}
+		} else { // Si on ne veut pas sauvegarder en cours
+			$valide = true; // OK
 		}
-	} else {
-		$valide2 = true;
+	} else { // Si la vache n'est pas enceinte 
+		$valide = true; // OK
 	}
 
-	if ($valide2) {
+	if ($valide) {
 		if ((!empty($updateStart))) {
 			if ($valideEmptyEnd) {
 				if (strlen($updateNote) <= 50) {
@@ -193,22 +244,26 @@ if (isset($_POST['updateGestRowSubmit'])) {
 
 
 						$successMessageGest = "Opération réussie.";
-						header('Location: ' . $_SERVER['REQUEST_URI'] . '#gestations');
+						header('Location: /cow-single?id=' . $currentCowId . '&s=1#gestations');
 					} else {
 						$errorMessageGest = 'Champs état non valide';
+						header('Location: /cow-single?id=' . $currentCowId . '&eg=1#gestations');
 					}
 				} else {
 					$errorMessageGest = 'Le champs note est trop long. 50 charactères maximum.';
+					header('Location: /cow-single?id=' . $currentCowId . '&eg=2#gestations');
 				}
 			} else {
 				$errorMessageGest = 'Une date de fin de gestation est nécéssaire.';
-				header('Location: /cow-single?id=' . $currentCowId . '&e=1#gestations');
+				header('Location: /cow-single?id=' . $currentCowId . '&eg=3#gestations');
 			}
 		} else {
 			$errorMessageGest = 'Une date de début de gestation est nécéssaire.';
+			header('Location: /cow-single?id=' . $currentCowId . '&eg=4#gestations');
 		}
 	} else {
 		$errorMessageGest = 'Cet vache à déjà une gestation en cours.';
+		header('Location: /cow-single?id=' . $currentCowId . '&eg=5#gestations');
 	}
 }
 
@@ -279,8 +334,7 @@ if (isset($_POST['addGestSubmit'])) {
 							echo " Error ! " . $e->getMessage();
 						}
 
-						$successMessage = "Opération réussie.";
-						header('Location: ' . $_SERVER['REQUEST_URI']);
+						header('Location: /cow-single?id=' . $currentCowId . '&s=1#gestations');
 					} else {
 						$errorMessage = 'Champs select non valide';
 					}
@@ -317,7 +371,7 @@ if (isset($_POST['deleteGest'])) {
 	$deleteGestRow = $database->prepare("DELETE FROM gestations WHERE g_id = $deletedNumber AND g_owner_id = $owner_id");
 	$deleteGestRow->execute();
 	$successMessage = "Opération réussie.";
-	header('Location: ' . $_SERVER['REQUEST_URI']);
+	header('Location: /cow-single?id=' . $currentCowId . '&s=1#gestations');
 }
 
 
@@ -326,9 +380,11 @@ $pageTitle = $result['name'];
 ?>
 
 <body id="page-top">
+	<?php include 'includes/loader.php'; ?>
 
 	<!-- Page Wrapper -->
 	<div id="wrapper">
+
 
 		<?php include 'sidebar.php'; ?>
 		<?php include 'topbar.php'; ?>
@@ -380,16 +436,88 @@ $pageTitle = $result['name'];
 			}
 			?>
 
-			<?php if ($result['ispregnant']) { ?>
-				<div class="row">
+			<div class="row mb-4">
+				<?php if ($numberLastGest > 0) { ?>
+
+					<div class="col-xl-6 col-md-6 mb-4">
+						<div class="card border-left-primary shadow h-100 py-2">
+							<div class="card-body">
+								<div class="container">
+									<!-- Stack the columns on mobile by making one full-width and the other half-width -->
+									<div class="row mb-3 gestInfo">
+										<div class="col-sm-2 align-middle">
+											<div class="icon-circle bg-primary"><i class="icon-calf text-white"></i></div>
+										</div>
+										<div class="col-sm-10 align-middle">Dernier vêlage le <?= $lastGestResult['g_end']; ?>
+										</div>
+									</div>
+									<div class="row mb-3 gestInfo">
+										<div class="col-sm-2 align-middle">
+											<div class="icon-circle bg-primary"><i class="fas fa-tint text-white"></i></div>
+										</div>
+										<div class="col-sm-10 align-middle"><?php
+																date_default_timezone_set('Europe/Paris');
+																$dateToday = date('j/m/Y');
+																$dateEndLact = futureDate($lastGestResult['g_end'], 10);
+																if (compareDate($dateEndLact, $dateToday)) { // Si date 1 > date 2
+																?>
+												Lactation prévue pendant les <?= daysSince($dateEndLact) ?> prochains jours, soit jusqu'au <?= $dateEndLact; ?> environ.
+											<?php
+																} else {
+											?>
+												Vache en tarrissement depuis <?= daysSince($dateEndLact); ?> jours 
+												<i class="fad fa-question-circle text-primary" data-toggle="tooltip" data-placement="top" title="Information téhorique car cette vache a vêlé il y a plus de 10 mois"></i>
+												<span class="font-weight-lighter"><em> (~<?= $dateEndLact; ?>)</em></span>
+											<?php
+																}
+											?></div>
+									</div>
+									<div class="row gestInfo">
+										<div class="col-sm-2 align-middle">
+											<div class="icon-circle bg-primary"></i><i class="icon-sperm text-white"></i></div>
+										</div>
+										<div class="col-sm-10 align-middle"><?php
+																$dateNextInsemin = futureDate($lastGestResult['g_end'], 3);
+																if (compareDate($dateNextInsemin, $dateToday)) {
+																?>
+												Prévoir une insémination vers le <?= $dateNextInsemin ?>
+												<i class="fad fa-question-circle text-primary" data-toggle="tooltip" data-placement="top" title="3 mois après le dernier vêlage"></i>
+											<?php
+																} else {
+											?>
+												La date idéale d'insémination était le <?= $dateNextInsemin ?>.
+												<i class="fad fa-question-circle text-primary" data-toggle="tooltip" data-placement="top" title="3 mois après le dernier vêlage"></i>
+											<?php
+																}
+											?></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+				<?php } // END IF PREGNANT NUMBER > 1
+				?>
+
+				<?php if ($result['ispregnant']) { ?>
 					<div class="col-xl-6 col-md-6 mb-4">
 						<div class="card border-left-<?= $color ?> shadow h-100 py-2">
 							<div class="card-body">
 								<div class="row no-gutters align-items-center">
 									<div class="col mr-5">
-										<p class="mb-1 text-gray-800 h5">En gestation depuis le <span class="font-weight-bold"><?= $result['pregnant_since']; ?></span></p>
 
-										<div class="row no-gutters align-items-center mt-3">
+									<div class="row mb-1 gestInfo">
+										<div class="col-sm-2 align-middle">
+											<div class="icon-circle bg-<?= $color ?>"><i class="fas fa-baby-carriage text-white"></i></div>
+										</div>
+										<div class="col-sm-10 align-middle">
+										<p class="mb-1 text-gray-800 h6">En gestation depuis le <span class="font-weight-bold"><?= $result['pregnant_since']; ?></span></p>
+										</div>
+									</div>
+										
+
+										<div class="row no-gutters align-items-center mt-4">
 											<div class="col-auto">
 												<div class="mb-0 mr-3 font-weight-bold text-gray-800"><?= $pregnantdays . '/283 jours' ?></div>
 											</div>
@@ -402,9 +530,9 @@ $pageTitle = $result['name'];
 											$daysToEndOfPregnant = (283 - $pregnantdays);
 											if ($daysToEndOfPregnant >= 0) {
 											?>
-												<p class="mt-3 pr-1">Vêlge prévu dans environ <?= $daysToEndOfPregnant ?> jours </p>
+												<p class="mt-4 pr-1">Vêlage prévu dans environ <?= $daysToEndOfPregnant ?> jours, soit le <?= futureDateDay($result['pregnant_since'], 283) ?></p>
 											<?php } else { ?>
-												<p class="mt-3 pr-1">Vêlage prévu depuis environ <?= abs($daysToEndOfPregnant) ?> jours </p>
+												<p class="mt-4 pr-1">Vêlage prévu depuis environ <?= abs($daysToEndOfPregnant) ?> jours </p>
 											<?php
 											}
 											if (abs($daysToEndOfPregnant) >= 31) {
@@ -415,16 +543,12 @@ $pageTitle = $result['name'];
 										</div>
 
 									</div>
-									<div class="col-auto">
-										<i class="fas fa-baby-carriage fa-4x text-gray-300"></i>
-									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-				</div> <!-- /.row -->
-			<?php } ?>
-
+				<?php } ?>
+			</div> <!-- /.row -->
 
 			<!-- INFORMATIONS GENERALES -->
 			<div class="row">
@@ -437,7 +561,7 @@ $pageTitle = $result['name'];
 						</div>
 						<!-- Card Body -->
 						<div class="card-body">
-							<form method="post" action="" id="cowInfos" class="enableSubmitOnChange">
+							<form method="post" action="" id="cowInfos" class="enableSubmitOnChange noEnterKey">
 								<p class="mb-4 h5">Description</p>
 								<div class="form-row">
 									<div class="form-group col-md-6">
@@ -464,11 +588,11 @@ $pageTitle = $result['name'];
 										<select class="form-control" id="gender" name="gender" onchange="noPregnant();">
 											<option></option>
 											<option value="femelle" <?php if ($result['gender'] == "femelle") {
-																								echo "selected";
-																							} ?>>Femelle</option>
+																		echo "selected";
+																	} ?>>Femelle</option>
 											<option value="male" <?php if ($result['gender'] == "male") {
-																							echo "selected";
-																						} ?>>Male</option>
+																		echo "selected";
+																	} ?>>Male</option>
 										</select>
 									</div>
 								</div>
@@ -479,146 +603,155 @@ $pageTitle = $result['name'];
 											<option></option>
 											<optgroup label="Races laitières">
 												<option value="Abondance" <?php if ($result['race'] == "Abondance") {
-																										echo "selected";
-																									} ?>>Abondance</option>
+																				echo "selected";
+																			} ?>>Abondance</option>
 												<option value="Bordelaise" <?php if ($result['race'] == "Bordelaise") {
-																											echo "selected";
-																										} ?>>Bordelaise</option>
+																				echo "selected";
+																			} ?>>Bordelaise</option>
 												<option value="Brune" <?php if ($result['race'] == "Brune") {
-																								echo "selected";
-																							} ?>>Brune</option>
+																			echo "selected";
+																		} ?>>Brune</option>
 												<option value="Froment du Léon" <?php if ($result['race'] == "Froment du Léon") {
-																													echo "selected";
-																												} ?>>Froment du Léon</option>
+																					echo "selected";
+																				} ?>>Froment du Léon</option>
 												<option value="Jersiaise" <?php if ($result['race'] == "Jersiaise") {
-																										echo "selected";
-																									} ?>>Jersiaise</option>
+																				echo "selected";
+																			} ?>>Jersiaise</option>
 												<option value="Pie rouge des plaines" <?php if ($result['race'] == "Pie rouge des plaines") {
-																																echo "selected";
-																															} ?>>Pie rouge des plaines</option>
+																							echo "selected";
+																						} ?>>Pie rouge des plaines</option>
 												<option value="Prim'Holstein" <?php if ($result['race'] == "Prim'Holstein") {
-																												echo "selected";
-																											} ?>>Prim'Holstein</option>
+																					echo "selected";
+																				} ?>>Prim'Holstein</option>
 												<option value="Rouge flamande" <?php if ($result['race'] == "Rouge flamande") {
-																													echo "selected";
-																												} ?>>Rouge flamande</option>
+																					echo "selected";
+																				} ?>>Rouge flamande</option>
 											</optgroup>
 											<optgroup label="Races production viande">
 												<option value="Bazadaise" <?php if ($result['race'] == "Bazadaise") {
-																										echo "selected";
-																									} ?>>Bazadaise</option>
+																				echo "selected";
+																			} ?>>Bazadaise</option>
 												<option value="Blanc bleu" <?php if ($result['race'] == "Blanc bleu") {
-																											echo "selected";
-																										} ?>>Blanc bleu</option>
+																				echo "selected";
+																			} ?>>Blanc bleu</option>
 												<option value="Blonde d'Aquitaine" <?php if ($result['race'] == "Blonde d'Aquitaine") {
-																															echo "selected";
-																														} ?>>Blonde d'Aquitaine</option>
+																						echo "selected";
+																					} ?>>Blonde d'Aquitaine</option>
 												<option value="Charolaise" <?php if ($result['race'] == "Charolaise") {
-																											echo "selected";
-																										} ?>>Charolaise</option>
+																				echo "selected";
+																			} ?>>Charolaise</option>
 												<option value="Corse" <?php if ($result['race'] == "Corse") {
-																								echo "selected";
-																							} ?>>Corse</option>
+																			echo "selected";
+																		} ?>>Corse</option>
 												<option value="Créole" <?php if ($result['race'] == "Créole") {
-																									echo "selected";
-																								} ?>>Créole</option>
+																			echo "selected";
+																		} ?>>Créole</option>
 												<option value="Gasconne" <?php if ($result['race'] == "Gasconne") {
-																										echo "selected";
-																									} ?>>Gasconne</option>
+																				echo "selected";
+																			} ?>>Gasconne</option>
 												<option value="Hereford" <?php if ($result['race'] == "Hereford") {
-																										echo "selected";
-																									} ?>>Hereford</option>
+																				echo "selected";
+																			} ?>>Hereford</option>
 												<option value="Highland Cattle" <?php if ($result['race'] == "Highland Cattle") {
-																													echo "selected";
-																												} ?>>Highland Cattle</option>
+																					echo "selected";
+																				} ?>>Highland Cattle</option>
 												<option value="bazadaise" <?php if ($result['race'] == "INRA 95") {
-																										echo "selected";
-																									} ?>>INRA 95</option>
+																				echo "selected";
+																			} ?>>INRA 95</option>
 												<option value="Limousine" <?php if ($result['race'] == "limousine") {
-																										echo "selected";
-																									} ?>>Limousine</option>
+																				echo "selected";
+																			} ?>>Limousine</option>
 												<option value="Mirandaise" <?php if ($result['race'] == "Mirandaise") {
-																											echo "selected";
-																										} ?>>Mirandaise</option>
+																				echo "selected";
+																			} ?>>Mirandaise</option>
 												<option value="Parthenaise" <?php if ($result['race'] == "Parthenaise") {
-																											echo "selected";
-																										} ?>>Parthenaise</option>
+																				echo "selected";
+																			} ?>>Parthenaise</option>
 												<option value="Rouge des prés" <?php if ($result['race'] == "Rouge des prés") {
-																													echo "selected";
-																												} ?>>Rouge des prés</option>
+																					echo "selected";
+																				} ?>>Rouge des prés</option>
 												<option value="Saosnoise" <?php if ($result['race'] == "Saosnoise") {
-																										echo "selected";
-																									} ?>>Saosnoise</option>
+																				echo "selected";
+																			} ?>>Saosnoise</option>
 												<option value="Taureau de Camargue" <?php if ($result['race'] == "Taureau de Camargue") {
-																															echo "selected";
-																														} ?>>Taureau de Camargue</option>
+																						echo "selected";
+																					} ?>>Taureau de Camargue</option>
 											</optgroup>
 											<optgroup label="Races mixtes">
 												<option value="Armoricaine" <?php if ($result['race'] == "Armoricaine") {
-																											echo "selected";
-																										} ?>>Armoricaine</option>
+																				echo "selected";
+																			} ?>>Armoricaine</option>
 												<option value="Aubrac" <?php if ($result['race'] == "Aubrac") {
-																									echo "selected";
-																								} ?>>Aubrac</option>
+																			echo "selected";
+																		} ?>>Aubrac</option>
 												<option value="Aure-et-saint-girons" <?php if ($result['race'] == "Aure-et-saint-girons") {
-																																echo "selected";
-																															} ?>>Aure-et-saint-girons</option>
+																							echo "selected";
+																						} ?>>Aure-et-saint-girons</option>
 												<option value="Béarnaise" <?php if ($result['race'] == "Béarnaise") {
-																										echo "selected";
-																									} ?>>Béarnaise</option>
+																				echo "selected";
+																			} ?>>Béarnaise</option>
 												<option value="Bretonne pie noir" <?php if ($result['race'] == "Bretonne pie noir") {
-																														echo "selected";
-																													} ?>>Bretonne pie noir</option>
+																						echo "selected";
+																					} ?>>Bretonne pie noir</option>
 												<option value="Bleue du Nord" <?php if ($result['race'] == "Bleue du Nord") {
-																												echo "selected";
-																											} ?>>Bleue du Nord</option>
+																					echo "selected";
+																				} ?>>Bleue du Nord</option>
 												<option value="Ferrandaise" <?php if ($result['race'] == "Ferrandaise") {
-																											echo "selected";
-																										} ?>>Ferrandaise</option>
+																				echo "selected";
+																			} ?>>Ferrandaise</option>
 												<option value="Lourdaise" <?php if ($result['race'] == "Lourdaise") {
-																										echo "selected";
-																									} ?>>Lourdaise</option>
+																				echo "selected";
+																			} ?>>Lourdaise</option>
 												<option value="Maraîchine" <?php if ($result['race'] == "Maraîchine") {
-																											echo "Maraîchine";
-																										} ?>>Armoricaine</option>
+																				echo "Maraîchine";
+																			} ?>>Armoricaine</option>
 												<option value="Montbéliarde" <?php if ($result['race'] == "Montbéliarde") {
-																												echo "selected";
-																											} ?>>Montbéliarde</option>
+																					echo "selected";
+																				} ?>>Montbéliarde</option>
 												<option value="Nantaise" <?php if ($result['race'] == "Nantaise") {
-																										echo "selected";
-																									} ?>>Nantaise</option>
+																				echo "selected";
+																			} ?>>Nantaise</option>
 												<option value="Normande" <?php if ($result['race'] == "Normande") {
-																										echo "selected";
-																									} ?>>Normande</option>
+																				echo "selected";
+																			} ?>>Normande</option>
 												<option value="Salers" <?php if ($result['race'] == "Salers") {
-																									echo "selected";
-																								} ?>>Salers</option>
+																			echo "selected";
+																		} ?>>Salers</option>
 												<option value="Simmental française" <?php if ($result['race'] == "Simmental française") {
-																															echo "selected";
-																														} ?>>Simmental française</option>
+																						echo "selected";
+																					} ?>>Simmental française</option>
 												<option value="Tarentaise (ou Tarine)" <?php if ($result['race'] == "Tarentaise (ou Tarine)") {
-																																	echo "selected";
-																																} ?>>Tarentaise (ou Tarine)</option>
+																							echo "selected";
+																						} ?>>Tarentaise (ou Tarine)</option>
 												<option value="Villard-de-lans" <?php if ($result['race'] == "Villard-de-lans") {
-																													echo "selected";
-																												} ?>>Villard-de-lans</option>
+																					echo "selected";
+																				} ?>>Villard-de-lans</option>
 											</optgroup>
 											<optgroup label="Autres">
 												<option value="Brava" <?php if ($result['race'] == "Brava") {
-																								echo "selected";
-																							} ?>>Brava</option>
+																			echo "selected";
+																		} ?>>Brava</option>
 												<option value="Marine landaise" <?php if ($result['race'] == "Marine landaise") {
-																													echo "selected";
-																												} ?>>Marine landaise</option>
+																					echo "selected";
+																				} ?>>Marine landaise</option>
 												<option value="Betizu" <?php if ($result['race'] == "Betizu") {
-																									echo "selected";
-																								} ?>>Betizu</option>
+																			echo "selected";
+																		} ?>>Betizu</option>
 												<option value="Autre" <?php if ($result['race'] == "Autre") {
-																								echo "selected";
-																							} ?>>Autre</option>
+																			echo "selected";
+																		} ?>>Autre</option>
 											</optgroup>
 										</select>
 										<small id="" class="form-text text-muted">Choisir "Autre" si la race recherchée n'apparait pas.</small>
+									</div>
+									<div class="form-group col-md-6">
+										<label for="note">Note</label>
+										<div class="input-group">
+											<textarea name="note" id="note" class="form-control" maxlength="500" cols="30" rows="3"><?= $result['note']; ?></textarea>
+											<div class="input-group-addon">
+												<span class="glyphicon glyphicon-th"></span>
+											</div>
+										</div>
 									</div>
 								</div>
 								<p class="h5 mt-3">
@@ -684,6 +817,7 @@ $pageTitle = $result['name'];
 
 			$reponseGestationList = $database->prepare("SELECT * FROM gestations WHERE g_owner_id = $owner_id AND g_cow_index = $currentCowIndex ORDER BY g_id ASC");
 			$reponseGestationList->execute();
+			$GestNumber = $reponseGestationList->rowCount();
 
 			?>
 
@@ -700,7 +834,9 @@ $pageTitle = $result['name'];
 			<?php } ?>
 
 			<!-- GESTATION -->
-			<div class="row">
+			<div class="row <?php if (calculeType($result['birth_date']) == 'veau') {
+								echo 'd-none';
+							} ?>">
 				<!-- Area Chart -->
 				<div class="col-12">
 					<div class="card shadow mb-4" id="gestations">
@@ -708,11 +844,11 @@ $pageTitle = $result['name'];
 						<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
 							<h6 class="m-0 font-weight-bold text-primary">Gestations</h6>
 							<div class="dropdown no-arrow">
-
 							</div>
 						</div>
 						<!-- Card Body -->
 						<div class="card-body">
+							<p><?= $result['name']; ?> a un total de <?= $GestNumber ?> géstations.</p>
 							<div class="table-responsive">
 								<table class="table table-bordered" id="gestTable" width="100%" cellspacing="0">
 
@@ -729,16 +865,16 @@ $pageTitle = $result['name'];
 
 										<?php
 
-
 										while ($gestData = $reponseGestationList->fetch()) {
 										?>
+
 											<tr class="rowGestList">
 												<td>
 													<div class="displayRead">
 														<?= $gestData['g_start']; ?>
 													</div>
-													<div class="displayEdit date" data-provide="datepicker">
-														<input type="text" class="form-control g_start_edit col-12" value="" placeholder="Début" required>
+													<div class="displayEdit input-group date" data-provide="datepicker">
+														<input type="text" class="form-control g_start_edit" style="width:100%" value="" placeholder="Début" required>
 														<div class="input-group-addon">
 															<span class="glyphicon glyphicon-th"></span>
 														</div>
@@ -747,17 +883,18 @@ $pageTitle = $result['name'];
 														<input type="text" class="col-12 g_start_origin" value="<?= $gestData['g_start']; ?>">
 													</div>
 												</td>
-												<td>
+												<td class="positionRelative hideOverflow">
 													<div class="displayRead">
 														<?php
 
 														switch ($gestData['g_state']) {
 															case 0:
 																echo "En cours";
+																echo '<div class="progressBarGest bg-' . $color . '" style="width:' . $pregnantpercent . '%;"></div>';
 																$select0 = 'selected';
 																break;
 															case 1:
-																echo "Terminé";
+																echo "Terminée";
 																$select1 = 'selected';
 																break;
 															case 2:
@@ -778,13 +915,19 @@ $pageTitle = $result['name'];
 														<input type="text" class="col-12 g_state_origin" value="<?= $gestData['g_state']; ?>">
 													</div>
 
+
 												</td>
 												<td>
 													<div class="displayRead">
-														<?= $gestData['g_end']; ?>
+														<?php if (!empty($gestData['g_end'])) {
+															echo $gestData['g_end'];
+														} else { ?>
+															Vêlage prévu le <?= futureDateDay($gestData['g_start'], 283) ?>
+														<?php
+														} ?>
 													</div>
-													<div class="displayEdit date" data-provide="datepicker">
-														<input type="text" class="form-control g_end_edit" value="">
+													<div class="displayEdit input-group date" data-provide="datepicker">
+														<input type="text" class="form-control g_end_edit" value="" style="width:100%">
 														<div class="input-group-addon">
 															<span class="glyphicon glyphicon-th"></span>
 														</div>
@@ -837,10 +980,10 @@ $pageTitle = $result['name'];
 										}
 										$reponseGestationList->closeCursor();
 										?>
-
 									</tbody>
 								</table>
 							</div>
+
 
 
 							<?php
@@ -891,16 +1034,40 @@ $pageTitle = $result['name'];
 						</div>
 					</div>
 				</div>
+
+				<form action="" method="POST" id="updateGestRow" name="updateGestRow" class="d-none">
+					<input type="text" class="form-control" value="" id="inputGestId" name="inputGestId">
+					<input type="text" class="form-control" value="" id="inputGestStart" name="inputGestStart">
+					<input type="text" class="form-control" value="" id="inputGestState" name="inputGestState">
+					<input type="text" class="form-control" value="" id="inputGestOriginState" name="inputGestOriginState">
+					<input type="text" class="form-control" value="" id="inputGestEnd" name="inputGestEnd">
+					<input type="text" class="form-control" value="" id="inputGestNote" name="inputGestNote">
+					<input type="submit" id="updateGestRowSubmit" name="updateGestRowSubmit" value="Sauvegarder">
+				</form>
 			</div> <!-- /.row -->
 
-			<form action="" method="POST" id="updateGestRow" name="updateGestRow" class="d-none">
-				<input type="text" class="form-control" value="" id="inputGestId" name="inputGestId">
-				<input type="text" class="form-control" value="" id="inputGestStart" name="inputGestStart">
-				<input type="text" class="form-control" value="" id="inputGestState" name="inputGestState">
-				<input type="text" class="form-control" value="" id="inputGestEnd" name="inputGestEnd">
-				<input type="text" class="form-control" value="" id="inputGestNote" name="inputGestNote">
-				<input type="submit" id="updateGestRowSubmit" name="updateGestRowSubmit" value="Sauvegarder">
-			</form>
+
+
+			<div class="row">
+				<!-- Area Chart -->
+				<div class="col-12">
+					<div class="card shadow mb-4">
+						<!-- Card Header - Dropdown -->
+						<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+							<h6 class="m-0 font-weight-bold text-primary">Timeline</h6>
+							<div class="dropdown no-arrow">
+
+							</div>
+						</div>
+						<!-- Card Body -->
+						<div class="card-body">
+
+							<div id="timeline"></div>
+
+						</div> <!-- Card Body -->
+					</div>
+				</div>
+			</div> <!-- ./row -->
 
 		</div>
 		<!-- /.container-fluid -->
@@ -922,8 +1089,8 @@ $pageTitle = $result['name'];
 					<div class="modal-footer">
 						<button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
 						<form action="" method="post">
-							<input type="text" id="deletedNumber" name="deletedNumber" value="">
-							<input type="text" id="deletedRowState" name="deletedRowState" value="">
+							<input type="text" id="deletedNumber" name="deletedNumber" value="" class="d-none">
+							<input type="text" id="deletedRowState" name="deletedRowState" value="" class="d-none">
 							<input type="submit" name="deleteGest" id="deleteGest" value="Supprimer" class="btn btn-danger">
 						</form>
 					</div>
@@ -935,15 +1102,14 @@ $pageTitle = $result['name'];
 
 		<?php include 'footer.php'; ?>
 
+
 		<?php
 
-
-		if (!isset($_GET['e']) and $_GET['e'] == '1') {
-			
-				?>
-				<script>
-					alert("Coucou");
-				</script>
-		<?php
+		if (isset($_GET['e']) || isset($_GET['eg'])) {
+			echo "<script>showSnackBar('Opération échouée.', 'danger');</script>";
 		}
+		if (isset($_GET['s'])) {
+			echo "<script>showSnackBar('Opération réussie.', 'primary');</script>";
+		}
+
 		?>
