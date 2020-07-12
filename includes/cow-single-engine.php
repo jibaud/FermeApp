@@ -153,7 +153,7 @@ if (isset($_POST['updateGestRowSubmit'])) {
 	if ($valide) {
 		if ((!empty($updateStart))) {
 			if ($valideEmptyEnd) {
-				if (compareDate($updateEnd, $updateStart)) {
+				if (compareDate($updateEnd, $updateStart) || $updateState == 0) {
 					if (strlen($updateNote) <= 50) {
 						if ($updateState == 0 || $updateState == 1 || $updateState == 2) {
 							$database = getPDO();
@@ -245,7 +245,7 @@ if (isset($_POST['addGestSubmit'])) {
 	if ($result['ispregnant'] == 0) {
 		if ((!empty($gStart))) {
 			if ($valide) {
-				if (compareDate($updateEnd, $updateStart)) {
+				if (compareDate($gEnd, $gStart) || $gState == 0) {
 					if (strlen($gNote) <= 50) {
 						if ($gState == 0 || $gState == 1 || $gState == 2) {
 							try {

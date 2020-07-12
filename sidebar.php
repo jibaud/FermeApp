@@ -44,7 +44,7 @@
 
 <!-- Nav Item - Tables -->
 <li class="nav-item">
-  <a class="nav-link" href="/">
+  <a class="nav-link" href="/gestations">
   <i class="fas fa-baby-carriage"></i>
     <span>Gestations</span></a>
 </li>

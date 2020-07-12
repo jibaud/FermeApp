@@ -104,7 +104,7 @@
             $reponseCowPregnant->closeCursor();
             ?>
 
-            <a class="dropdown-item text-center small text-gray-500" href="cows-manager?filter=">Show All Alerts</a>
+            <a class="dropdown-item text-center small text-gray-500" href="gestations">Voir en détails</a>
           </div>
         </li>
 
