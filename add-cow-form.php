@@ -18,9 +18,11 @@
         <div class="form-group col-md-6">
             <label for="cow_id">Numéro d'identification <span class="text-danger">*</span></label>
             <div class="input-group">
+            <?php if($set_prefixId){ ?>
                 <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon1">FR</span>
+                    <span class="input-group-text" id="basic-addon1"><?= $set_prefixId?> </span>
                 </div>
+            <?php } ?>
                 <input type="text" class="form-control" autofocus id="cow_id" name="cow_id" <?php if (isset($cow_id)) { ?>value="<?= $cow_id ?>" <?php } ?> aria-describedby="basic-addon1">
             </div>
         </div>

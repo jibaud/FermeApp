@@ -139,7 +139,8 @@ $pageTitle = $result['name'];
 
 			<!-- Page Heading -->
 			<div class="d-sm-flex align-items-center justify-content-between mb-2">
-				<h2 class="capitalize font-weight-bold text-primary"><span class="user-select-all"><?= $pageTitle ?></span><span class="badge badge-warning text-black ml-2 user-select-all"><span class="font-weight-normal"><?php if(isset($set_prefixId)){echo $set_prefixId.' ';}?></span><?= $result['id']; ?></span></h2>
+			
+				<h2 class="capitalize font-weight-bold text-primary"><span class="user-select-all"><?= $pageTitle ?></span><span class="badge badge-warning text-black ml-2 text-monospace user-select-all"><span class="font-weight-normal"><?php if(isset($set_prefixId)){echo $set_prefixId;}?></span><?= $result['id']; ?></span></i></h2>
 				<div class="dropdown">
 					<a class="btn btn-primary btn-sm dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 						<i class="fas fa-tools fa-sm mr-1 text-white-50"></i> Actions
@@ -798,28 +799,6 @@ $pageTitle = $result['name'];
 			</form>
 		</div> <!-- /.row -->
 
-
-
-		<div class="row">
-			<!-- Area Chart -->
-			<div class="col-12">
-				<div class="card shadow mb-4">
-					<!-- Card Header - Dropdown -->
-					<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-						<h6 class="m-0 font-weight-bold text-primary">Timeline</h6>
-						<div class="dropdown no-arrow">
-
-						</div>
-					</div>
-					<!-- Card Body -->
-					<div class="card-body">
-
-						<div id="timeline"></div>
-
-					</div> <!-- Card Body -->
-				</div>
-			</div>
-		</div> <!-- ./row -->
 
 	</div>
 	<!-- /.container-fluid -->
