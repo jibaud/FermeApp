@@ -3,6 +3,7 @@
 session_start();
 include 'includes/database.php';
 include 'includes/forbidden.php';
+include 'includes/settings-engine.php';
 
 $pageTitle = 'Profil';
 include 'header.php';
@@ -128,6 +129,7 @@ if (isset($_POST['change_password'])) {
 ?>
 
 <body id="page-top">
+<?php include 'includes/loader.php'; ?>
 
   <!-- Page Wrapper -->
   <div id="wrapper">
@@ -259,15 +261,6 @@ if (isset($_POST['change_password'])) {
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
               <h6 class="m-0 font-weight-bold text-primary">Modifier mot de passe</h6>
-              <div class="dropdown no-arrow">
-                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                </a>
-                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                  <a class="dropdown-item" href="#">Modifier</a>
-                  <a class="dropdown-item" href="#">Supprimer</a>
-                </div>
-              </div>
             </div>
             <!-- Card Body -->
             <div class="card-body">

@@ -4,12 +4,13 @@
 session_start();
 include 'includes/database.php';
 include 'includes/forbidden.php';
+include 'includes/settings-engine.php';
 
 $pageTitle = 'Cimetière';
 include 'header.php';
 
 
-// Rescusiter une bête morte
+// Rescusiter un bovin mort
 if (isset($_POST['restaure'])) {
   $restaureidnumber = htmlspecialchars($_POST['selectedIdToRestaure']);
   $owner_id = $_SESSION['userID'];
@@ -20,7 +21,7 @@ if (isset($_POST['restaure'])) {
   header('Location:dead');
 }
 
-// Archiver une bête morte
+// Archiver un bovin mort
 if (isset($_POST['delete'])) {
   $deleteindexnumber = htmlspecialchars($_POST['selectedIndexToDelete']);
   $owner_id = $_SESSION['userID'];
@@ -34,7 +35,7 @@ if (isset($_POST['delete'])) {
 
 // Message d'erreur redirection from cow-single if dead
 if (isset($_GET['e'])) {
-    $warningMessage = "La bête portant le numéro d'identification " . $_GET['e'] . " à été déclarée morte, elle se trouve dans le cimetière.";
+    $warningMessage = "Le bovin portant le numéro d'identification " . $_GET['e'] . " à été déclaré mort, il se trouve dans le cimetière.";
   }
 
 
@@ -164,19 +165,19 @@ if (isset($_GET['e'])) {
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title text-gray-800" id="">Restaurer ?</h5>
+            <h5 class="modal-title text-gray-800" id="">Restaurer</h5>
             <button class="close" type="button" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">×</span>
             </button>
           </div>
           <div class="modal-body">
-            <p>Vous êtes sur le point de sortir cette bête des archives pour la replacer dans la liste principale.</p>
+            <p>Vous êtes sur le point de sortir ce bovin des archives pour le replacer dans la liste principale.</p>
           </div>
           <div class="modal-footer">
               <button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
               <form action="" method="post">
                 <input type="text" id="selectedIdToRestaure" name="selectedIdToRestaure" value="" style="display:none;">
-                <input type="submit" name="restaure" id="restaure" value="Restaurer" class="btn btn-primary">
+                <input type="submit" name="restaure" id="restaure" value="Restaurer" class="btn btn-success">
               </form>
             </div>
         </div>

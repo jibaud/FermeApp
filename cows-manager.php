@@ -4,12 +4,13 @@
 session_start();
 include 'includes/database.php';
 include 'includes/forbidden.php';
+include 'includes/settings-engine.php';
 
 $pageTitle = 'Gestion des vaches';
 include 'header.php';
 
 
-// Supprimer une bête
+// Supprimer un bovin
 if (isset($_POST['archive'])) {
   $archiveidnumber = htmlspecialchars($_POST['selectedIdToArchive']);
   $owner_id = $_SESSION['userID'];

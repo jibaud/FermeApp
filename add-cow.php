@@ -3,8 +3,9 @@
 session_start();
 include 'includes/database.php';
 include 'includes/forbidden.php';
+include 'includes/settings-engine.php';
 
-$pageTitle = 'Ajouter une nouvelle bête';
+$pageTitle = 'Ajouter un nouveau bovin';
 include 'header.php';
 
 ?>

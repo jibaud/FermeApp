@@ -305,7 +305,7 @@ if (isset($_POST['addGestSubmit'])) {
 
 
 
-// Supprimer une bête
+// Supprimer un bovin
 if (isset($_POST['archive'])) {
 	$database = getPDO();
 	$archiveCow = $database->prepare("UPDATE cows SET isarchived = 1 WHERE id = $currentCowId AND owner_id = $owner_id");
@@ -315,7 +315,7 @@ if (isset($_POST['archive'])) {
 }
 
 
-// Déclarer une bête morte
+// Déclarer un bovin morte
 if (isset($_POST['deadConfirm'])) {
 	$deathDate = htmlspecialchars($_POST['deathDate']);
 
@@ -329,7 +329,7 @@ if (isset($_POST['deadConfirm'])) {
 	}
 }
 
-// Déclarer une bête vendue
+// Déclarer un bovin vendue
 if (isset($_POST['soldConfirm'])) {
 	$saleDate = htmlspecialchars($_POST['saleDate']);
 	$salePrice = htmlspecialchars($_POST['salePrice']);

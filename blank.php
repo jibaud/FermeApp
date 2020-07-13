@@ -3,6 +3,7 @@
 session_start();
 include 'includes/database.php';
 include 'includes/forbidden.php';
+include 'includes/settings-engine.php';
 
 $pageTitle = 'A simple page';
 include 'header.php';

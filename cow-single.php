@@ -3,6 +3,7 @@
 session_start();
 include 'includes/database.php';
 include 'includes/forbidden.php';
+include 'includes/settings-engine.php';
 
 include 'header.php';
 
@@ -138,7 +139,7 @@ $pageTitle = $result['name'];
 
 			<!-- Page Heading -->
 			<div class="d-sm-flex align-items-center justify-content-between mb-2">
-				<h2 class="capitalize font-weight-bold text-primary"><?= $pageTitle ?><span class="badge badge-warning text-black ml-2"><?= $result['id']; ?></span></h2>
+				<h2 class="capitalize font-weight-bold text-primary"><span class="user-select-all"><?= $pageTitle ?></span><span class="badge badge-warning text-black ml-2 user-select-all"><span class="font-weight-normal"><?php if(isset($set_prefixId)){echo $set_prefixId.' ';}?></span><?= $result['id']; ?></span></h2>
 				<div class="dropdown">
 					<a class="btn btn-primary btn-sm dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 						<i class="fas fa-tools fa-sm mr-1 text-white-50"></i> Actions
@@ -148,12 +149,12 @@ $pageTitle = $result['name'];
 																		echo 'disabled" tabindex="-1" aria-disabled="true"';
 																	} else {
 																		echo '"';
-																	}; ?>>Ajouter une gestation</a>
+																	}; ?>>Déclarer une gestation</a>
 						<div class=" dropdown-divider"></div>
-					<a class="dropdown-item" href="#" data-toggle="modal" data-target="#deadCowModal">Déclarer mort<?= $eIfFemal ?></a>
-					<a class="dropdown-item" href="#" data-toggle="modal" data-target="#soldCowModal">Déclarer vendu<?= $eIfFemal ?></a>
+					<a class="dropdown-item" href="#" data-toggle="modal" data-target="#deadCowModal">Bovin mort</a>
+					<a class="dropdown-item" href="#" data-toggle="modal" data-target="#soldCowModal">Bovin vendu</a>
 					<div class="dropdown-divider"></div>
-					<a class="dropdown-item text-danger" href="#" data-toggle="modal" data-target="#archiveCowModal">Supprimer</a>
+					<a class="dropdown-item text-danger" href="#" data-toggle="modal" data-target="#archiveCowModal">Supprimer <?= $result['name'] ?></a>
 				</div>
 			</div>
 		</div>
@@ -308,7 +309,12 @@ $pageTitle = $result['name'];
 							<div class="form-row">
 								<div class="form-group col-md-6">
 									<label for="cow_id">Numéro d'identification <span class="text-danger">*</span></label>
-									<input type="text" class="form-control" id="cow_id" name="cow_id" value="<?= $result['id']; ?>">
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text" id="basic-addon1">FR</span>
+										</div>
+										<input type="text" class="form-control" id="cow_id" name="cow_id" value="<?= $result['id']; ?>" aria-describedby="basic-addon1">
+									</div>
 								</div>
 								<div class="form-group col-md-6">
 									<label for="name">Nom <span class="text-danger">*</span></label>

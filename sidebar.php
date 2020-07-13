@@ -6,7 +6,7 @@
   <div class="sidebar-brand-icon rotate-n-15">
     <i class="fas fa-tractor"></i>
   </div>
-  <div class="sidebar-brand-text mx-3">Milkow <sup>0.3</sup></div>
+  <div class="sidebar-brand-text mx-3">Milkow <sup>0.4</sup></div>
 </a>
 
 <!-- Divider -->

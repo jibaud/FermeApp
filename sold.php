@@ -1,15 +1,15 @@
 <?php
 
-
 session_start();
 include 'includes/database.php';
 include 'includes/forbidden.php';
+include 'includes/settings-engine.php';
 
-$pageTitle = 'Bêtes vendues';
+$pageTitle = 'Bovins vendus';
 include 'header.php';
 
 
-// "Racheter" une bête vendue
+// "Racheter" un bovin vendue
 if (isset($_POST['restaure'])) {
     $restaureidnumber = htmlspecialchars($_POST['selectedIdToRestaure']);
     $owner_id = $_SESSION['userID'];
@@ -20,7 +20,7 @@ if (isset($_POST['restaure'])) {
     header('Location:sold');
 }
 
-// Archiver une bête morte
+// Archiver un bovin morte
 if (isset($_POST['delete'])) {
     $deleteindexnumber = htmlspecialchars($_POST['selectedIndexToDelete']);
     $owner_id = $_SESSION['userID'];
@@ -33,7 +33,7 @@ if (isset($_POST['delete'])) {
 
 // Message d'erreur redirection from cow-single if dead
 if (isset($_GET['e'])) {
-    $warningMessage = "La bête portant le numéro d'identification " . $_GET['e'] . " à été déclarée vendue.";
+    $warningMessage = "Le bovin portant le numéro d'identification " . $_GET['e'] . " à été déclaré vendu.";
 }
 
 ?>
@@ -167,13 +167,13 @@ if (isset($_GET['e'])) {
                         </button>
                     </div>
                     <div class="modal-body">
-                        <p>Finalement vous n'aviez pas vendu cette bête ? Vous pouvez la restaurer.</p>
+                        <p>Finalement vous n'aviez pas vendu ce bovin ? Vous pouvez le restaurer.</p>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
                         <form action="" method="post">
                             <input type="text" id="selectedIdToRestaure" name="selectedIdToRestaure" value="" style="display:none;">
-                            <input type="submit" name="restaure" id="restaure" value="Restaurer" class="btn btn-primary">
+                            <input type="submit" name="restaure" id="restaure" value="Restaurer" class="btn btn-success">
                         </form>
                     </div>
                 </div>

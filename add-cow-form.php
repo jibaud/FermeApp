@@ -1,5 +1,3 @@
-
-
 <?php if (isset($errorMessage)) { ?>
     <div class="alert alert-danger" role="alert">
         <?= $errorMessage // <?= shortcode for <?php echo 
@@ -19,7 +17,12 @@
     <div class="form-row">
         <div class="form-group col-md-6">
             <label for="cow_id">Numéro d'identification <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="cow_id" name="cow_id" <?php if (isset($cow_id)) { ?>value="<?= $cow_id ?>" <?php } ?>>
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">FR</span>
+                </div>
+                <input type="text" class="form-control" autofocus id="cow_id" name="cow_id" <?php if (isset($cow_id)) { ?>value="<?= $cow_id ?>" <?php } ?> aria-describedby="basic-addon1">
+            </div>
         </div>
         <div class="form-group col-md-6">
             <label for="name">Nom <span class="text-danger">*</span></label>
@@ -211,7 +214,7 @@
         </div>
     </div>
 
-   
+
     <div class="modal-footer">
         <button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
         <input type="submit" name="add" value="Valider" class="btn btn-primary" onclick="isPregnantChecked();">

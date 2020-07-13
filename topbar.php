@@ -61,9 +61,11 @@
         <!-- Nav Item - Pregnancy -->
         <li class="nav-item dropdown no-arrow mx-1">
           <a class="nav-link dropdown-toggle" href="#" id="pregnancyAlert" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="fad fa-cow"></i>
+            <i class="fas fa-baby-carriage"></i>
             <!-- Counter - Pregnancy -->
+            <?php if($pregnantNumber > 0) { ?>
             <span class="badge badge-danger badge-counter"><?= $pregnantNumber . ' ' ?></span>
+            <?php } ?>
           </a>
           <!-- Dropdown - Pregnancy -->
           <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">
@@ -86,7 +88,7 @@
               }
 
             ?>
-              <a class="dropdown-item d-flex align-items-center" href="#">
+              <a class="dropdown-item d-flex align-items-center" href="cow-single?id=<?= $donnees['id']; ?>">
                 <div class="mr-3">
                   <div class="icon-circle bg-primary">
                     <i class="fad fa-cow text-white"></i>
@@ -229,7 +231,7 @@
             </a>
             <a class="dropdown-item" href="settings">
               <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-              Settings
+              Paramètres
             </a>
             <a class="dropdown-item" href="#">
               <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>

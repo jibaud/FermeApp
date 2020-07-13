@@ -1,65 +1,69 @@
 <?php
- 
+
 session_start();
 include 'includes/database.php';
- 
+
 if (isset($_SESSION['userEmail'])) {
-    header('Location:index');
+  header('Location:index');
 }
- 
-if (isset($_POST['submit'])){
-   
-    $firstname = ucwords(htmlspecialchars($_POST['firstname']));
-    $lastname = ucwords(htmlspecialchars($_POST['lastname']));
-    $email = htmlspecialchars($_POST['email']);
-    $email_confirm = htmlspecialchars($_POST['email_confirm']);
-    if (!empty($_POST['password'])){
-      $password = sha1($_POST['password']);
-    }
-    if (!empty($_POST['password_confirm'])){
-      $password_confirm = sha1($_POST['password_confirm']);
-    }
-    date_default_timezone_set('Europe/Paris');
-    $date = date('d/m/Y à H:i:s');
- 
-    if ((!empty($firstname)) && (!empty($lastname)) && (!empty($email)) && (!empty($email_confirm)) && (!empty($password)) && (!empty($password_confirm))) {
-        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            if ($email == $email_confirm) {
-                if ($password == $password_confirm) {
- 
-                    $database = getPDO();
-                    $rowEmail = countDatabaseValue($database, 'users', 'user_email', 'user_email', $email, $email_confirm);
-                    if ($rowEmail == 0) {
-                      $insertMember = $database->prepare("INSERT INTO users(user_firstname, user_lastname, user_email, user_password, registerdate) VALUES(?, ?, ?, ?, ?, ?)");
-                      $insertMember->execute([
-                          $firstname,
-                          $lastname,
-                          $email,
-                          $password,
-                          $date
-                      ]);
-                      $successMessage = "Votre compte à bien été créé !";
-                      header('refresh:3;url=login.php');
-                    } else {
-                        $errorMessage = 'Cette adresse email est déjà utilisée.';
-                    }
-                } else {
-                    $errorMessage = 'Les mots de passes ne correspondent pas.';
-                }
-            } else {
-                $errorMessage = "Les adresses email ne correspondent pas.";
+
+if (isset($_POST['submit'])) {
+
+  $firstname = ucwords(htmlspecialchars($_POST['firstname']));
+  $lastname = ucwords(htmlspecialchars($_POST['lastname']));
+  $email = htmlspecialchars($_POST['email']);
+  $email_confirm = htmlspecialchars($_POST['email_confirm']);
+  if (!empty($_POST['password'])) {
+    $password = sha1($_POST['password']);
+  }
+  if (!empty($_POST['password_confirm'])) {
+    $password_confirm = sha1($_POST['password_confirm']);
+  }
+  date_default_timezone_set('Europe/Paris');
+  $date = date('d/m/Y à H:i:s');
+
+  if ((!empty($firstname)) && (!empty($lastname)) && (!empty($email)) && (!empty($email_confirm)) && (!empty($password)) && (!empty($password_confirm))) {
+    if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+      if ($email == $email_confirm) {
+        if ($password == $password_confirm) {
+          $database = getPDO();
+          $database->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+          $rowEmail = countDatabaseValue($database, 'users', 'user_email', 'user_email', $email, $email_confirm);
+          if ($rowEmail == 0) {
+            try {
+              $insertMember = $database->prepare("INSERT INTO users(user_firstname, user_lastname, user_email, user_password, registerdate) VALUES(?, ?, ?, ?, ?)");
+              $insertMember->execute([
+                $firstname,
+                $lastname,
+                $email,
+                $password,
+                $date
+              ]);
+              $successMessage = "Votre compte à bien été créé !";
+              header('refresh:3;url=login.php');
+            } catch (Exception $e) {
+              die('Error : ' . $e->getMessage());
             }
+          } else {
+            $errorMessage = 'Cette adresse email est déjà utilisée.';
+          }
         } else {
-            $errorMessage = "L'adresse email n'est pas valide.";
+          $errorMessage = 'Les mots de passes ne correspondent pas.';
         }
+      } else {
+        $errorMessage = "Les adresses email ne correspondent pas.";
+      }
     } else {
-        $errorMessage = 'Veuillez remplir tous les champs.';
+      $errorMessage = "L'adresse email n'est pas valide.";
     }
+  } else {
+    $errorMessage = 'Veuillez remplir tous les champs.';
+  }
 }
 
 $pageTitle = 'Inscription';
 include 'header.php';
- 
+
 ?>
 
 <body class="bg-gradient-primary">
@@ -76,16 +80,17 @@ include 'header.php';
               <div class="text-center">
                 <h1 class="h4 text-gray-900 mb-4"><?= $pageTitle ?></h1>
               </div>
-<?php if (isset($errorMessage)) {?>
-              <div class="alert alert-danger" role="alert">
-                <?= $errorMessage // <?= shortcode for <?php echo ?>
-              </div>
-<?php } ?>
-<?php if (isset($successMessage)) {?>
-              <div class="alert alert-success" role="alert">
-                <?= $successMessage ?>
-              </div>
-<?php } ?>
+              <?php if (isset($errorMessage)) { ?>
+                <div class="alert alert-danger" role="alert">
+                  <?= $errorMessage // <?= shortcode for <?php echo 
+                  ?>
+                </div>
+              <?php } ?>
+              <?php if (isset($successMessage)) { ?>
+                <div class="alert alert-success" role="alert">
+                  <?= $successMessage ?>
+                </div>
+              <?php } ?>
               <form class="user" method="post" action="">
                 <div class="form-group row">
                   <div class="col-sm-6 mb-3 mb-sm-0">
@@ -127,4 +132,3 @@ include 'header.php';
   </div>
 
   <?php include 'footer.php'; ?>
-
