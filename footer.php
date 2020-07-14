@@ -74,9 +74,23 @@
 
   <script src="vendor/snackbar/js/snackbar.js"></script>
 
-  
+  <script src="vendor/croppie/js/croppie.js"></script>
+
 
   <script src="js/scripts.js"></script>
+
+
+
+  <?php
+
+	if (isset($_GET['e']) || isset($_GET['eg'])) {
+		echo "<script>showSnackBar('Opération échouée.', 'danger');</script>";
+	}
+	if (isset($_GET['s'])) {
+		echo "<script>showSnackBar('Opération réussie.', 'primary');</script>";
+	}
+
+?>
 
 </body>
 

@@ -57,7 +57,7 @@ if (isset($_POST['settingsSubmit'])) {
           <h5>Identification des bovins</h5>
           <div class="row">
             <div class="col-md-6">
-              <label for="">Préfixe <span class="font-weight-lighter">[Pays] [Département] [Exploitation]</span></label>
+              <label for="prefixId">Préfixe <span class="font-weight-lighter">[Pays] [Département] [Exploitation]</span></label>
               <input type="text" class="form-control" id="prefixId" name="prefixId" value="<?php if(isset($set_prefixId)){echo $set_prefixId;}?>">
             </div>
           </div>

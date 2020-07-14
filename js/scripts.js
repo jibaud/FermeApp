@@ -207,6 +207,23 @@ $(document).ready(function () {
     }
   });
 
+
+  $('#modifyImgButton').click(function(e) {
+    e.preventDefault();
+
+    $('#profilePicture').toggleClass('d-none');
+    $('#imgUploadInput').toggleClass('d-none');
+    $('#deleteImgButton').toggleClass('d-none');
+
+    if ($(this).html() == "Modifier") {
+      $(this).html("Annuler");
+   }
+   else {
+      $(this).html("Modifier");
+   }
+  });
+
+
 }); // End of document ready function
 
 

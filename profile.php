@@ -126,10 +126,42 @@ if (isset($_POST['change_password'])) {
   }
 }
 
+
+
+//Update profile pic
+if (isset($_POST['imageSubmit'])) {
+  $imgName = htmlspecialchars($_POST['imageName']);
+  try {
+    $database->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $insertUserImg = $database->prepare("UPDATE users SET user_img=? WHERE user_id = $currentUserId");
+    $insertUserImg->execute([$imgName]);
+    $successMessage = "Photo de profil changée.";
+    header('Location: profile?s=1');
+  } catch (Exception $e) {
+    die('Error : ' . $e->getMessage());
+  }
+}
+
+//Delete profile pic
+if (isset($_POST['deleteImg'])) {
+  $imgName = htmlspecialchars($_POST['imageNameToDelete']);
+
+  try {
+    $database->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $insertUserImg = $database->prepare("UPDATE users SET user_img='' WHERE user_id = $currentUserId");
+    $insertUserImg->execute();
+    unlink('img/profilepic/' . $imgName); // Supprimer l'image du serveur
+    $successMessage = "Photo de profil supprimée.";
+    header('Location: profile?s=1');
+  } catch (Exception $e) {
+    die('Error : ' . $e->getMessage());
+  }
+}
+
 ?>
 
 <body id="page-top">
-<?php include 'includes/loader.php'; ?>
+  <?php include 'includes/loader.php'; ?>
 
   <!-- Page Wrapper -->
   <div id="wrapper">
@@ -155,6 +187,65 @@ if (isset($_POST['change_password'])) {
         </div>
       <?php } ?>
 
+
+
+
+
+      <script>
+        $(document).ready(function() {
+
+          $image_crop = $('#image_demo').croppie({
+            enableExif: true,
+            viewport: {
+              width: 300,
+              height: 300,
+              type: 'square' //circle
+            },
+            boundary: {
+              width: 400,
+              height: 400
+            }
+          });
+
+          $('#upload_image').on('change', function() {
+            var reader = new FileReader();
+            reader.onload = function(event) {
+              $image_crop.croppie('bind', {
+                url: event.target.result
+              }).then(function() {
+                console.log('jQuery bind complete');
+              });
+            }
+            reader.readAsDataURL(this.files[0]);
+            $('#uploadimageModal').modal('show');
+          });
+
+          $('.crop_image').click(function(event) {
+            $image_crop.croppie('result', {
+              type: 'canvas',
+              size: 'viewport'
+            }).then(function(response) {
+              $.ajax({
+                url: "includes/upload.php",
+                type: "POST",
+                data: {
+                  "image": response
+                },
+                success: function(data) {
+                  $('#uploadimageModal').modal('hide');
+                  $('#uploaded_image').html(data);
+                }
+              });
+            })
+          });
+
+        });
+      </script>
+
+
+
+
+
       <!-- Content Row -->
       <div class="row">
 
@@ -171,63 +262,63 @@ if (isset($_POST['change_password'])) {
                   <div class="col-md-6 mb-3">
                     <label for="firstname">Prénom <span class="text-danger">*</span></label>
                     <input type="text" autocomplete="off" class="form-control capitalize" id="firstname" name="firstname" value="<?php if (isset($firstname)) {
-                                                                                                                echo $firstname;
-                                                                                                              } else {
-                                                                                                                echo $resultUser['user_firstname'];
-                                                                                                              } ?>" required>
+                                                                                                                                    echo $firstname;
+                                                                                                                                  } else {
+                                                                                                                                    echo $resultUser['user_firstname'];
+                                                                                                                                  } ?>" required>
                   </div>
                   <div class="col-md-6 mb-3">
                     <label for="lastname">Nom <span class="text-danger">*</span></label>
                     <input type="text" autocomplete="off" class="form-control capitalize" id="lastname" name="lastname" value="<?php if (isset($lastname)) {
-                                                                                                              echo $lastname;
-                                                                                                            } else {
-                                                                                                              echo $resultUser['user_lastname'];
-                                                                                                            } ?>" required>
+                                                                                                                                  echo $lastname;
+                                                                                                                                } else {
+                                                                                                                                  echo $resultUser['user_lastname'];
+                                                                                                                                } ?>" required>
                   </div>
                 </div>
                 <div class="form-row">
                   <div class="col-md-6 mb-3">
                     <label for="email">Adresse email <span class="text-danger">*</span></label>
                     <input type="email" autocomplete="off" class="form-control" id="email" name="email" value="<?php if (isset($email)) {
-                                                                                              echo $email;
-                                                                                            } else {
-                                                                                              echo $resultUser['user_email'];
-                                                                                            } ?>" required>
+                                                                                                                  echo $email;
+                                                                                                                } else {
+                                                                                                                  echo $resultUser['user_email'];
+                                                                                                                } ?>" required>
                     <small id="emailHelp" class="form-text text-muted">Votre identifiant de connexion</small>
                   </div>
                   <div class="col-md-6 mb-3">
                     <label for="phone">Téléphone</label>
                     <input type="tel" autocomplete="off" class="form-control" id="phone" name="phone" value="<?php if (isset($phone)) {
-                                                                                            echo $phone;
-                                                                                          } else {
-                                                                                            echo $resultUser['user_phone'];
-                                                                                          } ?>">
+                                                                                                                echo $phone;
+                                                                                                              } else {
+                                                                                                                echo $resultUser['user_phone'];
+                                                                                                              } ?>">
                   </div>
                 </div>
                 <div class="form-row">
                   <div class="col-md-6 mb-3">
                     <label for="address">Adresse</label>
                     <input type="text" autocomplete="off" class="form-control capitalize" id="address" name="address" value="<?php if (isset($address)) {
-                                                                                                            echo $address;
-                                                                                                          } else {
-                                                                                                            echo $resultUser['user_address'];
-                                                                                                          } ?>">
+                                                                                                                                echo $address;
+                                                                                                                              } else {
+                                                                                                                                echo $resultUser['user_address'];
+                                                                                                                              } ?>">
                   </div>
                   <div class="col-md-3 mb-3">
                     <label for="city">Ville</label>
                     <input type="text" autocomplete="off" class="form-control capitalize" id="city" name="city" value="<?php if (isset($city)) {
-                                                                                                      echo $city;
-                                                                                                    } else {
-                                                                                                      echo $resultUser['user_city'];
-                                                                                                    } ?>">
+                                                                                                                          echo $city;
+                                                                                                                        } else {
+                                                                                                                          echo $resultUser['user_city'];
+                                                                                                                        } ?>">
                   </div>
                   <div class="col-md-3 mb-3">
                     <label for="zipcode">Code Postal</label>
                     <input type="text" autocomplete="off" class="form-control" id="zipcode" name="zipcode" value="<?php if (isset($zipcode)) {
-                                                                                                  echo $zipcode;
-                                                                                                } else {
-                                                                                                  echo $resultUser['user_zipcode'];
-                                                                                                } ?>">
+                                                                                                                    echo $zipcode;
+                                                                                                                  } else {
+                                                                                                                    echo $resultUser['user_zipcode'];
+                                                                                                                  } ?>">
                   </div>
                 </div>
                 <hr>
@@ -236,6 +327,7 @@ if (isset($_POST['change_password'])) {
             </div>
           </div>
         </div>
+
 
         <div class="col-xl-4 col-lg-5">
           <div class="card shadow mb-4">
@@ -247,14 +339,30 @@ if (isset($_POST['change_password'])) {
                   <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                  <a class="dropdown-item" href="#">Modifier</a>
-                  <a class="dropdown-item" href="#">Supprimer</a>
+                  <a class="dropdown-item" id="modifyImgButton" href="#">Modifier</a>
+                  <a class="dropdown-item" id="deleteImgButton" href="#" data-toggle="modal" data-target="#deleteImgModal">Supprimer</a>
                 </div>
               </div>
             </div>
             <!-- Card Body -->
             <div class="card-body">
-              <img class="img-profile rounded img-fluid mx-auto d-block" src="https://images.unsplash.com/photo-1518526157563-b1ee37a05129?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjI5MzI0fQ&auto=format&fit=crop&w=1500&q=80">
+              <div class="input-group d-none" id="imgUploadInput">
+                <div class="custom-file">
+                  <input type="file" class="custom-file-input" id="upload_image" name="upload_image" accept="image/*" data-browse="Charger">
+                  <label class="custom-file-label" for="upload_image">Choisissez un fichier</label>
+                </div>
+              </div>
+              <form action="" method="post" id="imageForm">
+                <div id="uploaded_image"></div>
+                <input type="text" class="d-none" id="imageNameToDelete" name="imageNameToDelete" value="<?= $resultUser['user_img']; ?>">
+              </form>
+              <div id="profilePicture">
+                <img class="img-profile rounded img-fluid mx-auto d-block" src="img/profilepic/<?php if (!empty($resultUser['user_img'])) {
+                                                                                                  echo $resultUser['user_img'];
+                                                                                                } else {
+                                                                                                  echo 'default.png';
+                                                                                                }; ?>">
+              </div>
             </div>
           </div>
           <div class="card shadow mb-4">
@@ -283,5 +391,58 @@ if (isset($_POST['change_password'])) {
 
     </div>
     <!-- /.container-fluid -->
+
+
+
+    <!-- Image Cropper Modal-->
+    <div id="uploadimageModal" class="modal" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Upload & Crop Image</h4>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-8 text-center">
+                <div id="image_demo" style="width:350px; margin-top:30px"></div>
+              </div>
+              <div class="col-md-4" style="padding-top:30px;">
+                <br />
+                <br />
+                <br />
+                <button class="btn btn-success crop_image">Crop & Upload Image</button>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Image Modal-->
+    <div class="modal fade" id="deleteImgModal" tabindex="-1" role="dialog" aria-labelledby="deleteGest" aria-hidden="true" data-keyboard="false">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title text-gray-800" id="">Supprimer</h5>
+            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Voulez-vous vraiment supprimer votre photo de profil ?</p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
+            <form action="" method="post">
+              <input form="imageForm" type="submit" name="deleteImg" id="deleteImg" value="Supprimer" class="btn btn-danger">
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <?php include 'footer.php'; ?>

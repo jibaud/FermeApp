@@ -98,7 +98,7 @@ if (isset($_POST['archive'])) {
                   }
                 ?>
                   <tr>
-                    <td class="user-select-all"><?php if(isset($set_prefixId)){echo $set_prefixId;}?><?= $donnees['id']; ?></td>
+                    <td class="user-select-all"><?= $donnees['id']; ?></td>
                     <td class="text-capitalize user-select-all" id="namefor<?= $donnees['id']; ?>"><?= $donnees['name']; ?></td>
                     <td class="text-capitalize"><?= $donnees['gender']; ?></td>
                     <td class="text-capitalize"><?= $type ?></td>

@@ -139,8 +139,10 @@ $pageTitle = $result['name'];
 
 			<!-- Page Heading -->
 			<div class="d-sm-flex align-items-center justify-content-between mb-2">
-			
-				<h2 class="capitalize font-weight-bold text-primary"><span class="user-select-all"><?= $pageTitle ?></span><span class="badge badge-warning text-black ml-2 text-monospace user-select-all"><span class="font-weight-normal"><?php if(isset($set_prefixId)){echo $set_prefixId;}?></span><?= $result['id']; ?></span></i></h2>
+
+				<h2 class="capitalize font-weight-bold text-primary"><span class="user-select-all"><?= $pageTitle ?></span><span class="badge badge-warning text-black ml-2 text-monospace user-select-all"><span class="font-weight-normal"><?php if (isset($set_prefixId)) {
+																																																													echo $set_prefixId;
+																																																												} ?></span><?= $result['id']; ?></span></i></h2>
 				<div class="dropdown">
 					<a class="btn btn-primary btn-sm dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 						<i class="fas fa-tools fa-sm mr-1 text-white-50"></i> Actions
@@ -312,7 +314,7 @@ $pageTitle = $result['name'];
 									<label for="cow_id">Numéro d'identification <span class="text-danger">*</span></label>
 									<div class="input-group">
 										<div class="input-group-prepend">
-											<span class="input-group-text" id="basic-addon1">FR</span>
+											<span class="input-group-text" id="basic-addon1"><?= $set_prefixId ?></span>
 										</div>
 										<input type="text" class="form-control" id="cow_id" name="cow_id" value="<?= $result['id']; ?>" aria-describedby="basic-addon1">
 									</div>
@@ -512,7 +514,15 @@ $pageTitle = $result['name'];
 							<div class="form-row mb-3">
 								<div class="form-group col-md-6">
 									<label for="cow_id">Numéro de la mère</label>
-									<input type="text" class="form-control" id="mother_id" name="mother_id" value="<?= $result['mother_id']; ?>" placeholder="Inconnu">
+									<div class="input-group">
+										<?php if ($set_prefixId) { ?>
+											<div class="input-group-prepend">
+												<span class="input-group-text" id="basic-addon1"><?= $set_prefixId ?> </span>
+											</div>
+										<?php } ?>
+										<input type="text" class="form-control" id="mother_id" name="mother_id" value="<?= $result['mother_id']; ?>" placeholder="Inconnu">
+									</div>
+
 								</div>
 							</div>
 
@@ -923,15 +933,3 @@ $pageTitle = $result['name'];
 
 
 	<?php include 'footer.php'; ?>
-
-
-	<?php
-
-	if (isset($_GET['e']) || isset($_GET['eg'])) {
-		echo "<script>showSnackBar('Opération échouée.', 'danger');</script>";
-	}
-	if (isset($_GET['s'])) {
-		echo "<script>showSnackBar('Opération réussie.', 'primary');</script>";
-	}
-
-	?>
