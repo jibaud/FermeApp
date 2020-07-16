@@ -58,13 +58,17 @@
 
         ?>
 
+        <li class="nav-item date-topbar d-none d-xl-block text-gray-500">
+          <?= date('d/m/Y');?>
+        </li>
+
         <!-- Nav Item - Pregnancy -->
-        <li class="nav-item dropdown no-arrow mx-1">
+        <li class="nav-item dropdown no-arrow mx-1" id="gestNotification">
           <a class="nav-link dropdown-toggle" href="#" id="pregnancyAlert" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="fas fa-baby-carriage"></i>
             <!-- Counter - Pregnancy -->
             <?php if ($pregnantNumber > 0) { ?>
-              <span class="badge badge-danger badge-counter"><?= $pregnantNumber . ' ' ?></span>
+              <span class="badge badge-success badge-counter" id="gestNotifBadge"><?= $pregnantNumber . ' ' ?></span>
             <?php } ?>
           </a>
           <!-- Dropdown - Pregnancy -->
@@ -90,12 +94,12 @@
             ?>
               <a class="dropdown-item d-flex align-items-center" href="cow-single?id=<?= $donnees['id']; ?>">
                 <div class="mr-3">
-                  <div class="icon-circle bg-primary">
+                  <div class="icon-circle bg-primary <?= $color ?>">
                     <i class="fad fa-cow text-white"></i>
                   </div>
                 </div>
                 <div class="w-100">
-                  <div class="text-gray-900 uppercase"><?= $donnees['name'] . ' - ' . $donnees['id']; ?></div>
+                  <div class="text-gray-900"><?= $donnees['name'] . ' - ' . $donnees['id']; ?></div>
                   <div class="progress">
                     <div class="progress-bar <?= $color ?>" role="progressbar" style="width:<?= $pregnantpercent ?>%;" aria-valuenow="<?= $pregnantpercent ?>" aria-valuemin="0" aria-valuemax="100"><?= $pregnantdays . '/283' ?></div>
                   </div>
@@ -106,56 +110,106 @@
             $reponseCowPregnant->closeCursor();
             ?>
 
-            <a class="dropdown-item text-center small text-gray-500" href="gestations">Voir en détails</a>
+            <a class="dropdown-item text-center small text-gray-500" href="gestations">Voir tout</a>
           </div>
         </li>
 
+        <?php
+        // On récupère tout le contenu de la table treats sauf les traitements qui ne se repettent pas
+        // puisqu'on ne va pas les afficher.
+        $owner_id = $_SESSION['userID'];
+        $database = getPDO();
+        $reponseTreats = $database->prepare("SELECT * FROM treats WHERE t_owner_id = ? AND t_repeat != 0");
+        $reponseTreats->execute([$owner_id]);
+
+        // Un appel qui servira à récuperer le nom du bovin associé au traitement
+        $needCows = $database->prepare("SELECT cow_index, id, name FROM cows WHERE owner_id = ? AND isarchived = 0 AND death_date = '' AND sale_date = ''");
+        $needCows->execute([$owner_id]);
+        $dataCows = $needCows->fetchAll(); // Cré un tableau avec les resultats
+        $indexArray = array_column($dataCows, 'cow_index'); // Cré un tableau avec seulement les cow_index car on le connait dans la BDD des traitements
+        
+        ?>
+
         <!-- Nav Item - Alerts -->
-        <li class="nav-item dropdown no-arrow mx-1">
-          <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="fas fa-bell fa-fw"></i>
+        <li class="nav-item dropdown no-arrow mx-1" id="treatNotification">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-syringe fa-fw"></i>
             <!-- Counter - Alerts -->
-            <span class="badge badge-danger badge-counter">3+</span>
+            <span class="badge badge-success badge-counter" id="treatNotifBadge">0</span>
           </a>
           <!-- Dropdown - Alerts -->
           <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">
             <h6 class="dropdown-header">
-              Alerts Center
+              Traitements <span class="capitalize" id="howManyToday"></span>
             </h6>
-            <a class="dropdown-item d-flex align-items-center" href="#">
-              <div class="mr-3">
-                <div class="icon-circle bg-primary">
-                  <i class="fas fa-file-alt text-white"></i>
-                </div>
-              </div>
-              <div>
-                <div class="small text-gray-500">December 12, 2019</div>
-                <span class="font-weight-bold">A new monthly report is ready to download!</span>
-              </div>
-            </a>
-            <a class="dropdown-item d-flex align-items-center" href="#">
-              <div class="mr-3">
-                <div class="icon-circle bg-success">
-                  <i class="fas fa-donate text-white"></i>
-                </div>
-              </div>
-              <div>
-                <div class="small text-gray-500">December 7, 2019</div>
-                $290.29 has been deposited into your account!
-              </div>
-            </a>
-            <a class="dropdown-item d-flex align-items-center" href="#">
-              <div class="mr-3">
-                <div class="icon-circle bg-warning">
-                  <i class="fas fa-exclamation-triangle text-white"></i>
-                </div>
-              </div>
-              <div>
-                <div class="small text-gray-500">December 2, 2019</div>
-                Spending Alert: We've noticed unusually high spending for your account.
-              </div>
-            </a>
-            <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
+            <?php
+            while ($data = $reponseTreats->fetch()) {
+              // Retrouver le nom du bovin
+              $key = array_search($data['t_cow_index'], $indexArray);
+              $cowName =  $dataCows[$key]['name'];
+              $cowId =  $dataCows[$key]['id'];
+
+              $dateOfToday = date('d/m/Y');
+              if ($data['t_repeat'] != 0) {
+                $dateEnd = futureDateDay($data['t_date'], $data['t_days']);
+              }
+              if (compareDate($dateEnd, $dateOfToday)) {
+                $color = "bg-warning";
+              } else if ($dateOfToday == $dateEnd) {
+                $color = "bg-danger";
+              } else {
+                $color = "bg-success";
+              }
+              if ($data['t_repeat'] == 2 && $color == 'bg-warning') {
+                $color = 'bg-danger';
+              }
+
+              // On affiche seulement les traitements en cours, donc pas ceux qui ont la couleur success,
+              // ce n'est pas la peine puisqu'ils sont terminés.
+              if ($color != 'bg-success') {
+
+            ?>
+                <a class="dropdown-item d-flex align-items-center treatNotifElement" href="cow-single?id=<?= $cowId; ?>">
+                  <div class="mr-3">
+                    <div class="icon-circle bg-primary <?= $color ?>">
+                      <i class="fad fa-syringe text-white"></i>
+                    </div>
+                  </div>
+                  <div class="w-100">
+                    <div class="text-gray-900"><span class="font-weight-bold"><?= $data['t_name'] ?></span> <span class="font-weight-light">pour</span> <?= $cowName ?></div>
+                    
+                    <div>
+                      <?php
+                      switch ($data['t_repeat']) {
+                        case 0:
+                          echo 'Une seule fois';
+                          break;
+                        case 1:
+                          if ($dateEnd == $dateOfToday) {
+                            echo 'Répéter aujourd\'hui';
+                          } else {
+                            echo 'Répéter le ' . $dateEnd;
+
+                          }
+                          break;
+                        case 2:
+                          if ($dateEnd == $dateOfToday) {
+                            echo 'Dernier jour aujourd\'hui';
+                          } else {
+                            echo 'Jusq\'au ' . $dateEnd;
+                          }
+                          break;
+                      }
+                      ?>
+                    </div>
+                  </div>
+                </a>
+            <?php
+              }
+            }
+            $reponseCowPregnant->closeCursor();
+            ?>
+            <a class="dropdown-item text-center small text-gray-500" href="treats">Voir tout</a>
           </div>
         </li>
 
@@ -221,17 +275,21 @@
         <li class="nav-item dropdown no-arrow">
           <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="mr-2 d-none d-lg-inline text-gray-600 small"><?= $_SESSION['userFirstname'] ?> <?= $_SESSION['userLastname'] ?></span>
-            <img class="img-profile rounded-circle" src="img/profilepic/<?php if(!empty($resultUser['user_img'])){echo $resultUser['user_img'];}else{echo 'default.png';}; ?>">
+            <img class="img-profile rounded-circle" src="img/<?php if (!empty($_SESSION['userImg'])) {
+                                                                echo 'profilepic/' . $_SESSION['userImg'];
+                                                              } else {
+                                                                echo 'default.png';
+                                                              }; ?>">
           </a>
           <!-- Dropdown - User Information -->
           <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
             <a class="dropdown-item" href="profile">
-              <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+              <i class="fas fa-user-cowboy fa-sm fa-fw mr-2 text-gray-400"></i>
               Profil
             </a>
             <a class="dropdown-item" href="settings">
-              <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-              Paramètres
+              <i class="fas fa-cog fa-sm fa-fw mr-2 text-gray-400"></i>
+              Réglages
             </a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">

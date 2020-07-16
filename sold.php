@@ -191,7 +191,7 @@ if (isset($_GET['e'])) {
                         </button>
                     </div>
                     <div class="modal-body">
-                        <p>Voulez-vous vraiment supprimer cette vache ?</p>
+                        <p>Voulez-vous vraiment supprimer ce bovin ?</p>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
@@ -296,13 +296,13 @@ if (isset($_GET['e'])) {
                                         <?php } ?>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Géstation</th>
+                                        <th scope="row">Gestation</th>
                                         <?php if ($donnees['ispregnant'] == 0 && $donnees['pregnant_number'] > 0) { ?>
-                                            <td><?= $donnees['pregnant_number']; ?> géstation(s) passée(s)</td>
+                                            <td><?= $donnees['pregnant_number']; ?> gestation(s) passée(s)</td>
                                         <?php } else if ($donnees['ispregnant'] == 1) { ?>
                                             <td>Depuis le <?= $donnees['pregnant_since']; ?></td>
                                         <?php } else { ?>
-                                            <td>Aucune géstation</td>
+                                            <td>Aucune gestation</td>
                                         <?php } ?>
                                     </tr>
                                     <tr>

@@ -118,15 +118,18 @@
     opacity: .5;
 }
 
-#addGest{
+#addGest,
+#addTreat{
     display: none;
 }
 
-.activeGest{
+.activeGest,
+.activeTreat{
     background-color: #f3f5ff;
 }
 
-#displayGestForm{
+#displayGestForm,
+#displayTreatForm{
     cursor: pointer;
 }
 
@@ -158,4 +161,18 @@
 #croppie{
     width: 100%;
     height: 400px;
+}
+a.gest-card:hover .card{
+    background-color: #f8f9fc;
+}
+
+.sidebar .nav-item .nav-link .badge-counter, .topbar .nav-item .nav-link .badge-counter{
+    right: 0.15rem;
+    margin-top: -0.55rem;
+}
+
+.date-topbar {
+    display: flex!important;
+    align-items: center;
+    padding: 0 .75rem;
 }

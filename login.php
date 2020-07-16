@@ -32,6 +32,7 @@
              $_SESSION['userAddress'] = $userInfo['user_address'];
              $_SESSION['userCity'] = $userInfo['user_city'];
              $_SESSION['userZipcode'] = $userInfo['user_zipcode'];
+             $_SESSION['userImg'] = $userInfo['user_img'];
              $_SESSION['userRegisterDate'] = $userInfo['registerdate'];
              $successMessage = "Connexion réussie";
              header('refresh:0;url=index');
@@ -80,7 +81,7 @@ include 'header.php';
 <?php } ?>
                   <form class="user" method="post" action="">
                     <div class="form-group">
-                      <input type="email" class="form-control form-control-user" id="email" name="email" aria-describedby="emailHelp" placeholder="Adresse email" <?php if (isset($email)) { ?>value="<?= $email ?>" <?php } ?> value="jb3@gmail.com">
+                      <input type="email" class="form-control form-control-user" id="email" name="email" aria-describedby="emailHelp" placeholder="Adresse email" <?php if (isset($email)) { ?>value="<?= $email ?>" <?php } ?> value="iphone0212@gmail.com">
                     </div>
                     <div class="form-group">
                       <input type="password" class="form-control form-control-user" id="password" name="password" placeholder="Mot de passe" value="jb">

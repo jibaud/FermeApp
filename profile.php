@@ -131,10 +131,13 @@ if (isset($_POST['change_password'])) {
 //Update profile pic
 if (isset($_POST['imageSubmit'])) {
   $imgName = htmlspecialchars($_POST['imageName']);
+  $oldimgName = htmlspecialchars($_POST['imageNameToDelete']);
   try {
     $database->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $insertUserImg = $database->prepare("UPDATE users SET user_img=? WHERE user_id = $currentUserId");
     $insertUserImg->execute([$imgName]);
+    unlink('img/profilepic/' . $oldimgName); // Supprimer l'image du serveur
+    $_SESSION['userImg'] = $imgName;
     $successMessage = "Photo de profil changée.";
     header('Location: profile?s=1');
   } catch (Exception $e) {
@@ -144,13 +147,14 @@ if (isset($_POST['imageSubmit'])) {
 
 //Delete profile pic
 if (isset($_POST['deleteImg'])) {
-  $imgName = htmlspecialchars($_POST['imageNameToDelete']);
+  $oldimgName = htmlspecialchars($_POST['imageNameToDelete']);
 
   try {
     $database->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $insertUserImg = $database->prepare("UPDATE users SET user_img='' WHERE user_id = $currentUserId");
     $insertUserImg->execute();
-    unlink('img/profilepic/' . $imgName); // Supprimer l'image du serveur
+    unlink('img/profilepic/' . $oldimgName); // Supprimer l'image du serveur
+    $_SESSION['userImg'] = $imgName;
     $successMessage = "Photo de profil supprimée.";
     header('Location: profile?s=1');
   } catch (Exception $e) {
@@ -357,8 +361,8 @@ if (isset($_POST['deleteImg'])) {
                 <input type="text" class="d-none" id="imageNameToDelete" name="imageNameToDelete" value="<?= $resultUser['user_img']; ?>">
               </form>
               <div id="profilePicture">
-                <img class="img-profile rounded img-fluid mx-auto d-block" src="img/profilepic/<?php if (!empty($resultUser['user_img'])) {
-                                                                                                  echo $resultUser['user_img'];
+                <img class="img-profile rounded img-fluid mx-auto d-block" src="img/<?php if (!empty($resultUser['user_img'])) {
+                                                                                                  echo 'profilepic/'.$resultUser['user_img'];
                                                                                                 } else {
                                                                                                   echo 'default.png';
                                                                                                 }; ?>">

@@ -31,13 +31,13 @@
 <li class="nav-item <?php if (stripos($_SERVER['REQUEST_URI'], 'cows-manager') || stripos($_SERVER['REQUEST_URI'], 'add-cow')){echo 'active';}?>">
   <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCows" aria-expanded="true" aria-controls="collapsePages">
     <i class="fad fa-cow"></i>
-    <span>Vaches</span>
+    <span>Bovins</span>
   </a>
   <div id="collapseCows" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
     <div class="bg-white py-2 collapse-inner rounded">
       <h6 class="collapse-header">Gestion :</h6>
-      <a class="collapse-item" href="cows-manager">Géger les vaches</a>
-      <a class="collapse-item" href="add-cow">Ajouter une vache</a>
+      <a class="collapse-item" href="cows-manager">Géger les bovins</a>
+      <a class="collapse-item" href="add-cow">Ajouter un bovin</a>
     </div>
   </div>
 </li>
@@ -51,9 +51,9 @@
 
 <!-- Nav Item - Tables -->
 <li class="nav-item">
-  <a class="nav-link" href="/health">
-  <i class="fas fa-medkit"></i>
-    <span>Santé</span></a>
+  <a class="nav-link" href="/treats">
+  <i class="fas fa-syringe"></i>
+    <span>Traitements</span></a>
 </li>
 
 <!-- Divider -->
@@ -87,8 +87,8 @@
   </a>
   <div id="collapseArchives" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
     <div class="bg-white py-2 collapse-inner rounded">
-      <a class="collapse-item" href="/sold">Vaches vendues</a>
-      <a class="collapse-item" href="/dead">Vaches décédées</a>
+      <a class="collapse-item" href="/sold">Bovins vendus</a>
+      <a class="collapse-item" href="/dead">Bovins décédés</a>
       <a class="collapse-item" href="archives">Corbeille</a>
     </div>
   </div>

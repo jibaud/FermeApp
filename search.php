@@ -14,7 +14,7 @@ if (isset($_GET['q']) && !empty($_GET['q'])) {
 
   try {
     $searchQuery = $database->prepare(
-      "SELECT * FROM cows WHERE owner_id = '$currentUserId' AND id LIKE '%$search%' OR name LIKE '%$search%' OR race LIKE '%$search%' OR note LIKE '%$search%'"
+      "SELECT * FROM cows WHERE owner_id = '$currentUserId' AND (id LIKE '%$search%' OR name LIKE '%$search%' OR race LIKE '%$search%' OR note LIKE '%$search%')"
     );
     $searchQuery->execute();
   } catch (Exception $e) {

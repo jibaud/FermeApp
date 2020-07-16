@@ -89,7 +89,7 @@ if (isset($_POST['add'])) {
                             die('Error : ' . $e->getMessage());
                         }
                     } else {
-                        $errorMessage = 'Une vache existe déjà avec ce numéro.';
+                        $errorMessage = 'Un bovin existe déjà avec ce numéro.';
                     }
                 } else {
                     $errorMessage = 'Les dates doivent être au format jj/mm/aaaa. Exemple, le 2 décembre 1991 doit être écrit 02/12/1991.';

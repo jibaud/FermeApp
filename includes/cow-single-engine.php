@@ -5,6 +5,10 @@ $lastGest->execute();
 $numberLastGest = $lastGest->rowCount();
 $lastGestResult = $lastGest->fetch();
 
+
+$database->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+
 // Update cow
 if (isset($_POST['updateCow'])) {
 	$cow_id = htmlspecialchars($_POST['cow_id']);
@@ -84,7 +88,7 @@ if (isset($_POST['updateCow'])) {
 						$successMessage = "Changements sauvegardés.";
 						header('Location: /cow-single?id=' . $currentCowId . '&s=1#');
 					} else {
-						$errorMessage = 'Une vache existe déjà avec ce numéro.';
+						$errorMessage = 'Un bovin existe déjà avec ce numéro.';
 						header('Location: /cow-single?id=' . $currentCowId . '&e=1#');
 					}
 				} else {
@@ -305,6 +309,190 @@ if (isset($_POST['addGestSubmit'])) {
 
 
 
+
+
+// Update un TreatRow
+if (isset($_POST['updateTreatRowSubmit'])) {
+	$updateNumber = htmlspecialchars($_POST['inputTreatId']);
+	$updateDate = htmlspecialchars($_POST['inputTreatDate']);
+	$updateName = htmlspecialchars($_POST['inputTreatName']);
+	$updateRepeat = htmlspecialchars($_POST['inputTreatRepeat']);
+
+	if (empty($_POST['inputTreatDays'])) {
+		$updateDays = null;
+	} else {
+		$updateDays = htmlspecialchars($_POST['inputTreatDays']);
+	}
+
+	if (empty($_POST['inputTreatDose'])) {
+		$updateDose = "";
+	} else {
+		$updateDose = htmlspecialchars($_POST['inputTreatDose']);
+	}
+
+	if (empty($_POST['inputTreatNote'])) {
+		$updateNote = "";
+	} else {
+		$updateNote = htmlspecialchars($_POST['inputTreatNote']);
+	}
+
+	if ($updateRepeat != 0) {
+		if (!empty($updateDays)) {
+			$valideEmptyDays = true;
+			if (is_numeric($updateDays)) {
+				$valide_tDays = true;
+			} else {
+				$valide_tDays = false;
+			}
+		} else {
+			$valideEmptyDays = false;
+		}
+	} else {
+		$valideEmptyDays = true;
+		$valide_tDays = true;
+	}
+
+	if ((!empty($updateDate)) && (!empty($updateName))) {
+		if ($valideEmptyDays) {
+			if ($valide_tDays) {
+				if (strlen($updateDose) <= 50 && strlen($updateNote) <= 50) {
+					if ($updateRepeat == 0 || $updateRepeat == 1 || $updateRepeat == 2) {
+						try {
+							$updateTreat = $database->prepare("UPDATE treats SET t_date = ?, t_name = ?, t_repeat = ?, t_days = ?, t_dose = ?, t_note = ? WHERE t_id = $updateNumber AND t_owner_id = $owner_id");
+							$updateTreat->execute([
+								$updateDate,
+								$updateName,
+								$updateRepeat,
+								$updateDays,
+								$updateDose,
+								$updateNote
+							]);
+						} catch (Exception $e) {
+							echo " Error ! " . $e->getMessage();
+						}
+
+
+						$successMessageTreat = "Opération réussie.";
+						header('Location: /cow-single?id=' . $currentCowId . '&s=1#treats');
+					} else {
+						$errorMessageTreat = 'Sélécteur non valide.';
+						header('Location: /cow-single?id=' . $currentCowId . '&et=1#treats');
+					}
+				} else {
+					$errorMessageTreat = 'Le champs dose ou note est trop long. 50 charactères maximum.';
+					header('Location: /cow-single?id=' . $currentCowId . '&et=2#treats');
+				}
+			} else {
+				$errorMessageTreat = 'Le nombre de jours doit être composé uniquement de chiffres.';
+				header('Location: /cow-single?id=' . $currentCowId . '&et=3#treats');
+			}
+		} else {
+			$errorMessageTreat = 'Vous devez indiquez le nombre de jours.';
+			header('Location: /cow-single?id=' . $currentCowId . '&et=4#treats');
+		}
+	} else {
+		$errorMessageTreat = 'Veuillez remplir tous les champs obligatoires.';
+		header('Location: /cow-single?id=' . $currentCowId . '&et=5#treats');
+	}
+}
+
+
+
+// Add new treat
+if (isset($_POST['addTreatSubmit'])) {
+	$tDate = htmlspecialchars($_POST['t_date']);
+	$tName = htmlspecialchars($_POST['t_name']);
+	$tRepeat = (int) htmlspecialchars($_POST['t_repeat']); // 0 Une seule fois, 1 Répéter dans, 2 Pendant
+
+	if (empty($_POST['t_days'])) {
+		$tDays = null;
+	} else {
+		$tDays = (int) htmlspecialchars($_POST['t_days']);
+	}
+
+	if (empty($_POST['t_dose'])) {
+		$tDose = "";
+	} else {
+		$tDose = htmlspecialchars($_POST['t_dose']);
+	}
+
+	if (empty($_POST['t_note'])) {
+		$tNote = "";
+	} else {
+		$tNote = htmlspecialchars($_POST['t_note']);
+	}
+
+	if ($tRepeat != 0) {
+		if (!empty($tDays)) {
+			$valideEmptyDays = true;
+			if (is_numeric($tDays)) {
+				$valide_tDays = true;
+			} else {
+				$valide_tDays = false;
+			}
+		} else {
+			$valideEmptyDays = false;
+		}
+	} else {
+		$valideEmptyDays = true;
+		$valide_tDays = true;
+	}
+
+	if ((!empty($tDate)) && (!empty($tName))) {
+		if ($valideEmptyDays) {
+			if ($valide_tDays) {
+				if (strlen($tDose) <= 50 && strlen($tNote) <= 50) {
+					if ($tRepeat == 0 || $tRepeat == 1 || $tRepeat == 2) {
+						try {
+							$insertTreat = $database->prepare("INSERT INTO treats(
+								t_cow_index,
+								t_date,
+								t_name,
+								t_repeat,
+								t_days,
+								t_dose,
+								t_note,
+								t_owner_id
+								) VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
+							$insertTreat->execute([
+								$currentCowIndex,
+								$tDate,
+								$tName,
+								$tRepeat,
+								$tDays,
+								$tDose,
+								$tNote,
+								$owner_id
+							]);
+						} catch (Exception $e) {
+							echo " Error ! " . $e->getMessage();
+						}
+
+						header('Location: /cow-single?id=' . $currentCowId . '&s=1#treats');
+					} else {
+						$errorMessageTreat = 'Sélécteur non valide.';
+						header('Location: /cow-single?id=' . $currentCowId . '&et=1#treats');
+					}
+				} else {
+					$errorMessageTreat = 'Le champs dose ou note est trop long. 50 charactères maximum.';
+					header('Location: /cow-single?id=' . $currentCowId . '&et=2#treats');
+				}
+			} else {
+				$errorMessageTreat = 'Le nombre de jours doit être composé uniquement de chiffres.';
+				header('Location: /cow-single?id=' . $currentCowId . '&et=3#treats');
+			}
+		} else {
+			$errorMessageTreat = 'Vous devez indiquez le nombre de jours.';
+			header('Location: /cow-single?id=' . $currentCowId . '&et=4#treats');
+		}
+	} else {
+		$errorMessageTreat = 'Veuillez remplir tous les champs obligatoires.';
+		header('Location: /cow-single?id=' . $currentCowId . '&et=5#treats');
+	}
+}
+
+
+
 // Supprimer un bovin
 if (isset($_POST['archive'])) {
 	$database = getPDO();
@@ -376,4 +564,19 @@ if (isset($_POST['deleteGest'])) {
 	$successMessage = "Opération réussie.";
 	header('Location: /cow-single?id=' . $currentCowId . '&s=1#gestations');
 }
-?>
+
+
+// Supprimer un Traitement
+if (isset($_POST['deleteTreat'])) {
+	try {
+		$deletedTreatNumber = htmlspecialchars($_POST['deletedTreatNumber']);
+		$owner_id = $_SESSION['userID'];
+
+		$deleteTreatRow = $database->prepare("DELETE FROM treats WHERE t_id = $deletedTreatNumber AND t_owner_id = $owner_id");
+		$deleteTreatRow->execute();
+		$successMessage = "Opération réussie.";
+		header('Location: /cow-single?id=' . $currentCowId . '&s=1#treats');
+	} catch (Exception $e) {
+		echo " Error ! " . $e->getMessage();
+	}
+}

@@ -32,11 +32,22 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="vendor/nprogress/js/nprogress.js"></script>
 
-  
+  <!-- Favicons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#2299dd">
+  <meta name="msapplication-TileColor" content="#2d89ef">
+  <meta name="theme-color" content="#2299dd">
+
+
+
+
+
   <?php // INCLUDES
   include 'includes/add-cow-engine.php';
   include 'includes/functions.php';
-  include 'class/class_cow.php';
   ?>
 
 </head>

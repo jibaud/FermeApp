@@ -25,16 +25,34 @@ switch ($_GET['eg']) {
 		$errorMessageGest = 'Une date de début de gestation est nécéssaire.';
 		break;
 	case 5:
-		$errorMessageGest = 'Cet vache à déjà une gestation en cours.';
+		$errorMessageGest = 'Cette vache à déjà une gestation en cours.';
 		break;
 	case 6:
 		$errorMessageGest = 'La date de fin ne peut pas être plus ancienne que celle du début.';
 		break;
 }
 
+switch ($_GET['et']) {
+	case 1:
+		$errorMessageTreat = 'Sélécteur non valide.';
+		break;
+	case 2:
+		$errorMessageTreat = 'Le champs dose ou note est trop long. 50 charactères maximum.';
+		break;
+	case 3:
+		$errorMessageTreat = 'Le nombre de jours doit être composé uniquement de chiffres.';
+		break;
+	case 4:
+		$errorMessageTreat = 'Vous devez indiquez le nombre de jours.';
+		break;
+	case 5:
+		$errorMessageTreat = 'Veuillez remplir tous les champs obligatoires.';
+		break;
+}
+
 switch ($_GET['e']) {
 	case 1:
-		$errorMessage = 'Une vache existe déjà avec ce numéro.';
+		$errorMessage = 'Un bovin existe déjà avec ce numéro.';
 		break;
 	case 2:
 		$errorMessage = 'Le numéro d\'identification n\'est pas valide.';
@@ -63,7 +81,7 @@ $owner_id = $_SESSION['userID'];
 $currentCowId = $_GET['id'];
 
 
-// Appel les données de la vache actuelle
+// Appel les données du bovin actuelle
 $reponseCow = $database->prepare("SELECT * FROM cows WHERE owner_id = ? AND id = ? LIMIT 1"); // LIMIT 1 car il ne doit y avoir qu'un seul résultat de toute façon
 $reponseCow->execute([$owner_id, $currentCowId]);
 $result = $reponseCow->fetch();
@@ -610,7 +628,7 @@ $pageTitle = $result['name'];
 						<?php } ?>
 
 
-						<p><?= $result['name']; ?> a un total de <?= $GestNumber ?> géstations.</p>
+						<p><?= $result['name']; ?> a un total de <?= $GestNumber ?> gestation(s).</p>
 						<div class="table-responsive">
 							<table class="table table-bordered" id="gestTable" width="100%" cellspacing="0">
 
@@ -810,6 +828,273 @@ $pageTitle = $result['name'];
 		</div> <!-- /.row -->
 
 
+
+
+
+		<?php
+
+		$reponseTreatList = $database->prepare("SELECT * FROM treats WHERE t_owner_id = $owner_id AND t_cow_index = $currentCowIndex ORDER BY t_id ASC");
+		$reponseTreatList->execute();
+		$TreatNumber = $reponseTreatList->rowCount();
+
+		?>
+
+
+		<!-- TRAITEMENTS -->
+		<div class="row <?php if (calculeType($result['birth_date']) == 'veau') {
+							echo 'd-none';
+						} ?>">
+			<!-- Area Chart -->
+			<div class="col-12">
+				<div class="card shadow mb-4" id="treats">
+					<!-- Card Header - Dropdown -->
+					<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+						<h6 class="m-0 font-weight-bold text-primary">Traitements</h6>
+						<div class="dropdown no-arrow">
+						</div>
+					</div>
+					<!-- Card Body -->
+					<div class="card-body">
+
+						<?php if (isset($errorMessageTreat)) { ?>
+							<div class="alert alert-danger" role="alert">
+								<?= $errorMessageTreat // <?= shortcode for <?php echo 
+								?>
+							</div>
+						<?php } ?>
+						<?php if (isset($successMessageTreat)) { ?>
+							<div class="alert alert-success" role="alert">
+								<?= $successMessageTreat ?>
+							</div>
+						<?php } ?>
+
+
+						<p><?= $result['name']; ?> a un total de <?= $TreatNumber ?> traitement(s).</p>
+						<div class="table-responsive">
+							<table class="table table-bordered" id="treatTable" width="100%" cellspacing="0">
+
+								<thead>
+									<tr>
+										<th>Date</th>
+										<th>Nom</th>
+										<th>Fréquence</th>
+										<th>Dose</th>
+										<th>Note</th>
+										<th>Actions</th>
+									</tr>
+								</thead>
+								<tbody>
+
+									<?php
+
+									while ($treatData = $reponseTreatList->fetch()) {
+									?>
+
+										<tr class="rowTreatList">
+											<td>
+												<div class="displayRead">
+													<?= $treatData['t_date']; ?>
+												</div>
+												<div class="displayEdit input-group date" data-provide="datepicker">
+													<input type="text" class="form-control t_date_edit" style="width:100%" value="" placeholder="Début" required>
+													<div class="input-group-addon">
+														<span class="glyphicon glyphicon-th"></span>
+													</div>
+												</div>
+												<div class="d-none">
+													<input type="text" class="col-12 t_date_origin" value="<?= $treatData['t_date']; ?>">
+												</div>
+											</td>
+											<td>
+												<div class="displayRead">
+													<?= $treatData['t_name']; ?>
+												</div>
+												<div class="displayEdit input-group">
+													<input type="text" class="form-control t_name_edit" style="width:100%" value="" placeholder="Nom" required>
+												</div>
+												<div class="d-none">
+													<input type="text" class="col-12 t_name_origin" value="<?= $treatData['t_name']; ?>">
+												</div>
+											</td>
+
+											<?php 
+											$endDate = futureDateDay($treatData['t_date'], $treatData['t_days']);
+											$dateToday = date('j/m/Y');
+											if (compareDate($endDate, $dateToday)){
+												$colorText = 'text-warning';
+											} else if ($endDate == $dateToday){
+												$colorText = 'text-danger';
+											} else {
+												$colorText = 'text-gray';
+											}
+											if($treatData['t_repeat'] == 2 && $colorText == 'text-warning'){
+												$colorText = 'text-danger';
+											}
+											?>
+											<td class="positionRelative hideOverflow <?= $colorText ?>">
+												<div class="displayRead">
+													<?php
+
+													switch ($treatData['t_repeat']) {
+														case 0:
+															echo 'Une seule fois';
+															$select_0 = 'selected';
+															break;
+														case 1:
+															echo 'Répéter ' . $treatData['t_days'] . ' jours plus tard';
+															echo '<br>Le ' . $endDate;
+															if($endDate==$dateToday){echo ' (Aujourd\'hui)';}
+															$select_1 = 'selected';
+															break;
+														case 2:
+															echo 'Pendant ' . $treatData['t_days'] . ' jours';
+															echo '<br>Jusq\'au ' . $endDate;
+															if($endDate==$dateToday){echo ' (Aujourd\'hui)';}
+															$select_2 = 'selected';
+															break;
+													}
+													?>
+												</div>
+												<div class="displayEdit">
+													<select class="form-control t_repeat_edit" required>
+														<option value="0" <?= $select_0 ?>>Une seule fois</option>
+														<option value="1" <?= $select_1 ?>>Répéter dans</option>
+														<option value="2" <?= $select_2 ?>>Pendant</option>
+													</select>
+													<input type="text" class="form-control t_days_edit" value="">
+												</div>
+												<div class="d-none">
+													<input type="text" class="col-12 t_repeat_origin" value="<?= $treatData['t_repeat']; ?>">
+													<input type="text" class="col-12 t_days_origin" value="<?= $treatData['t_days']; ?>">
+												</div>
+
+
+											</td>
+											<td>
+												<div class="displayRead">
+													<?= $treatData['t_dose']; ?>
+												</div>
+												<div class="displayEdit">
+													<textarea class="form-control t_dose_edit" value="" cols="15" rows="2"></textarea>
+												</div>
+												<div class="d-none">
+													<input type="text" class="col-12 t_dose_origin" value="<?= $treatData['t_dose']; ?>">
+												</div>
+											</td>
+											<td>
+												<div class="displayRead">
+													<?= $treatData['t_note']; ?>
+												</div>
+												<div class="displayEdit">
+													<textarea class="form-control t_note_edit" value="" cols="15" rows="2"></textarea>
+												</div>
+												<div class="d-none">
+													<input type="text" class="col-12 t_note_origin" value="<?= $treatData['t_note']; ?>">
+												</div>
+											</td>
+											<td>
+
+												<span data-toggle="tooltip" data-placement="top" title="Modifier" class="displayRead">
+													<button class="btn btn-primary btn-sm editTreatRow" id="<?= $treatData['t_id']; ?>">
+														<i class="fas fa-pencil-alt"></i>
+													</button>
+												</span>
+
+												<span data-toggle="tooltip" data-placement="top" title="Sauvegarder" class="displayEdit">
+													<label for="updateTreatRowSubmit" class="btn btn-success btn-sm mb-0 updateTreatFormSubmit">
+														<i class="fas fa-check"></i>
+													</label>
+												</span>
+
+												<span data-toggle="tooltip" data-placement="top" title="Annuler" class="displayEdit">
+													<button type="button" class="btn btn-warning btn-sm cancelTreatEdit">
+														<i class="fas fa-times"></i>
+													</button>
+												</span>
+
+												<span data-toggle="tooltip" data-placement="top" title="Supprimer" class="displayEdit">
+													<button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteTreatModal">
+														<i class="fas fa-trash"></i>
+													</button>
+												</span>
+
+											</td>
+										</tr>
+
+									<?php
+									}
+									$reponseGestationList->closeCursor();
+									?>
+								</tbody>
+							</table>
+						</div>
+
+
+						<!-- ADD TREAT -->
+
+						<div class="d-flex flex-row align-items-center justify-content-end mt-4 mb-2" id="displayTreatForm">
+							<div class="pr-2">Déclarer un traitement</div>
+							<i class="fad fa-plus-circle fa-fw text-success" id="displayTreatFormIcon"></i>
+						</div>
+						<form method="post" action="" id="addTreat" class="enableSubmitOnChange">
+							<div class="form-row">
+
+								<div class="form-group input-group date col-md-2" data-provide="datepicker">
+									<input type="text" class="form-control" id="t_date" name="t_date" value="" placeholder="Date" required>
+									<div class="input-group-addon">
+										<span class="glyphicon glyphicon-th"></span>
+									</div>
+								</div>
+
+								<div class="form-group input-group col-md-2">
+									<input type="text" class="form-control" id="t_name" name="t_name" value="" maxlength="32" placeholder="Nom du traitement" required>
+								</div>
+
+								<div class="form-group col-md-2">
+									<select class="form-control" id="t_repeat" name="t_repeat" onchange="treatState();" required>
+										<option value="0" selected>Une seule fois</option>
+										<option value="1">Répéter dans</option>
+										<option value="2">Pendant</option>
+									</select>
+								</div>
+
+								<div class="form-group input-group col-md-1">
+									<input type="text" class="form-control" id="t_days" name="t_days" value="" placeholder="Jours" disabled required>
+								</div>
+
+								<div class="form-group col-md-2">
+									<textarea class="form-control" name="t_dose" id="t_dose" cols="30" rows="2" value="" maxlength="50" placeholder="Dose"></textarea>
+								</div>
+
+								<div class="form-group col-md-3">
+									<textarea class="form-control" name="t_note" id="t_note" cols="30" rows="2" value="" maxlength="50" placeholder="Note"></textarea>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<input type="submit" name="addTreatSubmit" id="addTreatSubmit" value="Ajouter" class="btn btn-success">
+							</div>
+						</form>
+
+					</div>
+				</div>
+			</div>
+
+			<form action="" method="POST" id="updateTreatRow" name="updateTreatRow" class="d-none">
+				<input type="text" class="form-control" value="" id="inputTreatId" name="inputTreatId">
+				<input type="text" class="form-control" value="" id="inputTreatDate" name="inputTreatDate">
+				<input type="text" class="form-control" value="" id="inputTreatName" name="inputTreatName">
+				<input type="text" class="form-control" value="" id="inputTreatRepeat" name="inputTreatRepeat">
+				<input type="text" class="form-control" value="" id="inputTreatDays" name="inputTreatDays">
+				<input type="text" class="form-control" value="" id="inputTreatDose" name="inputTreatDose">
+				<input type="text" class="form-control" value="" id="inputTreatNote" name="inputTreatNote">
+				<input type="submit" id="updateTreatRowSubmit" name="updateTreatRowSubmit" value="Sauvegarder">
+			</form>
+		</div> <!-- /.row -->
+
+
+
+
+
 	</div>
 	<!-- /.container-fluid -->
 
@@ -824,7 +1109,7 @@ $pageTitle = $result['name'];
 					</button>
 				</div>
 				<div class="modal-body">
-					<p>Voulez-vous vraiment supprimer cette vache ?</p>
+					<p>Voulez-vous vraiment supprimer ce bovin ?</p>
 				</div>
 				<div class="modal-footer">
 					<button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
@@ -924,6 +1209,31 @@ $pageTitle = $result['name'];
 						<input type="text" id="deletedNumber" name="deletedNumber" value="" class="d-none">
 						<input type="text" id="deletedRowState" name="deletedRowState" value="" class="d-none">
 						<input type="submit" name="deleteGest" id="deleteGest" value="Supprimer" class="btn btn-danger">
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- DeleteTreatRow Modal-->
+	<div class="modal fade" id="deleteTreatModal" tabindex="-1" role="dialog" aria-labelledby="deleteTreat" aria-hidden="true" data-keyboard="false">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title text-gray-800" id="">Supprimer</h5>
+					<button class="close" type="button" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">×</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<p>Voulez-vous vraiment supprimer ce traitement ?</p>
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
+					<form action="" method="post">
+						<input type="text" id="deletedTreatNumber" name="deletedTreatNumber" value="" class="d-none">
+						<input type="submit" name="deleteTreat" id="deleteTreat" value="Supprimer" class="btn btn-danger">
 					</form>
 				</div>
 			</div>

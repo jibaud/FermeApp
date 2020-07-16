@@ -124,6 +124,67 @@ $(document).ready(function () {
 
   });
 
+  var open = 0
+  $('#displayTreatForm').click(function (e) {
+    e.preventDefault();
+    if (open == 0) {
+      $('#addTreat').slideDown(300);
+      $('#displayTreatFormIcon').animate(
+        { deg: -225 },
+        {
+          duration: 300,
+          step: function (now) {
+            $(this).css({ transform: 'rotate(' + now + 'deg)' });
+            $(this).removeClass('text-success').addClass('text-danger');
+          }
+        }
+      );
+      open = 1;
+    } else {
+      $('#addTreat').slideUp(300);
+      $('#displayTreatFormIcon').animate(
+        { deg: 180 },
+        {
+          duration: 300,
+          step: function (now) {
+            $(this).css({ transform: 'rotate(' + now + 'deg)' });
+            $(this).removeClass('text-danger').addClass('text-success');
+          }
+        }
+      );
+      open = 0;
+    }
+
+  });
+
+
+  // TOPBAR
+  // Change la couleur du badge de notification des gestations
+  if ($("#gestNotification").find(".bg-danger").length > 0){ 
+    $('#gestNotifBadge').toggleClass(['bg-success', 'bg-danger']);
+  } else if ($("#gestNotification").find(".bg-warning").length > 0){
+    $('#gestNotifBadge').toggleClass(['bg-success', 'bg-warning']);
+  }
+
+  // Change la couleur du badge de notification des traitement
+  if ($("#treatNotification").find(".bg-danger").length > 0){ 
+    $('#treatNotifBadge').toggleClass(['bg-success', 'bg-danger']);
+  } else if ($("#treatNotification").find(".bg-warning").length > 0){
+    $('#treatNotifBadge').toggleClass(['bg-success', 'bg-warning']);
+  }
+
+  var $numberOfTreat = $('#treatNotification').find('.treatNotifElement').length;
+  $('#treatNotifBadge').html($numberOfTreat);
+  console.log($numberOfTreat);
+
+  var $howManyToday = $('#treatNotification').find('.treatNotifElement').find('.bg-danger').length;
+  if ($howManyToday > 0) {
+    $('#howManyToday').html('('+$howManyToday+' aujourd\'hui)');
+  }
+  
+
+
+
   // GESTATION LIST EDIT 
   //Bouton modifier dans gestation row edit
   $('.editGestRow').click(function (e) {
@@ -208,6 +269,103 @@ $(document).ready(function () {
   });
 
 
+  // TREATS LIST EDIT 
+  //Bouton modifier dans treat row edit
+  $('.editTreatRow').click(function (e) {
+    e.preventDefault();
+
+    resetTreatRow();
+    $(this).parents('.rowTreatList').addClass('activeTreat');
+
+    // Affiche/Cache edition mode
+    $(this).parents('.rowTreatList').find('.displayRead').hide();
+    $(this).parents('.rowTreatList').find('.displayEdit').show();
+
+    $(this).parent().tooltip('hide');
+
+    // Rénitialise la valeur à partir du champs origin
+    $(this).parents('.rowTreatList').find('.t_date_edit').val($(this).parents('.rowTreatList').find('.t_date_origin').val());
+    $(this).parents('.rowTreatList').find('.t_name_edit').val($(this).parents('.rowTreatList').find('.t_name_origin').val());
+    $(this).parents('.rowTreatList').find('.t_repeat_edit').val($(this).parents('.rowTreatList').find('.t_repeat_origin').val());
+    $(this).parents('.rowTreatList').find('.t_days_edit').val($(this).parents('.rowTreatList').find('.t_days_origin').val());
+    $(this).parents('.rowTreatList').find('.t_dose_edit').val($(this).parents('.rowTreatList').find('.t_dose_origin').val());
+    $(this).parents('.rowTreatList').find('.t_note_edit').val($(this).parents('.rowTreatList').find('.t_note_origin').val());
+
+    // Rempli les inputs cachés
+    document.getElementById("inputTreatId").value = this.id;
+    document.getElementById("deletedTreatNumber").value = this.id;
+    document.getElementById("inputTreatDate").value = $(this).parents('.rowTreatList').find('.t_date_edit').val();
+    document.getElementById("inputTreatName").value = $(this).parents('.rowTreatList').find('.t_name_edit').val();
+    document.getElementById("inputTreatRepeat").value = $(this).parents('.rowTreatList').find('.t_repeat_edit').val();
+    document.getElementById("inputTreatDays").value = $(this).parents('.rowTreatList').find('.t_days_edit').val();
+    document.getElementById("inputTreatDose").value = $(this).parents('.rowTreatList').find('.t_dose_edit').val();
+    document.getElementById("inputTreatNote").value = $(this).parents('.rowTreatList').find('.t_note_edit').val();
+
+
+    // Desactive le champs date de fin si en cours est selectionné
+    gState = $(this).parents('.rowTreatList').find('.g_state_edit');
+    gEnd = $(this).parents('.rowTreatList').find('.g_end_edit');
+    if (gState.val() != 0) {
+      gEnd.prop('disabled', false);
+    } else {
+      gEnd.prop('disabled', true);
+      gEnd.val('');
+      $('#inputTreatDays').val('');
+    }
+
+  });
+
+  // Bouton annuler dans traitement row edit
+  $('.cancelTreatEdit').click(function (e) {
+    e.preventDefault();
+    $(this).parent().tooltip('hide');
+    $(this).parents('.rowTreatList').removeClass('activeTreat');
+
+    resetTreatRow();
+  });
+
+  // Change les valeurs des inputs caché quand on modifie un input dans un row
+  $('.t_date_edit').on('change input', function () {
+    document.getElementById("inputTreatDate").value = $(this).val();
+  });
+  $('.t_name_edit').on('change input', function () {
+    document.getElementById("inputTreatName").value = $(this).val();
+  });
+  $('.t_repeat_edit').on('change input', function () {
+    document.getElementById("inputTreatRepeat").value = $(this).val();
+  });
+  $('.t_days_edit').on('change input', function () {
+    document.getElementById("inputTreatDays").value = $(this).val();
+  });
+  $('.t_dose_edit').on('change input', function () {
+    document.getElementById("inputTreatDose").value = $(this).val();
+  });
+  $('.t_note_edit').on('change input', function () {
+    document.getElementById("inputTreatNote").value = $(this).val();
+  });
+ 
+
+  // Desactive le champs date de fin si en cours est selectionné
+  $('.t_repeat_edit').change(function (e) {
+    e.preventDefault();
+
+    tRepeat = $(this).parents('.rowTreatList').find('.t_repeat_edit');
+    tDays = $(this).parents('.rowTreatList').find('.t_days_edit');
+
+    if (tRepeat.val() != 0) {
+      tDays.prop('disabled', false);
+    } else {
+      tDays.prop('disabled', true);
+      tDays.val('');
+      $('#inputTreatDays').val('');
+    }
+  });
+
+
+
+  // PROFIL
+  // Bouton pour changer la photo de profil
+  // Affiche ou non le bouton d'uploard
   $('#modifyImgButton').click(function(e) {
     e.preventDefault();
 
@@ -244,6 +402,21 @@ function resetGestRow() {
   document.getElementById("inputGestNote").value = '';
 };
 
+function resetTreatRow() {
+  $('.displayEdit').hide();
+  $('.displayRead').show();
+  $('.rowTreatList').removeClass('activeTreat');
+
+  document.getElementById("inputTreatId").value = '';
+  document.getElementById("deletedTreatNumber").value = '';
+  document.getElementById("inputTreatDate").value = '';
+  document.getElementById("inputTreatName").value = '';
+  document.getElementById("inputTreatRepeat").value = '';
+  document.getElementById("inputTreatDays").value = '';
+  document.getElementById("inputTreatDose").value = '';
+  document.getElementById("inputTreatNote").value = '';
+};
+
 
 
 // GESTATION ADD FORM - Désactive le champs date de fin si gestation toujours en cours
@@ -255,6 +428,18 @@ function gestationState() {
   } else {
     gEnd.prop('disabled', true);
     gEnd.val('');
+  }
+};
+
+// TREAT ADD FORM - Désactive le champs days si traitement une seule fois
+function treatState() {
+  var tRepeat = document.getElementById("t_repeat");
+  var tdays = $('#t_days');
+  if (tRepeat.value != 0) {
+    tdays.prop('disabled', false);
+  } else {
+    tdays.prop('disabled', true);
+    tdays.val('');
   }
 };
 

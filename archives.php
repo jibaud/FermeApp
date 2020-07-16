@@ -29,7 +29,7 @@ if (isset($_POST['delete'])) {
   $deleteCow = $database->prepare("DELETE FROM cows WHERE cow_index = $deleteindexnumber AND owner_id = $owner_id");
   $deleteCow->execute();
 
-  // Supprime aussi les gestations associées à cette vache
+  // Supprime aussi les gestations associées à ce bovin
   $deleteCowGest = $database->prepare("DELETE FROM gestations WHERE g_cow_index = $deleteindexnumber AND g_owner_id = $owner_id");
   $deleteCowGest->execute();
 
@@ -298,13 +298,13 @@ if (isset($_GET['e'])) {
                     <?php } ?>
                   </tr>
                   <tr>
-                    <th scope="row">Géstation</th>
+                    <th scope="row">Gestation</th>
                     <?php if ($donnees['ispregnant'] == 0 && $donnees['pregnant_number'] > 0) { ?>
-                      <td><?= $donnees['pregnant_number']; ?> géstation(s) passée(s)</td>
+                      <td><?= $donnees['pregnant_number']; ?> gestation(s) passée(s)</td>
                     <?php } else if ($donnees['ispregnant'] == 1) { ?>
                       <td>Depuis le <?= $donnees['pregnant_since']; ?></td>
                     <?php } else { ?>
-                      <td>Aucune géstation</td>
+                      <td>Aucune gestation</td>
                     <?php } ?>
                   </tr>
 

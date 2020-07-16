@@ -138,7 +138,6 @@ function calculeType($date)
   }
 }
 
-
 // Compare si $date1 est plus grand que $date2
  function compareDate($date1, $date2){
   $date1numeric = explode("/", $date1); 

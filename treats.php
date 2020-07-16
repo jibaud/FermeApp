@@ -5,7 +5,7 @@ include 'includes/database.php';
 include 'includes/forbidden.php';
 include 'includes/settings-engine.php';
 
-$pageTitle = 'Santé';
+$pageTitle = 'Traitements';
 include 'header.php';
 
 ?>

@@ -13,7 +13,7 @@
         }
     }
 
-    // Fonction qui empeche les doublons (2 vaches ayant le meme ID)
+    // Fonction qui empeche les doublons (2 utilisateurs avec la même adresse email ou 2 vaches ayant le meme ID)
     function countDatabaseValue($connexionBDD, $tableName, $key1, $key2, $value1, $value2) {
         $request = "SELECT * FROM $tableName WHERE $key1 = ? AND $key2 = ?";
         $rowCount = $connexionBDD->prepare($request);

@@ -27,6 +27,8 @@ include 'header.php';
 
             <h5 class="mb-4"><?= $pregnantNumber . ' ' ?> en cours</h5>
 
+            <div class="row">
+
             <?php
             $reponseCowPregnant->execute([$owner_id]);
 
@@ -42,7 +44,8 @@ include 'header.php';
                 }
 
             ?>
-                <a href="cow-single?id=<?= $donnees['id'] ?>" class="text-decoration-none text-reset">
+                <div class="col-xl-6 mb-4">
+                <a href="cow-single?id=<?= $donnees['id'] ?>" class="text-decoration-none text-reset gest-card">
                     <div class="card border-left-<?= $color ?> shadow h-100 py-2 mb-3">
                         <div class="card-body">
                             <div class="d-flex no-glutters align-items-center mb-3">
@@ -75,10 +78,13 @@ include 'header.php';
                         </div>
                     </div>
                 </a>
+                </div>
             <?php
             }
             $reponseCowPregnant->closeCursor();
             ?>
+
+            </div>
 
         </div>
         <!-- /.container-fluid -->
