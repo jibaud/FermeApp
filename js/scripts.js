@@ -175,11 +175,30 @@ $(document).ready(function () {
 
   var $numberOfTreat = $('#treatNotification').find('.treatNotifElement').length;
   $('#treatNotifBadge').html($numberOfTreat);
-  console.log($numberOfTreat);
+  $('.numberOfTreat').html($numberOfTreat);
 
   var $howManyToday = $('#treatNotification').find('.treatNotifElement').find('.bg-danger').length;
   if ($howManyToday > 0) {
     $('#howManyToday').html('('+$howManyToday+' aujourd\'hui)');
+  }
+
+
+  // Dashboard Treat Card - Change la couleur et le texte
+  var $numberOfTreatDanger = $('#treatNotification').find('.treatNotifElement').find('.bg-danger').length;
+  var $numberOfTreatWarning = $('#treatNotification').find('.treatNotifElement').find('.bg-warning').length;
+
+  if ($numberOfTreatDanger > 0) {
+    $('#treatDashboardText').html($numberOfTreatDanger+' aujourd\'hui');
+    $('#treatDashboardCard').addClass('border-left-danger');
+    $('#treatDashboardTitle').addClass('text-danger');
+  } else if ($numberOfTreatWarning > 0) {
+    $('#treatDashboardText').html($numberOfTreatWarning+' à venir');
+    $('#treatDashboardCard').addClass('border-left-warning');
+    $('#treatDashboardTitle').addClass('text-warning');
+  } else {
+    $('#treatDashboardText').html('Aucun prévu');
+    $('#treatDashboardCard').addClass('border-left-success');
+    $('#treatDashboardTitle').addClass('text-success');
   }
   
 

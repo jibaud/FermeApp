@@ -61,6 +61,7 @@
   <script src="js/demo/chart-area-demo.js"></script>
   <script src="js/demo/chart-pie-demo.js"></script>
 
+
   <script src="vendor/datatables/jquery.dataTables.min.js"></script>
   <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
   <script src="vendor/datatables/fixedHeader.bootstrap4.min.js"></script>
@@ -69,13 +70,13 @@
   <script src="vendor/bootstrap-datepicker/js/bootstrap-datepicker.fr.min.js"></script>
   <script src="js/bootstrap-datepicker/bootstrap-datepicker.js"></script>
 
+
   <script src="vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
   <script src="vendor/bootstrap-select/js/defaults-fr_FR.min.js"></script>
 
   <script src="vendor/snackbar/js/snackbar.js"></script>
 
   <script src="vendor/croppie/js/croppie.js"></script>
-
 
   <script src="js/scripts.js"></script>
 

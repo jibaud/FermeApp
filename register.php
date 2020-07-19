@@ -22,6 +22,8 @@ if (isset($_POST['submit'])) {
   date_default_timezone_set('Europe/Paris');
   $date = date('d/m/Y à H:i:s');
 
+  $salesYears = serialize(array());
+
   if ((!empty($firstname)) && (!empty($lastname)) && (!empty($email)) && (!empty($email_confirm)) && (!empty($password)) && (!empty($password_confirm))) {
     if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
       if ($email == $email_confirm) {
@@ -31,14 +33,17 @@ if (isset($_POST['submit'])) {
           $rowEmail = countDatabaseValue($database, 'users', 'user_email', 'user_email', $email, $email_confirm);
           if ($rowEmail == 0) {
             try {
-              $insertMember = $database->prepare("INSERT INTO users(user_firstname, user_lastname, user_email, user_password, registerdate) VALUES(?, ?, ?, ?, ?)");
+              $insertMember = $database->prepare("INSERT INTO users(user_firstname, user_lastname, user_email, user_password, registerdate, sales_years) VALUES(?, ?, ?, ?, ?, ?)");
               $insertMember->execute([
                 $firstname,
                 $lastname,
                 $email,
                 $password,
-                $date
+                $date,
+                $salesYears
               ]);
+
+
               $successMessage = "Votre compte à bien été créé !";
               header('refresh:3;url=login.php');
             } catch (Exception $e) {

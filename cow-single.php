@@ -11,67 +11,73 @@ if (!isset($_GET['id'])) {
 	header('Location:cows-manager');
 }
 
-switch ($_GET['eg']) {
-	case 1:
-		$errorMessageGest = 'Champs état non valide.';
-		break;
-	case 2:
-		$errorMessageGest = 'Le champs note est trop long. 50 charactères maximum.';
-		break;
-	case 3:
-		$errorMessageGest = 'Une date de fin de gestation est nécéssaire.';
-		break;
-	case 4:
-		$errorMessageGest = 'Une date de début de gestation est nécéssaire.';
-		break;
-	case 5:
-		$errorMessageGest = 'Cette vache à déjà une gestation en cours.';
-		break;
-	case 6:
-		$errorMessageGest = 'La date de fin ne peut pas être plus ancienne que celle du début.';
-		break;
+if (isset($_GET['eg'])) {
+	switch ($_GET['eg']) {
+		case 1:
+			$errorMessageGest = 'Champs état non valide.';
+			break;
+		case 2:
+			$errorMessageGest = 'Le champs note est trop long. 50 charactères maximum.';
+			break;
+		case 3:
+			$errorMessageGest = 'Une date de fin de gestation est nécéssaire.';
+			break;
+		case 4:
+			$errorMessageGest = 'Une date de début de gestation est nécéssaire.';
+			break;
+		case 5:
+			$errorMessageGest = 'Cette vache à déjà une gestation en cours.';
+			break;
+		case 6:
+			$errorMessageGest = 'La date de fin ne peut pas être plus ancienne que celle du début.';
+			break;
+	}
 }
 
-switch ($_GET['et']) {
-	case 1:
-		$errorMessageTreat = 'Sélécteur non valide.';
-		break;
-	case 2:
-		$errorMessageTreat = 'Le champs dose ou note est trop long. 50 charactères maximum.';
-		break;
-	case 3:
-		$errorMessageTreat = 'Le nombre de jours doit être composé uniquement de chiffres.';
-		break;
-	case 4:
-		$errorMessageTreat = 'Vous devez indiquez le nombre de jours.';
-		break;
-	case 5:
-		$errorMessageTreat = 'Veuillez remplir tous les champs obligatoires.';
-		break;
+if (isset($_GET['et'])) {
+	switch ($_GET['et']) {
+		case 1:
+			$errorMessageTreat = 'Sélécteur non valide.';
+			break;
+		case 2:
+			$errorMessageTreat = 'Le champs dose ou note est trop long. 50 charactères maximum.';
+			break;
+		case 3:
+			$errorMessageTreat = 'Le nombre de jours doit être composé uniquement de chiffres.';
+			break;
+		case 4:
+			$errorMessageTreat = 'Vous devez indiquez le nombre de jours.';
+			break;
+		case 5:
+			$errorMessageTreat = 'Veuillez remplir tous les champs obligatoires.';
+			break;
+	}
 }
 
-switch ($_GET['e']) {
-	case 1:
-		$errorMessage = 'Un bovin existe déjà avec ce numéro.';
-		break;
-	case 2:
-		$errorMessage = 'Le numéro d\'identification n\'est pas valide.';
-		break;
-	case 3:
-		$errorMessage = 'Le nom est trop long. 32 charactères maximum.';
-		break;
-	case 4:
-		$errorMessage = 'Veuillez remplir tous les champs obligatoires.';
-		break;
-	case 5:
-		$errorMessage = 'Vous devez préciser la date de mort.';
-		break;
-	case 5:
-		$errorMessage = 'Vous devez préciser la date et le prix de vente.';
-		break;
-	case 6:
-		$errorMessage = 'Veuillez indiquer un prix valide.';
-		break;
+if (isset($_GET['e'])) {
+	switch ($_GET['e']) {
+		case 1:
+			$errorMessage = 'Un bovin existe déjà avec ce numéro.';
+			break;
+		case 2:
+			$errorMessage = 'Le numéro d\'identification n\'est pas valide.';
+			break;
+		case 3:
+			$errorMessage = 'Le nom est trop long. 32 charactères maximum.';
+			break;
+		case 4:
+			$errorMessage = 'Veuillez remplir tous les champs obligatoires.';
+			break;
+		case 5:
+			$errorMessage = 'Vous devez préciser la date de mort.';
+			break;
+		case 5:
+			$errorMessage = 'Vous devez préciser la date et le prix de vente.';
+			break;
+		case 6:
+			$errorMessage = 'Veuillez indiquer un prix valide.';
+			break;
+	}
 }
 
 
@@ -191,9 +197,9 @@ $pageTitle = $result['name'];
 		<?php
 		$pregnantdays = daysSince($result['pregnant_since']);
 		$pregnantpercent = ($pregnantdays / 283 * 100);
-		if ($pregnantdays >= 283) {
+		if ($pregnantdays >= 280) {
 			$color = "danger";
-		} else if ($pregnantdays >= 250 && $pregnantdays < 283) {
+		} else if ($pregnantdays >= 250 && $pregnantdays < 280) {
 			$color = "warning";
 		} else {
 			$color = "success";
@@ -672,13 +678,19 @@ $pageTitle = $result['name'];
 															echo "En cours";
 															echo '<div class="progressBarGest bg-' . $color . '" style="width:' . $pregnantpercent . '%;"></div>';
 															$select0 = 'selected';
+															$select1 = '';
+															$select2 = '';
 															break;
 														case 1:
 															echo "Terminée";
+															$select0 = '';
 															$select1 = 'selected';
+															$select2 = '';
 															break;
 														case 2:
 															echo "Avorté";
+															$select0 = '';
+															$select1 = '';
 															$select2 = 'selected';
 															break;
 													}
@@ -841,9 +853,7 @@ $pageTitle = $result['name'];
 
 
 		<!-- TRAITEMENTS -->
-		<div class="row <?php if (calculeType($result['birth_date']) == 'veau') {
-							echo 'd-none';
-						} ?>">
+		<div class="row">
 			<!-- Area Chart -->
 			<div class="col-12">
 				<div class="card shadow mb-4" id="treats">
@@ -917,17 +927,17 @@ $pageTitle = $result['name'];
 												</div>
 											</td>
 
-											<?php 
+											<?php
 											$endDate = futureDateDay($treatData['t_date'], $treatData['t_days']);
 											$dateToday = date('j/m/Y');
-											if (compareDate($endDate, $dateToday)){
+											if (compareDate($endDate, $dateToday)) {
 												$colorText = 'text-warning';
-											} else if ($endDate == $dateToday){
+											} else if ($endDate == $dateToday) {
 												$colorText = 'text-danger';
 											} else {
 												$colorText = 'text-gray';
 											}
-											if($treatData['t_repeat'] == 2 && $colorText == 'text-warning'){
+											if ($treatData['t_repeat'] == 2 && $colorText == 'text-warning') {
 												$colorText = 'text-danger';
 											}
 											?>
@@ -939,17 +949,27 @@ $pageTitle = $result['name'];
 														case 0:
 															echo 'Une seule fois';
 															$select_0 = 'selected';
+															$select_1 = '';
+															$select_2 = '';
 															break;
 														case 1:
 															echo 'Répéter ' . $treatData['t_days'] . ' jours plus tard';
 															echo '<br>Le ' . $endDate;
-															if($endDate==$dateToday){echo ' (Aujourd\'hui)';}
+															if ($endDate == $dateToday) {
+																echo ' (Aujourd\'hui)';
+															}
+															$select_0 = '';
 															$select_1 = 'selected';
+															$select_2 = '';
 															break;
 														case 2:
 															echo 'Pendant ' . $treatData['t_days'] . ' jours';
-															echo '<br>Jusq\'au ' . $endDate;
-															if($endDate==$dateToday){echo ' (Aujourd\'hui)';}
+															echo '<br>Jusqu\'au ' . $endDate;
+															if ($endDate == $dateToday) {
+																echo ' (Aujourd\'hui)';
+															}
+															$select_0 = '';
+															$select_1 = '';
 															$select_2 = 'selected';
 															break;
 													}

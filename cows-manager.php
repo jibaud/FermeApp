@@ -116,7 +116,7 @@ if (isset($_POST['archive'])) {
                         echo '<td class="text-success">Oui (' . $pregnantdays . '/280j)</td>';
                       }
                     } else {
-                      if ($type != 'vache' & $donnees['genre'] != 'femelle') {
+                      if ($type != 'vache' & $donnees['gender'] != 'femelle') {
                         echo '<td></td>';
                       } else {
                         echo '<td>Non</td>';

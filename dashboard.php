@@ -49,7 +49,8 @@ include 'header.php';
 
 
     // On récupère les ventes de lait, qu'on place dans des tableaux récupérés par le script du graphique en bas de page.
-    $milkSalary = $database->prepare("SELECT * FROM sale ORDER BY id");
+    $currentYear = date('Y');
+    $milkSalary = $database->prepare("SELECT * FROM sales WHERE owner_id = '$currentUserId' AND date LIKE '%$currentYear%' ORDER BY id");
     $milkSalary->execute([$owner_id]);
     if ($milkSalary) {
       $dates = array();
@@ -81,7 +82,7 @@ include 'header.php';
           <!-- Content Row -->
           <div class="row">
 
-            <!-- Earnings (Monthly) Card Example -->
+            <!-- Card  -->
             <div class="col-xl-3 col-md-6 mb-4">
               <div class="card border-left-primary shadow h-100 py-2">
                 <div class="card-body">
@@ -98,7 +99,7 @@ include 'header.php';
               </div>
             </div>
 
-            <!-- Earnings (Monthly) Card Example -->
+            <!-- Card  -->
             <div class="col-xl-3 col-md-6 mb-4">
               <div class="card border-left-primary shadow h-100 py-2">
                 <div class="card-body">
@@ -115,7 +116,7 @@ include 'header.php';
               </div>
             </div>
 
-            <!-- Earnings (Monthly) Card Example -->
+            <!-- Card  -->
             <div class="col-xl-3 col-md-6 mb-4">
               <div class="card border-left-primary shadow h-100 py-2">
                 <div class="card-body">
@@ -132,71 +133,83 @@ include 'header.php';
               </div>
             </div>
 
-            <!-- Earnings (Monthly) Card Example -->
+            <!-- Card  -->
             <div class="col-xl-3 col-md-6 mb-4">
-              <div class="card border-left-info shadow h-100 py-2">
-                <div class="card-body">
-                  <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Prochain vaccin</div>
-                      <div class="row no-gutters align-items-center">
-                        <div class="col-auto">
-                          <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">3 jours</div>
-                        </div>
-                        <div class="col">
-                          <div class="progress progress-sm mr-2">
-                            <div class="progress-bar bg-info" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+              <a href="treats" class="text-decoration-none text-reset gest-card">
+                <div class="card shadow h-100 py-2" id="treatDashboardCard">
+                  <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                      <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1" id="treatDashboardTitle">Traitements</div>
+                        <div class="row no-gutters align-items-center">
+                          <div class="col-auto">
+                            <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800" id="treatDashboardText"></div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <div class="col-auto">
-                      <i class="fas fa-syringe fa-3x text-gray-300"></i>
+                      <div class="col-auto">
+                        <i class="fas fa-syringe fa-3x text-gray-300"></i>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </a>
             </div>
 
-            <!-- Pending Requests Card Example -->
+            <!-- Card  -->
             <div class="col-xl-3 col-md-6 mb-4">
-              <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                  <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Gestation<?= $ps ?> en cours</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $pregnantNumber //topbar top
-                                                                          ?></div>
-                    </div>
-                    <div class="col-auto">
-                      <i class="fas fa-baby-carriage fa-3x text-gray-300"></i>
+              <a href="gestations" class="text-decoration-none text-reset gest-card">
+                <div class="card border-left-success shadow h-100 py-2">
+                  <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                      <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Gestation<?= $ps ?> en cours</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $pregnantNumber //topbar top
+                                                                            ?></div>
+                      </div>
+                      <div class="col-auto">
+                        <i class="fas fa-baby-carriage fa-3x text-gray-300"></i>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </a>
             </div>
           </div>
+
+
+          <?php
+          // On récupere les années déjà créées
+          $requestUserYears = $database->prepare("SELECT sales_years FROM users WHERE user_id = ?");
+          $requestUserYears->execute([$currentUserId]);
+          $yearsCount = $requestUserYears->rowCount();
+
+          $salesYears = $requestUserYears->fetchColumn(0);
+          $salesYears = unserialize($salesYears);
+          ?>
 
           <!-- Content Row -->
 
           <div class="row">
 
-            <!-- Area Chart -->
+            <!-- Card  -->
             <div class="col-xl-8 col-lg-7">
-              <div class="card shadow mb-4">
+              <div class="card shadow mb-4" id="dashboardMilkSale">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                  <h6 class="m-0 font-weight-bold text-primary">Ventes du lait</h6>
+                  <h6 class="m-0 font-weight-bold text-primary">Ventes de lait en <?= $currentYear ?></h6>
                   <div class="dropdown no-arrow">
                     <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                       <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                      <div class="dropdown-header">Dropdown Header:</div>
-                      <a class="dropdown-item" href="#">Action</a>
-                      <a class="dropdown-item" href="#">Another action</a>
-                      <div class="dropdown-divider"></div>
-                      <a class="dropdown-item" href="#">Something else here</a>
+                      <div class="dropdown-header">Année:</div>
+                      
+                      <?php
+                      foreach ($salesYears as $year) {
+                        echo '<a class="dropdown-item" href="sales?y=' . $year . '">' . $year . '</a>';
+                      }
+                      ?>
                     </div>
                   </div>
                 </div>
@@ -209,7 +222,7 @@ include 'header.php';
               </div>
             </div>
 
-            <!-- Pie Chart -->
+            <!-- Quote -->
             <div class="col-xl-4 col-lg-5">
               <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
@@ -218,154 +231,53 @@ include 'header.php';
                 </div>
                 <!-- Card Body -->
                 <div class="card-body">
-                
-<?php
-// Citation aléatoire.
-$fichier = file('assets/quotes.txt');
-$totalRow = count($fichier); // Total du nombre de lignes du fichier
-$iRandom = mt_rand(0, $totalRow - 1);
-echo $fichier[$iRandom]; // On affiche une citation au hasard
-?>
+
+                  <?php
+                  // Citation aléatoire.
+                  $fichier = file('assets/quotes.txt');
+                  $totalRow = count($fichier); // Total du nombre de lignes du fichier
+                  $iRandom = mt_rand(0, $totalRow - 1);
+                  echo $fichier[$iRandom]; // On affiche une citation au hasard
+                  ?>
+
+                </div>
+              </div>
+              <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                  <h6 class="m-0 font-weight-bold text-primary">Météo Rumilly</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                  <!-- widget meteo -->
+                  <div id="widget_3e388d86e28dcc0580e6a2296fb6b6b4">
+                    <span id="l_3e388d86e28dcc0580e6a2296fb6b6b4"><a href="http://www.mymeteo.info/r/rumilly-74_f">https://www.my-meteo.com</a></span>
+                    <script type="text/javascript">
+                      (function() {
+                        var my = document.createElement("script");
+                        my.type = "text/javascript";
+                        my.async = true;
+                        my.src = "https://services.my-meteo.com/widget/js?ville=24113&format=carre&nb_jours=5&temps&icones&vent&precip&coins&c1=393939&c2=2b86c6&c3=transparent&c4=ffffff&c5=45a5e9&c6=ff3838&police=4&t_icones=2&x=336&y=500&d=0&id=3e388d86e28dcc0580e6a2296fb6b6b4";
+                        var z = document.getElementsByTagName("script")[0];
+                        z.parentNode.insertBefore(my, z);
+                      })();
+                    </script>
+                  </div>
+                  <!-- widget meteo -->
 
                 </div>
               </div>
             </div>
+
+            <div class="col-xl-4 col-lg-5">
+
+            </div>
           </div>
 
-          <!-- Content Row -->
           <div class="row">
 
-            <!-- Content Column -->
-            <div class="col-lg-6 mb-4">
-
-              <!-- Project Card Example -->
-              <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                  <h6 class="m-0 font-weight-bold text-primary">Gestations</h6>
-                </div>
-                <div class="card-body">
-                  <h4 class="small font-weight-bold">Server Migration <span class="float-right">20%</span></h4>
-                  <div class="progress mb-4">
-                    <div class="progress-bar bg-danger" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                  <h4 class="small font-weight-bold">Sales Tracking <span class="float-right">40%</span></h4>
-                  <div class="progress mb-4">
-                    <div class="progress-bar bg-warning" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                  <h4 class="small font-weight-bold">Customer Database <span class="float-right">60%</span></h4>
-                  <div class="progress mb-4">
-                    <div class="progress-bar" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                  <h4 class="small font-weight-bold">Payout Details <span class="float-right">80%</span></h4>
-                  <div class="progress mb-4">
-                    <div class="progress-bar bg-info" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                  <h4 class="small font-weight-bold">Account Setup <span class="float-right">Complete!</span></h4>
-                  <div class="progress">
-                    <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Color System -->
-              <div class="row">
-                <div class="col-lg-6 mb-4">
-                  <div class="card bg-primary text-white shadow">
-                    <div class="card-body">
-                      Primary
-                      <div class="text-white-50 small">#4e73df</div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-6 mb-4">
-                  <div class="card bg-success text-white shadow">
-                    <div class="card-body">
-                      Success
-                      <div class="text-white-50 small">#1cc88a</div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-6 mb-4">
-                  <div class="card bg-info text-white shadow">
-                    <div class="card-body">
-                      Info
-                      <div class="text-white-50 small">#36b9cc</div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-6 mb-4">
-                  <div class="card bg-warning text-white shadow">
-                    <div class="card-body">
-                      Warning
-                      <div class="text-white-50 small">#f6c23e</div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-6 mb-4">
-                  <div class="card bg-danger text-white shadow">
-                    <div class="card-body">
-                      Danger
-                      <div class="text-white-50 small">#e74a3b</div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-6 mb-4">
-                  <div class="card bg-secondary text-white shadow">
-                    <div class="card-body">
-                      Secondary
-                      <div class="text-white-50 small">#858796</div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-6 mb-4">
-                  <div class="card bg-light text-black shadow">
-                    <div class="card-body">
-                      Light
-                      <div class="text-black-50 small">#f8f9fc</div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-6 mb-4">
-                  <div class="card bg-dark text-white shadow">
-                    <div class="card-body">
-                      Dark
-                      <div class="text-white-50 small">#5a5c69</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-            <div class="col-lg-6 mb-4">
-
-              <!-- Illustrations -->
-              <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                  <h6 class="m-0 font-weight-bold text-primary">Illustrations</h6>
-                </div>
-                <div class="card-body">
-                  <div class="text-center">
-                    <img class="img-fluid px-3 px-sm-4 mt-3 mb-4" style="width: 25rem;" src="img/undraw_posting_photo.svg" alt="">
-                  </div>
-                  <p>Add some quality, svg illustrations to your project courtesy of <a target="_blank" rel="nofollow" href="https://undraw.co/">unDraw</a>, a constantly updated collection of beautiful svg images that you can use completely free and without attribution!</p>
-                  <a target="_blank" rel="nofollow" href="https://undraw.co/">Browse Illustrations on unDraw &rarr;</a>
-                </div>
-              </div>
-
-              <!-- Approach -->
-              <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                  <h6 class="m-0 font-weight-bold text-primary">Development Approach</h6>
-                </div>
-                <div class="card-body">
-                  <p>SB Admin 2 makes extensive use of Bootstrap 4 utility classes in order to reduce CSS bloat and poor page performance. Custom CSS classes are used to create custom components and custom utility classes.</p>
-                  <p class="mb-0">Before working with this theme, you should become familiar with the Bootstrap framework, especially the utility classes.</p>
-                </div>
-              </div>
-
-            </div>
           </div>
+
 
         </div>
         <!-- /.container-fluid -->
@@ -383,36 +295,20 @@ echo $fichier[$iRandom]; // On affiche une citation au hasard
           data: {
             labels: <?= json_encode($dates); ?>,
             datasets: [{
-                label: "Lait",
-                lineTension: 0.3,
-                backgroundColor: "rgba(78, 115, 223, 0.05)",
-                borderColor: "rgba(78, 115, 223, 1)",
-                pointRadius: 3,
-                pointBackgroundColor: "rgba(78, 115, 223, 1)",
-                pointBorderColor: "rgba(78, 115, 223, 1)",
-                pointHoverRadius: 3,
-                pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
-                pointHoverBorderColor: "rgba(78, 115, 223, 1)",
-                pointHitRadius: 10,
-                pointBorderWidth: 2,
-                data: <?= json_encode($amounts); ?>,
-              },
-              {
-                label: "Veaux",
-                lineTension: 0.3,
-                backgroundColor: "rgba(78, 115, 223, 0.05)",
-                borderColor: "rgba(78, 115, 223, 1)",
-                pointRadius: 3,
-                pointBackgroundColor: "rgba(78, 115, 223, 1)",
-                pointBorderColor: "rgba(78, 115, 223, 1)",
-                pointHoverRadius: 3,
-                pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
-                pointHoverBorderColor: "rgba(78, 115, 223, 1)",
-                pointHitRadius: 10,
-                pointBorderWidth: 2,
-                data: ['4100', '3550'],
-              }
-            ],
+              label: "Lait",
+              lineTension: 0.3,
+              backgroundColor: "rgba(78, 115, 223, 0.05)",
+              borderColor: "rgba(78, 115, 223, 1)",
+              pointRadius: 3,
+              pointBackgroundColor: "rgba(78, 115, 223, 1)",
+              pointBorderColor: "rgba(78, 115, 223, 1)",
+              pointHoverRadius: 3,
+              pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+              pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+              pointHitRadius: 10,
+              pointBorderWidth: 2,
+              data: <?= json_encode($amounts); ?>,
+            }],
           },
           options: {
             maintainAspectRatio: false,

@@ -36,9 +36,13 @@ function calculeAge($date, $option)
 
   if ($diff->y > 1) {
     $ys = 's'; // Rajoute un s à "an" si pluriel
+  } else {
+    $ys = '';
   }
   if ($diff->d > 1) {
     $ds = 's'; // Rajoute un s à "jour" si pluriel
+  } else {
+    $ds = '';
   }
 
   if ($option == 'full') {

@@ -81,10 +81,10 @@ include 'header.php';
 <?php } ?>
                   <form class="user" method="post" action="">
                     <div class="form-group">
-                      <input type="email" class="form-control form-control-user" id="email" name="email" aria-describedby="emailHelp" placeholder="Adresse email" <?php if (isset($email)) { ?>value="<?= $email ?>" <?php } ?> value="iphone0212@gmail.com">
+                      <input type="email" class="form-control form-control-user" id="email" name="email" aria-describedby="emailHelp" placeholder="Adresse email" <?php if (isset($email)) { ?>value="<?= $email ?>" <?php } ?>>
                     </div>
                     <div class="form-group">
-                      <input type="password" class="form-control form-control-user" id="password" name="password" placeholder="Mot de passe" value="jb">
+                      <input type="password" class="form-control form-control-user" id="password" name="password" placeholder="Mot de passe">
                     </div>
                     <div class="form-group">
                       <div class="custom-control custom-checkbox small">

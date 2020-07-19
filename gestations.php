@@ -35,9 +35,9 @@ include 'header.php';
             while ($donnees = $reponseCowPregnant->fetch()) {
                 $pregnantdays = daysSince($donnees['pregnant_since']);
                 $pregnantpercent = ($pregnantdays / 283 * 100);
-                if ($pregnantdays >= 283) {
+                if ($pregnantdays >= 280) {
                     $color = "danger";
-                } else if ($pregnantdays >= 250 && $pregnantdays < 283) {
+                } else if ($pregnantdays >= 250 && $pregnantdays < 280) {
                     $color = "warning";
                 } else {
                     $color = "success";
@@ -55,7 +55,7 @@ include 'header.php';
                                     </div>
                                 </div>
                                 <div class="w-100">
-                                    <div class="text-gray-900 uppercase"><?= $donnees['name'] . ' - ' . $donnees['id']; ?></div>
+                                    <div class="text-gray-900"><?= $donnees['name'] . ' - ' . $donnees['id']; ?></div>
                                     <div class="progress">
                                         <div class="progress-bar bg-<?= $color ?>" role="progressbar" style="width:<?= $pregnantpercent ?>%;" aria-valuenow="<?= $pregnantpercent ?>" aria-valuemin="0" aria-valuemax="100"><?= $pregnantdays . '/283' ?></div>
                                     </div>

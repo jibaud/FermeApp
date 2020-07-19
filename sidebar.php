@@ -50,7 +50,7 @@
 </li>
 
 <!-- Nav Item - Tables -->
-<li class="nav-item">
+<li class="nav-item <?php if (stripos($_SERVER['REQUEST_URI'], 'treats')){echo 'active';}?>">
   <a class="nav-link" href="/treats">
   <i class="fas fa-syringe"></i>
     <span>Traitements</span></a>
@@ -78,6 +78,14 @@
 <div class="sidebar-heading">
   Bureau
 </div>
+
+
+<!-- Nav Item - Tables -->
+<li class="nav-item <?php if (stripos($_SERVER['REQUEST_URI'], 'sales')){echo 'active';}?>">
+  <a class="nav-link" href="/sales">
+  <i class="fas fa-cash-register"></i>
+    <span>Ventes</span></a>
+</li>
 
 <!-- Nav Item - Cow Manager -->
 <li class="nav-item <?php if (stripos($_SERVER['REQUEST_URI'], 'archives') || stripos($_SERVER['REQUEST_URI'], 'dead') || stripos($_SERVER['REQUEST_URI'], 'sold')){echo 'active';}?>">
