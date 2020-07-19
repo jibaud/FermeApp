@@ -15,7 +15,7 @@
       <!-- Topbar Search -->
       <form class="d-none d-sm-inline-block mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" action="search">
         <div class="input-group">
-          <input type="search" class="form-control bg-light border-0 small" name="q" id="q" placeholder="Rechercher..." aria-label="Search" aria-describedby="basic-addon2">
+          <input type="search" class="form-control bg-light border-0 small" name="q" id="q" placeholder="Rechercher un nom ou un identifiant" aria-label="Search" aria-describedby="basic-addon2">
           <div class="input-group-append">
             <button class="btn btn-primary" type="submit">
               <i class="fas fa-search fa-sm text-white"></i>
@@ -36,7 +36,7 @@
           <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in" aria-labelledby="searchDropdown">
             <form class="form-inline mr-auto w-100 navbar-search">
               <div class="input-group">
-                <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+                <input type="text" class="form-control bg-light border-0 small" placeholder="Rechercher..." aria-label="Search" aria-describedby="basic-addon2">
                 <div class="input-group-append">
                   <button class="btn btn-primary" type="submit">
                     <i class="fas fa-search fa-sm"></i>
@@ -133,7 +133,7 @@
           <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="fas fa-syringe fa-fw"></i>
             <!-- Counter - Alerts -->
-            <span class="badge badge-success badge-counter" id="treatNotifBadge">0</span>
+            <span class="badge badge-success badge-counter" id="treatNotifBadge"></span>
           </a>
           <!-- Dropdown - Alerts -->
           <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">

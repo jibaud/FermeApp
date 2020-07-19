@@ -174,7 +174,11 @@ $(document).ready(function () {
   }
 
   var $numberOfTreat = $('#treatNotification').find('.treatNotifElement').length;
+  if($numberOfTreat > 0){
   $('#treatNotifBadge').html($numberOfTreat);
+  } else {
+    $('#treatNotifBadge').hide();
+  }
   $('.numberOfTreat').html($numberOfTreat);
 
   var $howManyToday = $('#treatNotification').find('.treatNotifElement').find('.bg-danger').length;
