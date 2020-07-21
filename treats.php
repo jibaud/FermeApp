@@ -30,7 +30,7 @@ include 'header.php';
       <div class="row">
 
         <?php
-        $reponseTreats->execute([$owner_id]);
+        $reponseTreats->execute([$owner_id]); // Appel dans topbar
 
         while ($data = $reponseTreats->fetch()) {
           // Retrouver le nom du bovin

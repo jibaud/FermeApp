@@ -114,10 +114,11 @@
 
         <?php
         // On récupère tout le contenu de la table treats sauf les traitements qui ne se repettent pas
-        // puisqu'on ne va pas les afficher.
+        // puisqu'on ne va pas les afficher
+        // Ni les traitements dont la vache est archivée.
         $owner_id = $_SESSION['userID'];
         $database = getPDO();
-        $reponseTreats = $database->prepare("SELECT * FROM treats WHERE t_owner_id = ? AND t_repeat != 0");
+        $reponseTreats = $database->prepare("SELECT * FROM treats WHERE t_owner_id = ? AND t_repeat != 0 AND t_isarchived = 0");
         $reponseTreats->execute([$owner_id]);
 
         // Un appel qui servira à récuperer le nom du bovin associé au traitement

@@ -10,13 +10,18 @@ $pageTitle = 'Gestion des bovins';
 include 'header.php';
 
 
-// Supprimer un bovin
+// Archiver un bovin
 if (isset($_POST['archive'])) {
-  $archiveidnumber = htmlspecialchars($_POST['selectedIdToArchive']);
+  $archiveIndexNumber = htmlspecialchars($_POST['selectedIdToArchive']);
   $owner_id = $_SESSION['userID'];
   $database = getPDO();
-  $archiveCow = $database->prepare("UPDATE cows SET isarchived = 1 WHERE id = $archiveidnumber AND owner_id = $owner_id");
+  $archiveCow = $database->prepare("UPDATE cows SET isarchived = 1 WHERE cow_index = $archiveIndexNumber AND owner_id = $owner_id");
   $archiveCow->execute();
+
+
+  // Archiver les treats asqociés
+	$archiveCowTreats = $database->prepare("UPDATE treats SET t_isarchived = 1 WHERE t_cow_index = $archiveIndexNumber AND t_owner_id = $owner_id");
+	$archiveCowTreats->execute();
 
   header('');
 }
@@ -51,7 +56,7 @@ if (isset($_POST['archive'])) {
 
 
 
-      <!-- DataTales Example -->
+      <!-- DataTales -->
       <div class="card shadow mb-4">
         <div class="card-body">
           <div class="table-responsive">
@@ -138,7 +143,7 @@ if (isset($_POST['archive'])) {
                       </span>
 
                       <span data-toggle="tooltip" data-placement="top" title="Supprimer">
-                        <button type="button" class="btn btn-danger btn-sm archiveButton selectIdButtonArchive" id="<?= $donnees['id']; ?>" data-toggle="modal" data-target="#archiveCowModal">
+                        <button type="button" class="btn btn-danger btn-sm archiveButton selectIdButtonArchive" id="<?= $donnees['cow_index']; ?>" data-toggle="modal" data-target="#archiveCowModal">
                           <i class="fas fa-trash"></i>
                         </button>
                       </span>

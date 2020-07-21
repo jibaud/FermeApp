@@ -11,11 +11,15 @@ include 'header.php';
 
 // "Racheter" un bovin vendue
 if (isset($_POST['restaure'])) {
-    $restaureidnumber = htmlspecialchars($_POST['selectedIdToRestaure']);
+    $restaureIndexNumber = htmlspecialchars($_POST['selectedIdToRestaure']);
     $owner_id = $_SESSION['userID'];
     $database = getPDO();
-    $restaureCow = $database->prepare("UPDATE cows SET sale_date = '', sale_price = null WHERE id = $restaureidnumber AND owner_id = $owner_id");
+    $restaureCow = $database->prepare("UPDATE cows SET sale_date = '', sale_price = null WHERE cow_index = $restaureIndexNumber AND owner_id = $owner_id");
     $restaureCow->execute();
+
+    // Réstaurer les treats associés
+	$archiveCowTreats = $database->prepare("UPDATE treats SET t_isarchived = 0 WHERE t_cow_index = $restaureIndexNumber AND t_owner_id = $owner_id");
+	$archiveCowTreats->execute();
 
     header('Location:sold');
 }
@@ -126,7 +130,7 @@ if (isset($_GET['e'])) {
                                             </span>
 
                                             <span data-toggle="tooltip" data-placement="top" title="Restaurer">
-                                                <a class="btn btn-success btn-sm selectIdButtonRestaure" id="<?= $donnees['id']; ?>" href="" data-toggle="modal" data-target="#restaureCowModal">
+                                                <a class="btn btn-success btn-sm selectIdButtonRestaure" id="<?= $donnees['cow_index']; ?>" href="" data-toggle="modal" data-target="#restaureCowModal">
                                                     <i class="fas fa-inbox-out"></i>
                                                 </a>
                                             </span>

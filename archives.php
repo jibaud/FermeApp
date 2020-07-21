@@ -12,11 +12,16 @@ include 'header.php';
 
 // Réstaurer un bovin archivée
 if (isset($_POST['restaure'])) {
-  $restaureidnumber = htmlspecialchars($_POST['selectedIdToRestaure']);
+  $restaureIndexNumber = htmlspecialchars($_POST['selectedIdToRestaure']);
   $owner_id = $_SESSION['userID'];
   $database = getPDO();
-  $restaureCow = $database->prepare("UPDATE cows SET isarchived = 0 WHERE id = $restaureidnumber AND owner_id = $owner_id");
+  $restaureCow = $database->prepare("UPDATE cows SET isarchived = 0 WHERE cow_index = $restaureIndexNumber AND owner_id = $owner_id");
   $restaureCow->execute();
+
+  // Réstaurer les treats associés
+	$archiveCowTreats = $database->prepare("UPDATE treats SET t_isarchived = 0 WHERE t_cow_index = $restaureIndexNumber AND t_owner_id = $owner_id");
+	$archiveCowTreats->execute();
+
 
   header('Location:archives');
 }
@@ -32,6 +37,10 @@ if (isset($_POST['delete'])) {
   // Supprime aussi les gestations associées à ce bovin
   $deleteCowGest = $database->prepare("DELETE FROM gestations WHERE g_cow_index = $deleteindexnumber AND g_owner_id = $owner_id");
   $deleteCowGest->execute();
+
+  // Supprime aussi les traitements associés à ce bovin
+  $deleteCowTreat = $database->prepare("DELETE FROM treats WHERE t_cow_index = $deleteindexnumber AND t_owner_id = $owner_id");
+  $deleteCowTreat->execute();
 
   header('Location:archives');
 }
@@ -140,7 +149,7 @@ if (isset($_GET['e'])) {
                       </span>
 
                       <span data-toggle="tooltip" data-placement="top" title="Restaurer">
-                        <a class="btn btn-success btn-sm selectIdButtonRestaure" id="<?= $donnees['id']; ?>" href="" data-toggle="modal" data-target="#restaureCowModal">
+                        <a class="btn btn-success btn-sm selectIdButtonRestaure" id="<?= $donnees['cow_index']; ?>" href="" data-toggle="modal" data-target="#restaureCowModal">
                           <i class="fas fa-inbox-out"></i>
                         </a>
                       </span>
@@ -186,7 +195,7 @@ if (isset($_GET['e'])) {
           <div class="modal-footer">
               <button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
               <form action="" method="post">
-                <input type="text" id="selectedIdToRestaure" name="selectedIdToRestaure" value="" style="display:none;">
+                <input type="text" id="selectedIdToRestaure" name="selectedIdToRestaure" value="" class="d-none">
                 <input type="submit" name="restaure" id="restaure" value="Restaurer" class="btn btn-success">
               </form>
             </div>

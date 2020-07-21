@@ -493,11 +493,15 @@ if (isset($_POST['addTreatSubmit'])) {
 
 
 
-// Supprimer un bovin
+// Archiver un bovin
 if (isset($_POST['archive'])) {
 	$database = getPDO();
 	$archiveCow = $database->prepare("UPDATE cows SET isarchived = 1 WHERE id = $currentCowId AND owner_id = $owner_id");
 	$archiveCow->execute();
+
+	// Archiver les treats associés
+	$archiveCowTreats = $database->prepare("UPDATE treats SET t_isarchived = 1 WHERE t_cow_index = $currentCowIndex AND t_owner_id = $owner_id");
+	$archiveCowTreats->execute();
 
 	header('Location: /cows-manager');
 }
@@ -510,6 +514,10 @@ if (isset($_POST['deadConfirm'])) {
 	if (!empty($deathDate)) {
 		$deadCow = $database->prepare("UPDATE cows SET death_date = '$deathDate' WHERE id = $currentCowId AND owner_id = $owner_id");
 		$deadCow->execute();
+
+		// Archiver les treats associés
+		$archiveCowTreats = $database->prepare("UPDATE treats SET t_isarchived = 1 WHERE t_cow_index = $currentCowIndex AND t_owner_id = $owner_id");
+		$archiveCowTreats->execute();
 
 		header('Location: /cows-manager');
 	} else {
@@ -533,6 +541,10 @@ if (isset($_POST['soldConfirm'])) {
 		if ($priceValide) {
 			$soldCow = $database->prepare("UPDATE cows SET sale_date = '$saleDate', sale_price = '$salePrice' WHERE id = $currentCowId AND owner_id = $owner_id");
 			$soldCow->execute();
+
+			// Archiver les treats associés
+			$archiveCowTreats = $database->prepare("UPDATE treats SET t_isarchived = 1 WHERE t_cow_index = $currentCowIndex AND t_owner_id = $owner_id");
+			$archiveCowTreats->execute();
 
 			header('Location: /cows-manager');
 		} else {

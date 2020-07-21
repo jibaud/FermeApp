@@ -42,7 +42,23 @@
   <meta name="theme-color" content="#2299dd">
 
 
-
+  <!-- Smartlook -->
+  <script type='text/javascript'>
+    window.smartlook || (function(d) {
+      var o = smartlook = function() {
+          o.api.push(arguments)
+        },
+        h = d.getElementsByTagName('head')[0];
+      var c = d.createElement('script');
+      o.api = new Array();
+      c.async = true;
+      c.type = 'text/javascript';
+      c.charset = 'utf-8';
+      c.src = 'https://rec.smartlook.com/recorder.js';
+      h.appendChild(c);
+    })(document);
+    smartlook('init', 'ac835e0ac7161da5c7eb19758f60181ba525f566');
+  </script>
 
 
   <?php // INCLUDES
